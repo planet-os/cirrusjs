@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta http-equiv="content-type" content="text/html; charset=UTF-8">
+    <title></title>
+    <script type='text/javascript' src="d3.js"></script>
+    <script type='text/javascript' src="src/core.js"></script>
+    <script type='text/javascript' src="src/utils.js"></script>
+    <script type='text/javascript' src="src/layout.js"></script>
+    <script type='text/javascript' src="src/attribute.js"></script>
+    <script type='text/javascript' src="src/render.js"></script>
+    <link href="style.css" rel="stylesheet" />
+    <style>
+        .container {
+            width: 600px;
+            height: 400px;
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <svg class="chart">
+        <g class="panel"></g>
+        <g class="axes">
+            <g class="axis-x"></g>
+            <g class="axis-y"></g>
+        </g>
+    </svg>
+</div>
+
+<script>
+
+var data = dadaviz.utils.getRandomData();
+
+var data = [
+  {name: 'name1', values: [7, 2, 3, 4]},
+  {name: 'name2', values:[5, 6, 2, 8]},
+  {name: 'name2', values:[5, 6, 2, 1]},
+  {name: 'name2', values:[5, 6, 2, 1]}
+];
+
+var config = {
+    containerSelector: '.container',
+    type: 'bar',
+    subtype: 'grouped'
+}
+
+var dz = dadaviz.init(config).render(data);
+
+var chartIndex = 0;
+setInterval(function(){
+    var chartSubtypes = ['simple', 'grouped', 'stacked', 'percent'];
+    var chartSubtype = chartSubtypes[chartIndex++ % chartSubtypes.length];
+
+    dz.setConfig({subtype: chartSubtype})
+        .render();
+
+}, 1000);
+
+</script>
+</body>
+</html>

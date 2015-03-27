@@ -1,0 +1,8 @@
+.shape, .line {
+    fill: skyblue;
+    stroke: black;
+}
+.domain, .tick line {
+    fill: none;
+    stroke: black;
+}
