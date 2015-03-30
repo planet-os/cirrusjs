@@ -1,10 +1,10 @@
-dadaviz.getAttr = {
+dadavis.getAttr = {
     bar: {},
     line: {},
     point: {}
 };
 
-dadaviz.getAttr.bar.simple = function(dParent, iParent){
+dadavis.getAttr.bar.simple = function(dParent, iParent){
     return {
         x: function(d, i){ return d.x; },
         y: function(d, i){ return d.y; },
@@ -13,16 +13,16 @@ dadaviz.getAttr.bar.simple = function(dParent, iParent){
     };
 };
 
-dadaviz.getAttr.bar.grouped = function(dParent, iParent){
+dadavis.getAttr.bar.grouped = function(dParent, iParent){
     return {
-        x: function(d, i, j){ return d.x + j * (d.w / d.layerCount - d.w * 0.02); },
+        x: function(d, i, j){ return d.x + j * (d.w / d.layerCount - d.w * 0.04); },
         y: function(d, i){ return d.y; },
-        width: function(d, i){ return d.w / d.layerCount - d.w * 0.02; },
+        width: function(d, i){ return d.w / d.layerCount - d.w * 0.04; },
         height: function(d, i){ return d.h; }
     };
 };
 
-dadaviz.getAttr.bar.percent = function(dParent, iParent){
+dadavis.getAttr.bar.percent = function(dParent, iParent){
     return {
         x: function(d, i){ return d.x; },
         y: function(d, i){ return d.stackedPercentY; },
@@ -31,7 +31,7 @@ dadaviz.getAttr.bar.percent = function(dParent, iParent){
     };
 };
 
-dadaviz.getAttr.bar.stacked = function(dParent, iParent){
+dadavis.getAttr.bar.stacked = function(dParent, iParent){
     return {
         x: function(d, i){ return d.x; },
         y: function(d, i){ return d.stackedY; },
@@ -40,15 +40,14 @@ dadaviz.getAttr.bar.stacked = function(dParent, iParent){
     };
 };
 
-dadaviz.getAttr.point.stacked = function(dParent, iParent){
+dadavis.getAttr.point.stacked = function(dParent, iParent){
     return {
         cx: function(d, i){ return d.x + d.w / 2; },
-        cy: function(d, i){ return d.stackedY; },
-        r: function(d, i){ return 10; }
+        cy: function(d, i){ return d.stackedY; }
     };
 };
 
-dadaviz.getAttr.line.stacked = function(dParent, iParent){
+dadavis.getAttr.line.stacked = function(dParent, iParent){
     return {
         d: function(d, i){
             return 'M' + [

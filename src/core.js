@@ -1,6 +1,6 @@
-var dadaviz = { version: '0.1.0' };
+var dadavis = { version: '0.1.0' };
 
-dadaviz.init = function(_config){
+dadavis.init = function(_config){
 
     var config = {
         containerSelector: '.container',
@@ -11,8 +11,6 @@ dadaviz.init = function(_config){
         subtype: 'stacked'
     }
 
-    dadaviz.utils.override(_config, config);
-
     var cache = {
         chartWidth: 500,
         chartHeight: 500,
@@ -20,13 +18,19 @@ dadaviz.init = function(_config){
         layout: null,
         scaleX: null,
         scaleY: null,
-        previousData: null
+        previousData: null,
+        container: null
     };
+
+    dadavis.utils.override(_config, config);
+
+    cache.container = d3.select(config.containerSelector);
+    cache.container.html(dadavis.template.main);
 
     exports = {};
 
     exports.setConfig = function(newConfig) {
-        dadaviz.utils.override(newConfig, config);
+        dadavis.utils.override(newConfig, config);
         return this;
     };
 
@@ -39,10 +43,9 @@ dadaviz.init = function(_config){
             cache.data = cache.previousData;
         }
 
-        var container = d3.select(config.containerSelector);
         this.setConfig({
-            width: container.node().offsetWidth,
-            height: container.node().offsetHeight
+            width: cache.container.node().offsetWidth,
+            height: cache.container.node().offsetHeight
         });
         cache.chartWidth = config.width - config.margin.left - config.margin.right;
         cache.chartHeight = config.height - config.margin.top - config.margin.bottom;
@@ -50,9 +53,9 @@ dadaviz.init = function(_config){
         cache.scaleX = d3.scale.linear().range([0, cache.chartWidth]);
         cache.scaleY = d3.scale.linear().range([0, cache.chartHeight]);
 
-        cache.layout = dadaviz.getLayout.call(this, config, cache);
+        cache.layout = dadavis.getLayout.call(this, config, cache);
 
-        dadaviz.render.chart(config, cache);
+        dadavis.render.chart(config, cache);
 
         return this;
     };

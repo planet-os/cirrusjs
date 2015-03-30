@@ -1,8 +1,35 @@
 .shape, .line {
     fill: skyblue;
-    stroke: black;
+    stroke: blue;
+}
+.shape.layer1 {
+    fill: orange;
+}
+.shape.layer2 {
+    fill: lime;
+}
+.shape.layer3 {
+    fill: orangered;
+}
+.shape.layer4 {
+    fill: violet;
+}
+.shape.layer5 {
+    fill: yellow;
 }
 .domain, .tick line {
     fill: none;
     stroke: black;
+}
+.axis-x {
+    border-top: 1px solid black;
+}
+.axis-y {
+    border-right: 1px solid black;
+}
+.axis-x .tick, .axis-y .tick {
+    background-color: black;
+}
+.axis-x .label, .axis-y .label {
+    color: black;
 }

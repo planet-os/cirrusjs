@@ -1,4 +1,4 @@
-dadaviz.getLayout = function(config, cache){
+dadavis.getLayout = function(config, cache){
 
     var percentScaleY = cache.scaleY.copy();
     var stackedScaleY = cache.scaleY.copy();
@@ -29,7 +29,8 @@ dadaviz.getLayout = function(config, cache){
                 h: cache.scaleY(dB),
                 stackedPercentH: percentScaleY(dB),
                 stackedH: stackedScaleY(dB),
-                layerCount: cache.data.length
+                layerCount: cache.data.length,
+                layerIndex: i
             };
 
             datum.previous = previous || datum;
