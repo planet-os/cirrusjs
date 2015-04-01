@@ -1,7 +1,10 @@
 dadavis.render = {};
 
 dadavis.render.chart = function(config, cache){
-    var chart = d3.select('.container .chart')
+    var chart = cache.container.style({
+            position: 'absolute'
+        })
+        .select('.chart')
         .attr({
             width: config.width,
             height: config.height
@@ -27,8 +30,12 @@ dadavis.render.chart = function(config, cache){
         dadavis.render[config.type].call(this, config, cache);
     });
 
-    chart.select('.axes').call(function(){
-        dadavis.render.axes.call(this, config, cache);
+    cache.container.select('.axis-x').call(function(){
+        dadavis.render.axisX.call(this, config, cache);
+    });
+
+    cache.container.select('.axis-y').call(function(){
+        dadavis.render.axisY.call(this, config, cache);
     });
 };
 
@@ -38,28 +45,27 @@ dadavis.render.bar = function(config, cache){
 
     shapes.enter().append('rect')
         .attr({'class': function(d, i){ return 'shape layer' + d.layerIndex + ' index' + d.index; }})
-        .attr(dadavis.getAttr[config.type][config.subtype]())
+        .attr(dadavis.getAttr[config.type][config.subtype](config, cache))
         .style({opacity: 0});
 
     shapes.transition()
-        .attr(dadavis.getAttr[config.type][config.subtype]())
+        .attr(dadavis.getAttr[config.type][config.subtype](config, cache))
         .style({opacity: 1});
 
     shapes.exit().remove();
 };
 
 dadavis.render.line = function(config, cache){
-    var dotSize = 2;
 
     var lines = this.selectAll('.line')
         .data(function(d, i){ return d; });
 
     lines.enter().append('path').classed('line', true)
-        .attr(dadavis.getAttr[config.type][config.subtype]())
+        .attr(dadavis.getAttr[config.type][config.subtype](config, cache))
         .style({opacity: 0});
 
     lines.transition()
-        .attr(dadavis.getAttr[config.type][config.subtype]())
+        .attr(dadavis.getAttr[config.type][config.subtype](config, cache))
         .style({opacity: 1});
 
     lines.exit().remove();
@@ -68,121 +74,94 @@ dadavis.render.line = function(config, cache){
         .data(function(d, i){ return d; });
 
     shapes.enter().append('circle').classed('shape', true)
-        .attr(dadavis.getAttr['point'][config.subtype]())
-        .attr({r: dotSize})
+        .attr(dadavis.getAttr['point'][config.subtype](config, cache))
+        .attr({r: config.dotSize})
         .style({opacity: 0});
 
     shapes.transition()
-        .attr(dadavis.getAttr['point'][config.subtype]())
+        .attr(dadavis.getAttr['point'][config.subtype](config, cache))
         .style({opacity: 1});
 
     shapes.exit().remove();
 };
 
-dadavis.render.axes = function(config, cache){
+dadavis.render.axisX = function(config, cache){
 
-    var tickSize = 10;
-    var tickCountY = 5;
+    this.style({
+        width: cache.chartWidth + 'px',
+        height: config.margin.bottom + 'px',
+        position: 'absolute',
+        top: cache.chartHeight + config.margin.top + 'px',
+        left: config.margin.left + 'px'
+    });
 
-    var axisX = cache.container
-        .style({position: 'absolute'}) //TODO should not be here
-        .selectAll('div.axis-x')
-        .data([0]);
-
-    axisX.enter().append('div').classed('axis-x', true)
-        .style({
-            width: cache.chartWidth + 'px',
-            height: config.margin.bottom + 'px',
-            position: 'absolute',
-            top: cache.chartHeight + config.margin.top + 'px',
-            left: config.margin.left + 'px'
-        });
-
-    var labelsX = axisX.selectAll('div.label')
+    var labelsX = this.selectAll('div.label')
         .data(cache.layout[0]);
 
-    labelsX.enter().append('div').classed('label', true);
+    labelsX.enter().append('div').classed('label', true)
+        .style({
+            position: 'absolute'
+        });
 
     labelsX.html(function(d, i){
-            return i;
+            if(config.labelFormatterX){
+                return config.labelFormatterX(d.parentData.keys[i], i);
+            }
+            else{
+                return d.parentData.keys[i];
+            }
         })
+        .style(dadavis.getAttr.axis.labelX(config, cache))
         .style({
-            position: 'absolute',
-            left: function(d, i){
-                return d.index * d.w + d.w / 2 - this.offsetWidth / 2 + 'px';
-            },
-            top: tickSize + 'px'
+            display: function(d, i){ return (i % config.axisXTickSkip) ? 'none' : 'block'; }
         });
 
     labelsX.exit().remove();
 
-    var ticksX = axisX.selectAll('div.tick')
+    var ticksX = this.selectAll('div.tick')
         .data(cache.layout[0]);
 
-    ticksX.enter().append('div').classed('tick', true);
+    ticksX.enter().append('div').classed('tick', true)
+        .style({position: 'absolute'});
 
-    ticksX.style({
-            position: 'absolute',
-            left: function(d, i){ return d.index * d.w + d.w / 2 + 'px'; },
-            width: 1 + 'px',
-            height: tickSize + 'px'
-        });
+    ticksX.style(dadavis.getAttr.axis.tickX(config, cache));
 
     ticksX.exit().remove();
+};
 
-    var axisY = cache.container
-        .selectAll('div.axis-y')
-        .data([0]);
+dadavis.render.axisY = function(config, cache){
 
-    axisY.enter().append('div').classed('axis-y', true)
-        .style({
-            width: config.margin.left + 'px',
-            height: cache.chartHeight + 'px',
-            position: 'absolute',
-            top: config.margin.top + 'px',
-            left: 0 + 'px'
-        });
+    this.style({
+        width: config.margin.left + 'px',
+        height: cache.chartHeight + 'px',
+        position: 'absolute',
+        top: config.margin.top + 'px',
+        left: 0 + 'px'
+    });
 
-    axisY.exit().remove();
-
-    //TODO belongs in layout
-    var axisScaleY = cache.scaleY.copy();
-    // var domainMax = d3.max(cache.data.map(function(d, i){ return d3.sum(d.values); }));
-    var domainMax = d3.max(cache.data.map(function(d, i){ return d3.max(d.values); }));
-    axisScaleY.domain([domainMax, 0]);
-
-    var labelsY = axisY.selectAll('div.label')
-        .data(d3.range(tickCountY));
+    var labelsY = this.selectAll('div.label')
+        .data(cache.axesLayout);
 
     labelsY.enter().append('div').classed('label', true);
 
     labelsY.html(function(d, i){
-            return i * domainMax / 4;
+            if(config.subtype === 'stacked'){
+                return d.stackedLabel;
+            }
+            else{
+                return d.label;
+            }
         })
-        .style({
-            position: 'absolute',
-            left: 0 + 'px',
-            top: function(d, i){
-                return axisScaleY(i * domainMax / 4)  - this.offsetHeight / 2 + 'px';
-            },
-        });
+        .style(dadavis.getAttr.axis.labelY(config, cache));
 
     labelsY.exit().remove();
 
-    var ticksY = axisY.selectAll('div.tick')
-        .data(d3.range(tickCountY));
+    var ticksY = this.selectAll('div.tick')
+        .data(cache.axesLayout);
 
     ticksY.enter().append('div').classed('tick', true);
 
-    ticksY.style({
-            width: tickSize + 'px',
-            height: 1 + 'px',
-            position: 'absolute',
-            left: config.margin.left - tickSize + 'px',
-            top: function(d, i){
-                return axisScaleY(i * domainMax / 4) + 'px';
-            },
-        });
+    ticksY.style(dadavis.getAttr.axis.tickY(config, cache));
 
     ticksY.exit().remove();
 };

@@ -8,7 +8,13 @@ dadavis.init = function(_config){
         height: 500,
         margin: {top: 20, right: 20, bottom: 50, left: 50},
         type: 'bar',
-        subtype: 'stacked'
+        subtype: 'stacked',
+        labelFormatterX: null,
+        axisXAngle: null,
+        tickSize: 10,
+        tickYCount: 5,
+        axisXTickSkip: null,
+        dotSize: 2
     }
 
     var cache = {
@@ -19,7 +25,8 @@ dadavis.init = function(_config){
         scaleX: null,
         scaleY: null,
         previousData: null,
-        container: null
+        container: null,
+        noPadding: false
     };
 
     dadavis.utils.override(_config, config);
@@ -50,10 +57,15 @@ dadavis.init = function(_config){
         cache.chartWidth = config.width - config.margin.left - config.margin.right;
         cache.chartHeight = config.height - config.margin.top - config.margin.bottom;
 
+        if(config.type === 'line'){
+            cache.noPadding = true;
+        }
+
         cache.scaleX = d3.scale.linear().range([0, cache.chartWidth]);
         cache.scaleY = d3.scale.linear().range([0, cache.chartHeight]);
 
-        cache.layout = dadavis.getLayout.call(this, config, cache);
+        cache.layout = dadavis.getLayout.data.call(this, config, cache);
+        cache.axesLayout = dadavis.getLayout.axes.call(this, config, cache);
 
         dadavis.render.chart(config, cache);
 

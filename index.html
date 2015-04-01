@@ -4,15 +4,16 @@
     <meta http-equiv="content-type" content="text/html; charset=UTF-8">
     <title></title>
     <script type='text/javascript' src="d3.js"></script>
-    <script type='text/javascript' src="dadavis-0.1.0.js"></script>
-    <!--
+
+    <!-- <script type='text/javascript' src="dadavis-0.1.0.js"></script> -->
+
     <script type='text/javascript' src="src/core.js"></script>
     <script type='text/javascript' src="src/utils.js"></script>
     <script type='text/javascript' src="src/layout.js"></script>
     <script type='text/javascript' src="src/attribute.js"></script>
     <script type='text/javascript' src="src/template.js"></script>
     <script type='text/javascript' src="src/render.js"></script>
-    -->
+
     <link href="style.css" rel="stylesheet" />
     <style>
         .container {
@@ -27,12 +28,37 @@
 
 <script>
 
-var data = dadavis.utils.getRandomData(20, 5);
+var data = dadavis.utils.getRandomNumericData(20, 5);
 
 var data = [
-  {name: 'name1', values: [7, 2, 3, 4]},
-  {name: 'name2', values:[5, 6, 2, 8]},
-  {name: 'name3', values:[5, 6, 2, 1]}
+  {name: 'name1', keys: [1, 2, 3, 4], values: [7, 2, 3, 4]},
+  {name: 'name2', keys: [1, 2, 3, 4], values:[5, 6, 2, 8]},
+  {name: 'name3', keys: [1, 2, 3, 4], values:[5, 6, 2, 1]}
+];
+
+var data = [
+  {name: 'name1', keys: ['A', 'B', 'C', 'D'], values: [7, 2, 3, 4]},
+  {name: 'name2', keys: ['A', 'B', 'C', 'D'], values:[5, 6, 2, 8]},
+  {name: 'name3', keys: ['A', 'B', 'C', 'D'], values:[5, 6, 2, 1]}
+];
+
+var dateKeys = [
+    'Mon Mar 01 2015 13:55:07 GMT-0400 (EDT)',
+    'Mon Mar 02 2015 13:55:08 GMT-0400 (EDT)',
+    'Mon Mar 03 2015 13:55:09 GMT-0400 (EDT)',
+    'Mon Mar 04 2015 13:55:10 GMT-0400 (EDT)',
+    'Mon Mar 05 2015 13:55:10 GMT-0400 (EDT)',
+    'Mon Mar 06 2015 13:55:10 GMT-0400 (EDT)',
+    'Mon Mar 07 2015 13:55:10 GMT-0400 (EDT)',
+    'Mon Mar 08 2015 13:55:10 GMT-0400 (EDT)',
+    'Mon Mar 09 2015 13:55:10 GMT-0400 (EDT)',
+    'Mon Mar 10 2015 13:55:10 GMT-0400 (EDT)'
+];
+
+var data = [
+  {name: 'name1', keys: dateKeys, values: [7, 2, 3, 4, 8, 10, 11, 14, 2, 6]},
+  {name: 'name2', keys: dateKeys, values: [5, 6, 2, 8, 2, 3, 6, 8, 12, 10]},
+  {name: 'name3', keys: dateKeys, values: [5, 6, 2, 1, 7, 8, 12, 7, 6, 3]}
 ];
 
 var config = {
@@ -41,18 +67,28 @@ var config = {
     subtype: 'grouped'
 }
 
+var config = {
+    containerSelector: '.container',
+    type: 'line',
+    subtype: 'stacked',
+    axisXAngle: -30,
+    axisXTickSkip: 2,
+    tickYCount: 5,
+    labelFormatterX: function(d, i){ return d3.time.format('%e %b %Y')(new Date(d)); }
+}
+
 var ds = dadavis.init(config).render(data);
 
-var chartIndex = 0;
-setInterval(function(){
-    data = dadavis.utils.getRandomData(30, 5);
-    var chartSubtypes = ['simple', 'grouped', 'stacked', 'percent'];
-    var chartSubtype = chartSubtypes[chartIndex++ % chartSubtypes.length];
-
-    ds.setConfig({subtype: chartSubtype})
-        .render(data);
-
-}, 1000);
+// var chartIndex = 0;
+// setInterval(function(){
+//     data = dadavis.utils.getRandomData(30, 5);
+//     var chartSubtypes = ['simple', 'grouped', 'stacked', 'percent'];
+//     var chartSubtype = chartSubtypes[chartIndex++ % chartSubtypes.length];
+//
+//     ds.setConfig({subtype: chartSubtype})
+//         .render(data);
+//
+// }, 1000);
 
 </script>
 </body>
