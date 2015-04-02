@@ -135,17 +135,19 @@ dadavis.getAttr.axis.tickX = function(config, cache){
             }
         },
         width: 1 + 'px',
-        height: function(d, i){ return ((i % config.axisXTickSkip) ? config.tickSize / 3 : config.tickSize) + 'px'; }
+        height: function(d, i){ return ((i % config.axisXTickSkip) ? config.minorTickSize : config.tickSize) + 'px'; }
     };
 };
 
 dadavis.getAttr.axis.labelY = function(config, cache){
     return {
         position: 'absolute',
-        left: 0 + 'px',
+        left: function(d, i){
+            var labelW = this.offsetWidth;
+            return config.margin.left - labelW - config.tickSize + 'px';
+        },
         top: function(d, i){
-            var labelH = 10;
-            // var labelH = this.offsetHeight;
+            var labelH = this.offsetHeight;
             return d.labelY - labelH / 2 + 'px';
         }
     };

@@ -40,7 +40,7 @@ dadavis.getLayout.data = function(config, cache){
                 stackedH: stackedScaleY(dB),
                 layerCount: cache.data.length,
                 layerIndex: i,
-                key: d.keys[i]
+                key: d.keys ? d.keys[i] : i
             };
 
             datum.previous = previous || datum;

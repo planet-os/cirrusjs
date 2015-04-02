@@ -18,6 +18,7 @@ dadavis.init = function(_config) {
         labelFormatterX: null,
         axisXAngle: null,
         tickSize: 10,
+        minorTickSize: 3,
         tickYCount: 5,
         axisXTickSkip: null,
         dotSize: 2
@@ -83,15 +84,15 @@ dadavis.utils.computeRandomNumericArray = function(count, min, max) {
     });
 };
 
-dadavis.utils.computeRandomTimeArray = function(count, min, max) {
+dadavis.utils.computeRandomTimeArray = function(count, dateNow) {
+    var dayInMillis = 1e3 * 60 * 60 * 24;
+    var dateNow = new Date().getTime() - count * dayInMillis;
     return d3.range(count || 0).map(function(d, i) {
-        return ~~(Math.random() * (max - min) + min);
+        return dateNow + i * dayInMillis;
     });
 };
 
-dadavis.utils.getRandomNumericData = function(maxShapeCount, maxLayerCount) {
-    var shapeCount = ~~(Math.random() * (maxShapeCount || 10)) + 2;
-    var layerCount = ~~(Math.random() * (maxLayerCount || 5)) + 2;
+dadavis.utils.getRandomNumericData = function(shapeCount, layerCount) {
     return d3.range(layerCount).map(function(d, i) {
         return {
             name: "name" + i,
@@ -100,20 +101,20 @@ dadavis.utils.getRandomNumericData = function(maxShapeCount, maxLayerCount) {
     });
 };
 
-dadavis.utils.getRandomTimeData = function(maxShapeCount, maxLayerCount) {
-    var shapeCount = ~~(Math.random() * (maxShapeCount || 10)) + 2;
-    var layerCount = ~~(Math.random() * (maxLayerCount || 5)) + 2;
+dadavis.utils.getRandomTimeData = function(shapeCount, layerCount) {
+    var dateNow = new Date().getTime();
     return d3.range(layerCount).map(function(d, i) {
         return {
             name: "name" + i,
-            values: dadavis.utils.computeRandomTimeArray(shapeCount, 10, 100)
+            values: dadavis.utils.computeRandomNumericArray(shapeCount, 10, 100),
+            keys: dadavis.utils.computeRandomTimeArray(shapeCount, dateNow)
         };
     });
 };
 
 dadavis.template = {};
 
-dadavis.template.main = "" + '<svg class="chart">' + '<g class="panel"></g>' + "</svg>" + '<div class="axis-x"></div>' + '<div class="axis-y"></div>';
+dadavis.template.main = '<div class="chart">' + '<svg class="svg-shapes">' + '<g class="panel"></g>' + "</svg>" + '<div class="axis-x"></div>' + '<div class="axis-y"></div>' + "</div>";
 
 dadavis.getLayout = {
     data: {},
@@ -154,7 +155,7 @@ dadavis.getLayout.data = function(config, cache) {
                 stackedH: stackedScaleY(dB),
                 layerCount: cache.data.length,
                 layerIndex: i,
-                key: d.keys[i]
+                key: d.keys ? d.keys[i] : i
             };
             datum.previous = previous || datum;
             previous = datum;
@@ -340,7 +341,7 @@ dadavis.getAttr.axis.tickX = function(config, cache) {
         },
         width: 1 + "px",
         height: function(d, i) {
-            return (i % config.axisXTickSkip ? config.tickSize / 3 : config.tickSize) + "px";
+            return (i % config.axisXTickSkip ? config.minorTickSize : config.tickSize) + "px";
         }
     };
 };
@@ -348,9 +349,12 @@ dadavis.getAttr.axis.tickX = function(config, cache) {
 dadavis.getAttr.axis.labelY = function(config, cache) {
     return {
         position: "absolute",
-        left: 0 + "px",
+        left: function(d, i) {
+            var labelW = this.offsetWidth;
+            return config.margin.left - labelW - config.tickSize + "px";
+        },
         top: function(d, i) {
-            var labelH = 10;
+            var labelH = this.offsetHeight;
             return d.labelY - labelH / 2 + "px";
         }
     };
@@ -371,9 +375,9 @@ dadavis.getAttr.axis.tickY = function(config, cache) {
 dadavis.render = {};
 
 dadavis.render.chart = function(config, cache) {
-    var chart = cache.container.style({
+    var chart = cache.container.select(".chart").style({
         position: "absolute"
-    }).select(".chart").attr({
+    }).select(".svg-shapes").attr({
         width: config.width,
         height: config.height
     });
@@ -452,10 +456,11 @@ dadavis.render.axisX = function(config, cache) {
         position: "absolute"
     });
     labelsX.html(function(d, i) {
+        var key = d.parentData.keys ? d.parentData.keys[i] : i;
         if (config.labelFormatterX) {
-            return config.labelFormatterX(d.parentData.keys[i], i);
+            return config.labelFormatterX(key, i);
         } else {
-            return d.parentData.keys[i];
+            return key;
         }
     }).style(dadavis.getAttr.axis.labelX(config, cache)).style({
         display: function(d, i) {
@@ -494,3 +499,10 @@ dadavis.render.axisY = function(config, cache) {
     ticksY.style(dadavis.getAttr.axis.tickY(config, cache));
     ticksY.exit().remove();
 };
+
+if (typeof define === "function" && define.amd) {
+    define(dadavis);
+} else if (typeof module === "object" && module.exports) {
+    var d3 = require("d3");
+    module.exports = dadavis;
+}

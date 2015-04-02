@@ -12,6 +12,7 @@ dadavis.init = function(_config){
         labelFormatterX: null,
         axisXAngle: null,
         tickSize: 10,
+        minorTickSize: 3,
         tickYCount: 5,
         axisXTickSkip: null,
         dotSize: 2

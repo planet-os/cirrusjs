@@ -1,10 +1,10 @@
 dadavis.render = {};
 
 dadavis.render.chart = function(config, cache){
-    var chart = cache.container.style({
+    var chart = cache.container.select('.chart').style({
             position: 'absolute'
         })
-        .select('.chart')
+        .select('.svg-shapes')
         .attr({
             width: config.width,
             height: config.height
@@ -104,11 +104,12 @@ dadavis.render.axisX = function(config, cache){
         });
 
     labelsX.html(function(d, i){
+            var key = d.parentData.keys ? d.parentData.keys[i] : i;
             if(config.labelFormatterX){
-                return config.labelFormatterX(d.parentData.keys[i], i);
+                return config.labelFormatterX(key, i);
             }
             else{
-                return d.parentData.keys[i];
+                return key;
             }
         })
         .style(dadavis.getAttr.axis.labelX(config, cache))
@@ -165,3 +166,11 @@ dadavis.render.axisY = function(config, cache){
 
     ticksY.exit().remove();
 };
+
+if (typeof define === "function" && define.amd){
+    define(dadavis);
+}
+else if (typeof module === "object" && module.exports){
+    var d3 = require('d3');
+    module.exports = dadavis;
+}
