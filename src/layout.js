@@ -16,13 +16,17 @@ dadavis.getLayout.data = function(config, cache){
         cache.scaleX.domain([0, val.length - 1]);
         cache.scaleY.domain([0, d3.max(val)]);
 
-        var transposed = d3.transpose(cache.data.map(function(d, i){ return d.values; }));
+        var transposed = d3.transpose(cache.data.map(function(d, i){
+            return d.values;
+        }));
 
         var previous = null;
         return val.map(function(dB, iB){
 
             percentScaleY.domain([0, d3.sum(transposed[iB])]);
-            stackedScaleY.domain([0, d3.max(transposed.map(function(d, i){ return d3.sum(d); }))]);
+            stackedScaleY.domain([0, d3.max(transposed.map(function(d, i){
+                return d3.sum(d);
+            }))]);
 
             var datum = {
                 value: dB,
@@ -31,8 +35,8 @@ dadavis.getLayout.data = function(config, cache){
                 paddedX: paddedScaleX(iB),
                 x: cache.scaleX(iB),
                 y: cache.chartHeight - cache.scaleY(dB),
-                stackedPercentY: cache.chartHeight - percentScaleY(d3.sum(transposed[iB].slice(0, i+1))),
-                stackedY: cache.chartHeight - stackedScaleY(d3.sum(transposed[iB].slice(0, i+1))),
+                stackedPercentY: cache.chartHeight - percentScaleY(d3.sum(transposed[iB].slice(0, i + 1))),
+                stackedY: cache.chartHeight - stackedScaleY(d3.sum(transposed[iB].slice(0, i + 1))),
                 paddedW: paddedScaleX(1),
                 w: cache.scaleX(1),
                 h: cache.scaleY(dB),
@@ -55,11 +59,15 @@ dadavis.getLayout.data = function(config, cache){
 
 dadavis.getLayout.axes = function(config, cache){
     var axisStackedScaleY = cache.scaleY.copy();
-    var stackedDomainMax = d3.max(cache.data.map(function(d, i){ return d3.sum(d.values); }));
+    var stackedDomainMax = d3.max(cache.data.map(function(d, i){
+        return d3.sum(d.values);
+    }));
     axisStackedScaleY.domain([stackedDomainMax, 0]);
 
     var axisScaleY = cache.scaleY.copy();
-    var domainMax = d3.max(cache.data.map(function(d, i){ return d3.max(d.values); }));
+    var domainMax = d3.max(cache.data.map(function(d, i){
+        return d3.max(d.values);
+    }));
     axisScaleY.domain([domainMax, 0]);
 
     return d3.range(config.tickYCount).map(function(d, i){

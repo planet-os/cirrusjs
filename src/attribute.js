@@ -7,13 +7,19 @@ dadavis.getAttr = {
 
 dadavis.getAttr.bar.simple = function(config, cache){
     return {
-        x: function(d, i){ return d.paddedX + d.paddedW / 2; },
-        y: function(d, i){ return d.y + d.h / 2; },
+        x: function(d, i){
+            return d.paddedX + d.paddedW / 2;
+        },
+        y: function(d, i){
+            return d.y + d.h / 2;
+        },
         width: function(d, i){
             var gutterW = d.paddedW / 100 * config.gutterPercent;
             return d.paddedW - gutterW;
         },
-        height: function(d, i){ return d.h; }
+        height: function(d, i){
+            return d.h;
+        }
     };
 };
 
@@ -24,36 +30,52 @@ dadavis.getAttr.bar.grouped = function(config, cache){
             var groupedW = d.paddedW / d.layerCount - gutterW;
             return d.paddedX + j * (groupedW) + groupedW / 2 + (d.layerCount * gutterW) / 2;
         },
-        y: function(d, i){ return d.y + d.h / 2; },
+        y: function(d, i){
+            return d.y + d.h / 2;
+        },
         width: function(d, i){
             var gutterW = (d.paddedW / d.layerCount) / 100 * gutterPercent;
             return d.paddedW / d.layerCount - gutterW;
         },
-        height: function(d, i){ return d.h; }
+        height: function(d, i){
+            return d.h;
+        }
     };
 };
 
 dadavis.getAttr.bar.percent = function(config, cache){
     return {
-        x: function(d, i){ return d.paddedX + d.paddedW / 2; },
-        y: function(d, i){ return d.stackedPercentY + d.stackedPercentH / 2; },
+        x: function(d, i){
+            return d.paddedX + d.paddedW / 2;
+        },
+        y: function(d, i){
+            return d.stackedPercentY + d.stackedPercentH / 2;
+        },
         width: function(d, i){
             var gutterW = d.paddedW / 100 * config.gutterPercent;
             return d.paddedW - gutterW;
         },
-        height: function(d, i){ return d.stackedPercentH; }
+        height: function(d, i){
+            return d.stackedPercentH;
+        }
     };
 };
 
 dadavis.getAttr.bar.stacked = function(config, cache){
     return {
-        x: function(d, i){ return d.paddedX + d.paddedW / 2; },
-        y: function(d, i){ return d.stackedY + d.stackedH / 2; },
+        x: function(d, i){
+            return d.paddedX + d.paddedW / 2;
+        },
+        y: function(d, i){
+            return d.stackedY + d.stackedH / 2;
+        },
         width: function(d, i){
             var gutterW = d.paddedW / 100 * config.gutterPercent;
             return d.paddedW - gutterW;
         },
-        height: function(d, i){ return d.stackedH; }
+        height: function(d, i){
+            return d.stackedH;
+        }
     };
 };
 
@@ -68,13 +90,17 @@ dadavis.getAttr.point.stacked = function(config, cache){
             }
         },
         // cx: function(d, i){ return d.x + d.w / 2; },
-        cy: function(d, i){ return d.stackedY; }
+        cy: function(d, i){
+            return d.stackedY;
+        }
     };
 };
 
 dadavis.getAttr.line.simple = function(config, cache){
     return cache.layout.map(function(d, i){
-        return d3.merge(d.map(function(dB, iB){ return [dB.x, dB.y]; }));
+        return d3.merge(d.map(function(dB, iB){
+            return [dB.x, dB.y];
+        }));
     });
 };
 
@@ -146,7 +172,9 @@ dadavis.getAttr.axis.tickX = function(config, cache){
             }
         },
         width: 1 + 'px',
-        height: function(d, i){ return ((i % config.axisXTickSkip) ? config.minorTickSize : config.tickSize) + 'px'; }
+        height: function(d, i){
+            return ((i % config.axisXTickSkip) ? config.minorTickSize : config.tickSize) + 'px';
+        }
     };
 };
 

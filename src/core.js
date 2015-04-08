@@ -1,4 +1,4 @@
-var dadavis = { version: '0.1.0' };
+var dadavis = {version: '0.1.0'};
 
 dadavis.init = function(_config){
 
@@ -38,17 +38,17 @@ dadavis.init = function(_config){
 
     exports = {};
 
-    exports.setConfig = function(newConfig) {
+    exports.setConfig = function(newConfig){
         dadavis.utils.override(newConfig, config);
         return this;
     };
 
-    exports.render = function(data) {
-        if (data) {
+    exports.render = function(data){
+        if(data){
             cache.previousData = data;
             cache.data = data;
         }
-        else {
+        else{
             cache.data = cache.previousData;
         }
 
