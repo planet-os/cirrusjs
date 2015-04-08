@@ -7,36 +7,52 @@ dadavis.getAttr = {
 
 dadavis.getAttr.bar.simple = function(config, cache){
     return {
-        x: function(d, i){ return d.paddedX; },
-        y: function(d, i){ return d.y; },
-        width: function(d, i){ return d.paddedW; },
+        x: function(d, i){ return d.paddedX + d.paddedW / 2; },
+        y: function(d, i){ return d.y + d.h / 2; },
+        width: function(d, i){
+            var gutterW = d.paddedW / 100 * config.gutterPercent;
+            return d.paddedW - gutterW;
+        },
         height: function(d, i){ return d.h; }
     };
 };
 
 dadavis.getAttr.bar.grouped = function(config, cache){
     return {
-        x: function(d, i, j){ return d.paddedX + j * (d.paddedW / d.layerCount - d.w * 0.04); },
-        y: function(d, i){ return d.y; },
-        width: function(d, i){ return d.paddedW / d.layerCount - d.paddedW * 0.04; },
+        x: function(d, i, j){
+            var gutterW = (d.paddedW / d.layerCount) / 100 * config.gutterPercent;
+            var groupedW = d.paddedW / d.layerCount - gutterW;
+            return d.paddedX + j * (groupedW) + groupedW / 2 + (d.layerCount * gutterW) / 2;
+        },
+        y: function(d, i){ return d.y + d.h / 2; },
+        width: function(d, i){
+            var gutterW = (d.paddedW / d.layerCount) / 100 * gutterPercent;
+            return d.paddedW / d.layerCount - gutterW;
+        },
         height: function(d, i){ return d.h; }
     };
 };
 
 dadavis.getAttr.bar.percent = function(config, cache){
     return {
-        x: function(d, i){ return d.paddedX; },
-        y: function(d, i){ return d.stackedPercentY; },
-        width: function(d, i){ return d.paddedW; },
+        x: function(d, i){ return d.paddedX + d.paddedW / 2; },
+        y: function(d, i){ return d.stackedPercentY + d.stackedPercentH / 2; },
+        width: function(d, i){
+            var gutterW = d.paddedW / 100 * config.gutterPercent;
+            return d.paddedW - gutterW;
+        },
         height: function(d, i){ return d.stackedPercentH; }
     };
 };
 
 dadavis.getAttr.bar.stacked = function(config, cache){
     return {
-        x: function(d, i){ return d.paddedX; },
-        y: function(d, i){ return d.stackedY; },
-        width: function(d, i){ return d.paddedW; },
+        x: function(d, i){ return d.paddedX + d.paddedW / 2; },
+        y: function(d, i){ return d.stackedY + d.stackedH / 2; },
+        width: function(d, i){
+            var gutterW = d.paddedW / 100 * config.gutterPercent;
+            return d.paddedW - gutterW;
+        },
         height: function(d, i){ return d.stackedH; }
     };
 };
@@ -61,15 +77,15 @@ dadavis.getAttr.line.stacked = function(config, cache){
         d: function(d, i){
             if(cache.noPadding){
                 return 'M' + [
-                    [d.previous.x, d.previous.stackedY],
-                    [d.x, d.stackedY]
-                ].join('L');
+                        [d.previous.x, d.previous.stackedY],
+                        [d.x, d.stackedY]
+                    ].join('L');
             }
             else{
                 return 'M' + [
-                    [d.previous.paddedX + d.paddedW / 2, d.previous.stackedY],
-                    [d.paddedX + d.paddedW / 2, d.stackedY]
-                ].join('L');
+                        [d.previous.paddedX + d.paddedW / 2, d.previous.stackedY],
+                        [d.paddedX + d.paddedW / 2, d.stackedY]
+                    ].join('L');
             }
         }
     };

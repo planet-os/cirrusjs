@@ -4,6 +4,7 @@
     <meta http-equiv="content-type" content="text/html; charset=UTF-8">
     <title></title>
     <script type='text/javascript' src="d3.js"></script>
+    <script type='text/javascript' src="two.js"></script>
 
     <!-- <script type='text/javascript' src="dadavis-0.1.0.js"></script> -->
 
@@ -17,7 +18,7 @@
     <link href="style.css" rel="stylesheet" />
     <style>
         .container {
-            width: 600px;
+            width: 800px;
             height: 400px;
             margin-top: 100px;
         }
@@ -68,12 +69,12 @@ var config = {
     subtype: 'grouped'
 }
 
-var data = dadavis.utils.getRandomTimeData(100, 5);
+var data = dadavis.utils.getRandomTimeData(4, 5);
 
 var config = {
     containerSelector: '.container',
     margin: {top: 10, right: 10, bottom: 40, left: 70},
-    type: 'bar',
+    type: 'line',
     subtype: 'stacked',
     axisXAngle: -30,
     axisXTickSkip: 15,

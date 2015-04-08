@@ -1,15 +1,59 @@
 dadavis.render = {};
 
 dadavis.render.chart = function(config, cache){
-    var chart = cache.container.select('.chart').style({
+    var chartContainer = cache.container.select('.chart').style({
             position: 'absolute'
-        })
-        .select('.svg-shapes')
-        .attr({
-            width: config.width,
-            height: config.height
         });
 
+    var panelContainer = chartContainer.select('.panel').style({
+            position: 'absolute',
+            left: config.margin.left + 'px',
+            top: config.margin.top + 'px'
+        });
+
+    var params = {
+            width: config.width,
+            height: config.height,
+            type: Two.Types.svg
+        };
+    var two = new Two(params).appendTo(panelContainer.node());
+
+    var panel = two.makeGroup();
+
+     var rectAttr = dadavis.getAttr[config.type][config.subtype](config, cache);
+    var colors = ['skyblue', 'orange', 'lime', 'orangered', 'violet', 'yellow', 'brown', 'pink'];
+
+    console.time('rendering');
+
+    cache.layout.forEach(function(d, i){
+        var line = d3.merge(d.map(function(dB, iB){ return [dB.x, dB.y]; }));
+        var curve = two.makePolygon.apply(two, line);
+        var layer = two.makeGroup(curve);
+        panel.add(layer);
+    });
+
+    //cache.layout.forEach(function(d, i){
+    //    var layer = two.makeGroup();
+    //    d.forEach(function(dB, iB){
+    //        var layout = d[iB];
+    //        var x = rectAttr.x(layout, iB, i);
+    //        var y = rectAttr.y(layout, iB, i);
+    //        var width = rectAttr.width(layout, iB, i);
+    //        var height = rectAttr.height(layout, iB, i);
+    //
+    //        var rect = two.makeRectangle(x, y, width, height);
+    //        rect.fill = colors[i];
+    //        layer.add(rect);
+    //    });
+    //    panel.add(layer);
+    //});
+    console.timeEnd('rendering');
+
+    console.time('update');
+    two.update();
+    console.timeEnd('update');
+
+/*
     var panelAttr = {
         transform: 'translate(' + [config.margin.left, config.margin.top] + ')',
         height: config.chartHeight,
@@ -29,6 +73,7 @@ dadavis.render.chart = function(config, cache){
     layers.call(function(){
         dadavis.render[config.type].call(this, config, cache);
     });
+    */
 
     cache.container.select('.axis-x').call(function(){
         dadavis.render.axisX.call(this, config, cache);

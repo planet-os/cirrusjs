@@ -15,8 +15,9 @@ dadavis.init = function(_config){
         minorTickSize: 3,
         tickYCount: 5,
         axisXTickSkip: null,
-        dotSize: 2
-    }
+        dotSize: 2,
+        gutterPercent: 10
+    };
 
     var cache = {
         chartWidth: 500,
@@ -74,4 +75,4 @@ dadavis.init = function(_config){
     };
 
     return exports;
-}
+};
