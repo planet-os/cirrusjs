@@ -21,7 +21,8 @@ dadavis.init = function(_config) {
         minorTickSize: 3,
         tickYCount: 5,
         axisXTickSkip: null,
-        dotSize: 2
+        dotSize: 2,
+        gutterPercent: 10
     };
     var cache = {
         chartWidth: 500,
@@ -114,7 +115,7 @@ dadavis.utils.getRandomTimeData = function(shapeCount, layerCount) {
 
 dadavis.template = {};
 
-dadavis.template.main = '<div class="chart">' + '<svg class="svg-shapes">' + '<g class="panel"></g>' + "</svg>" + '<div class="axis-x"></div>' + '<div class="axis-y"></div>' + "</div>";
+dadavis.template.main = '<div class="chart">' + '<div class="panel"></div>' + '<div class="axis-x"></div>' + '<div class="axis-y"></div>' + "</div>";
 
 dadavis.getLayout = {
     data: {},
@@ -194,13 +195,14 @@ dadavis.getAttr = {
 dadavis.getAttr.bar.simple = function(config, cache) {
     return {
         x: function(d, i) {
-            return d.paddedX;
+            return d.paddedX + d.paddedW / 2;
         },
         y: function(d, i) {
-            return d.y;
+            return d.y + d.h / 2;
         },
         width: function(d, i) {
-            return d.paddedW;
+            var gutterW = d.paddedW / 100 * config.gutterPercent;
+            return d.paddedW - gutterW;
         },
         height: function(d, i) {
             return d.h;
@@ -211,13 +213,16 @@ dadavis.getAttr.bar.simple = function(config, cache) {
 dadavis.getAttr.bar.grouped = function(config, cache) {
     return {
         x: function(d, i, j) {
-            return d.paddedX + j * (d.paddedW / d.layerCount - d.w * .04);
+            var gutterW = d.paddedW / d.layerCount / 100 * config.gutterPercent;
+            var groupedW = d.paddedW / d.layerCount - gutterW;
+            return d.paddedX + j * groupedW + groupedW / 2 + d.layerCount * gutterW / 2;
         },
         y: function(d, i) {
-            return d.y;
+            return d.y + d.h / 2;
         },
         width: function(d, i) {
-            return d.paddedW / d.layerCount - d.paddedW * .04;
+            var gutterW = d.paddedW / d.layerCount / 100 * gutterPercent;
+            return d.paddedW / d.layerCount - gutterW;
         },
         height: function(d, i) {
             return d.h;
@@ -228,13 +233,14 @@ dadavis.getAttr.bar.grouped = function(config, cache) {
 dadavis.getAttr.bar.percent = function(config, cache) {
     return {
         x: function(d, i) {
-            return d.paddedX;
+            return d.paddedX + d.paddedW / 2;
         },
         y: function(d, i) {
-            return d.stackedPercentY;
+            return d.stackedPercentY + d.stackedPercentH / 2;
         },
         width: function(d, i) {
-            return d.paddedW;
+            var gutterW = d.paddedW / 100 * config.gutterPercent;
+            return d.paddedW - gutterW;
         },
         height: function(d, i) {
             return d.stackedPercentH;
@@ -245,13 +251,14 @@ dadavis.getAttr.bar.percent = function(config, cache) {
 dadavis.getAttr.bar.stacked = function(config, cache) {
     return {
         x: function(d, i) {
-            return d.paddedX;
+            return d.paddedX + d.paddedW / 2;
         },
         y: function(d, i) {
-            return d.stackedY;
+            return d.stackedY + d.stackedH / 2;
         },
         width: function(d, i) {
-            return d.paddedW;
+            var gutterW = d.paddedW / 100 * config.gutterPercent;
+            return d.paddedW - gutterW;
         },
         height: function(d, i) {
             return d.stackedH;
@@ -274,16 +281,39 @@ dadavis.getAttr.point.stacked = function(config, cache) {
     };
 };
 
+dadavis.getAttr.line.simple = function(config, cache) {
+    return cache.layout.map(function(d, i) {
+        return d3.merge(d.map(function(dB, iB) {
+            return [ dB.x, dB.y ];
+        }));
+    });
+};
+
 dadavis.getAttr.line.stacked = function(config, cache) {
-    return {
-        d: function(d, i) {
-            if (cache.noPadding) {
-                return "M" + [ [ d.previous.x, d.previous.stackedY ], [ d.x, d.stackedY ] ].join("L");
-            } else {
-                return "M" + [ [ d.previous.paddedX + d.paddedW / 2, d.previous.stackedY ], [ d.paddedX + d.paddedW / 2, d.stackedY ] ].join("L");
-            }
+    return cache.layout.map(function(d, i) {
+        return d3.merge(d.map(function(dB, iB) {
+            return [ dB.x, dB.stackedY ];
+        }));
+    });
+};
+
+dadavis.getAttr.line.area = function(config, cache) {
+    return cache.layout.map(function(d, i) {
+        var line = d.map(function(dB, iB) {
+            return [ dB.x, dB.stackedY ];
+        });
+        var previousLine = null;
+        if (i === 0) {
+            previousLine = d.map(function(dB, iB) {
+                return [ dB.x, cache.chartHeight ];
+            }).reverse();
+        } else {
+            previousLine = cache.layout[i - 1].map(function(dB, iB) {
+                return [ dB.x, dB.stackedY ];
+            }).reverse();
         }
-    };
+        return d3.merge(line.concat(previousLine));
+    });
 };
 
 dadavis.getAttr.axis.labelX = function(config, cache) {
@@ -322,7 +352,6 @@ dadavis.getAttr.axis.labelX = function(config, cache) {
                 } else {
                     return d.index * d.paddedW + d.paddedW / 2 - this.offsetWidth / 2 + "px";
                 }
-                return d.index * d.w + d.w / 2 - this.offsetWidth / 2 + "px";
             },
             top: config.tickSize + "px"
         };
@@ -375,24 +404,56 @@ dadavis.getAttr.axis.tickY = function(config, cache) {
 dadavis.render = {};
 
 dadavis.render.chart = function(config, cache) {
-    var chart = cache.container.select(".chart").style({
+    var chartContainer = cache.container.select(".chart").style({
         position: "absolute"
-    }).select(".svg-shapes").attr({
+    });
+    var panelContainer = chartContainer.select(".panel").style({
+        position: "absolute",
+        left: config.margin.left + "px",
+        top: config.margin.top + "px"
+    });
+    var params = {
         width: config.width,
-        height: config.height
-    });
-    var panelAttr = {
-        transform: "translate(" + [ config.margin.left, config.margin.top ] + ")",
-        height: config.chartHeight,
-        width: config.chartWidth
+        height: config.height,
+        type: Two.Types.svg
     };
-    var panel = chart.select(".panel").attr(panelAttr);
-    var layers = panel.selectAll(".layer").data(cache.layout);
-    layers.enter().append("g").classed("layer", true);
-    layers.exit().remove();
-    layers.call(function() {
-        dadavis.render[config.type].call(this, config, cache);
-    });
+    var two = new Two(params).appendTo(panelContainer.node());
+    var panel = two.makeGroup();
+    var shapeAttr = dadavis.getAttr[config.type][config.subtype](config, cache);
+    var colors = [ "skyblue", "orange", "lime", "orangered", "violet", "yellow", "brown", "pink" ];
+    console.time("rendering");
+    if (config.type === "line") {
+        cache.layout.forEach(function(d, i) {
+            var curve = two.makePolygon.apply(two, shapeAttr[i].concat([ true ]));
+            if (config.subtype === "area") {
+                curve.fill = colors[i];
+            } else {
+                curve.fill = "transparent";
+            }
+            curve.stroke = colors[i];
+            var layer = two.makeGroup(curve);
+            panel.add(layer);
+        });
+    } else {
+        cache.layout.forEach(function(d, i) {
+            var layer = two.makeGroup();
+            d.forEach(function(dB, iB) {
+                var layout = d[iB];
+                var x = shapeAttr.x(layout, iB, i);
+                var y = shapeAttr.y(layout, iB, i);
+                var width = shapeAttr.width(layout, iB, i);
+                var height = shapeAttr.height(layout, iB, i);
+                var rect = two.makeRectangle(x, y, width, height);
+                rect.fill = colors[i];
+                layer.add(rect);
+            });
+            panel.add(layer);
+        });
+    }
+    console.timeEnd("rendering");
+    console.time("update");
+    two.update();
+    console.timeEnd("update");
     cache.container.select(".axis-x").call(function() {
         dadavis.render.axisX.call(this, config, cache);
     });

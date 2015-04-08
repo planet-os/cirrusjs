@@ -27,7 +27,12 @@ dadavis.render.chart = function(config, cache){
     if(config.type === 'line'){
         cache.layout.forEach(function(d, i){
             var curve = two.makePolygon.apply(two, shapeAttr[i].concat([true]));
-            curve.fill = 'transparent';
+            if(config.subtype === 'area'){
+                curve.fill = colors[i];
+            }
+            else{
+                curve.fill = 'transparent';
+            }
             curve.stroke = colors[i];
             var layer = two.makeGroup(curve);
             panel.add(layer);

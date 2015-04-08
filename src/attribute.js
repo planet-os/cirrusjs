@@ -112,6 +112,28 @@ dadavis.getAttr.line.stacked = function(config, cache){
     });
 };
 
+dadavis.getAttr.line.area = function(config, cache){
+    return cache.layout.map(function(d, i){
+        var line = d.map(function(dB, iB){
+            return [dB.x, dB.stackedY];
+        });
+
+        var previousLine = null;
+        if(i === 0){
+            previousLine = d.map(function(dB, iB){
+                return [dB.x, cache.chartHeight];
+            }).reverse();
+        }
+        else{
+            previousLine = cache.layout[i - 1].map(function(dB, iB){
+                return [dB.x, dB.stackedY];
+            }).reverse();
+        }
+
+        return d3.merge(line.concat(previousLine));
+    });
+};
+
 dadavis.getAttr.axis.labelX = function(config, cache){
     var labelAttr = {};
     if(config.axisXAngle < 0){
@@ -153,7 +175,6 @@ dadavis.getAttr.axis.labelX = function(config, cache){
                 else{
                     return d.index * d.paddedW + d.paddedW / 2 - this.offsetWidth / 2 + 'px';
                 }
-                return d.index * d.w + d.w / 2 - this.offsetWidth / 2 + 'px';
             },
             top: config.tickSize + 'px'
         }
