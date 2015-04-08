@@ -72,23 +72,18 @@ dadavis.getAttr.point.stacked = function(config, cache){
     };
 };
 
+dadavis.getAttr.line.simple = function(config, cache){
+    return cache.layout.map(function(d, i){
+        return d3.merge(d.map(function(dB, iB){ return [dB.x, dB.y]; }));
+    });
+};
+
 dadavis.getAttr.line.stacked = function(config, cache){
-    return {
-        d: function(d, i){
-            if(cache.noPadding){
-                return 'M' + [
-                        [d.previous.x, d.previous.stackedY],
-                        [d.x, d.stackedY]
-                    ].join('L');
-            }
-            else{
-                return 'M' + [
-                        [d.previous.paddedX + d.paddedW / 2, d.previous.stackedY],
-                        [d.paddedX + d.paddedW / 2, d.stackedY]
-                    ].join('L');
-            }
-        }
-    };
+    return cache.layout.map(function(d, i){
+        return d3.merge(d.map(function(dB, iB){
+            return [dB.x, dB.stackedY];
+        }));
+    });
 };
 
 dadavis.getAttr.axis.labelX = function(config, cache){

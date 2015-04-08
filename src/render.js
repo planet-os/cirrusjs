@@ -2,78 +2,59 @@ dadavis.render = {};
 
 dadavis.render.chart = function(config, cache){
     var chartContainer = cache.container.select('.chart').style({
-            position: 'absolute'
-        });
+        position: 'absolute'
+    });
 
     var panelContainer = chartContainer.select('.panel').style({
-            position: 'absolute',
-            left: config.margin.left + 'px',
-            top: config.margin.top + 'px'
-        });
+        position: 'absolute',
+        left: config.margin.left + 'px',
+        top: config.margin.top + 'px'
+    });
 
     var params = {
-            width: config.width,
-            height: config.height,
-            type: Two.Types.svg
-        };
+        width: config.width,
+        height: config.height,
+        type: Two.Types.svg
+    };
     var two = new Two(params).appendTo(panelContainer.node());
 
     var panel = two.makeGroup();
 
-     var rectAttr = dadavis.getAttr[config.type][config.subtype](config, cache);
+    var shapeAttr = dadavis.getAttr[config.type][config.subtype](config, cache);
     var colors = ['skyblue', 'orange', 'lime', 'orangered', 'violet', 'yellow', 'brown', 'pink'];
 
     console.time('rendering');
+    if(config.type === 'line'){
+        cache.layout.forEach(function(d, i){
+            var curve = two.makePolygon.apply(two, shapeAttr[i].concat([true]));
+            curve.fill = 'transparent';
+            curve.stroke = colors[i];
+            var layer = two.makeGroup(curve);
+            panel.add(layer);
+        });
+    }
+    else{
+        cache.layout.forEach(function(d, i){
+            var layer = two.makeGroup();
+            d.forEach(function(dB, iB){
+                var layout = d[iB];
+                var x = shapeAttr.x(layout, iB, i);
+                var y = shapeAttr.y(layout, iB, i);
+                var width = shapeAttr.width(layout, iB, i);
+                var height = shapeAttr.height(layout, iB, i);
 
-    cache.layout.forEach(function(d, i){
-        var line = d3.merge(d.map(function(dB, iB){ return [dB.x, dB.y]; }));
-        var curve = two.makePolygon.apply(two, line);
-        var layer = two.makeGroup(curve);
-        panel.add(layer);
-    });
-
-    //cache.layout.forEach(function(d, i){
-    //    var layer = two.makeGroup();
-    //    d.forEach(function(dB, iB){
-    //        var layout = d[iB];
-    //        var x = rectAttr.x(layout, iB, i);
-    //        var y = rectAttr.y(layout, iB, i);
-    //        var width = rectAttr.width(layout, iB, i);
-    //        var height = rectAttr.height(layout, iB, i);
-    //
-    //        var rect = two.makeRectangle(x, y, width, height);
-    //        rect.fill = colors[i];
-    //        layer.add(rect);
-    //    });
-    //    panel.add(layer);
-    //});
+                var rect = two.makeRectangle(x, y, width, height);
+                rect.fill = colors[i];
+                layer.add(rect);
+            });
+            panel.add(layer);
+        });
+    }
     console.timeEnd('rendering');
 
     console.time('update');
     two.update();
     console.timeEnd('update');
-
-/*
-    var panelAttr = {
-        transform: 'translate(' + [config.margin.left, config.margin.top] + ')',
-        height: config.chartHeight,
-        width: config.chartWidth
-    };
-
-    var panel = chart.select('.panel')
-        .attr(panelAttr);
-
-    var layers = panel.selectAll('.layer')
-        .data(cache.layout);
-
-    layers.enter().append('g').classed('layer', true);
-
-    layers.exit().remove();
-
-    layers.call(function(){
-        dadavis.render[config.type].call(this, config, cache);
-    });
-    */
 
     cache.container.select('.axis-x').call(function(){
         dadavis.render.axisX.call(this, config, cache);
@@ -86,10 +67,16 @@ dadavis.render.chart = function(config, cache){
 
 dadavis.render.bar = function(config, cache){
     var shapes = this.selectAll('.shape')
-        .data(function(d, i){ return d; });
+        .data(function(d, i){
+            return d;
+        });
 
     shapes.enter().append('rect')
-        .attr({'class': function(d, i){ return 'shape layer' + d.layerIndex + ' index' + d.index; }})
+        .attr({
+            'class': function(d, i){
+                return 'shape layer' + d.layerIndex + ' index' + d.index;
+            }
+        })
         .attr(dadavis.getAttr[config.type][config.subtype](config, cache))
         .style({opacity: 0});
 
@@ -103,7 +90,9 @@ dadavis.render.bar = function(config, cache){
 dadavis.render.line = function(config, cache){
 
     var lines = this.selectAll('.line')
-        .data(function(d, i){ return d; });
+        .data(function(d, i){
+            return d;
+        });
 
     lines.enter().append('path').classed('line', true)
         .attr(dadavis.getAttr[config.type][config.subtype](config, cache))
@@ -116,7 +105,9 @@ dadavis.render.line = function(config, cache){
     lines.exit().remove();
 
     var shapes = this.selectAll('.shape')
-        .data(function(d, i){ return d; });
+        .data(function(d, i){
+            return d;
+        });
 
     shapes.enter().append('circle').classed('shape', true)
         .attr(dadavis.getAttr['point'][config.subtype](config, cache))
@@ -148,7 +139,8 @@ dadavis.render.axisX = function(config, cache){
             position: 'absolute'
         });
 
-    labelsX.html(function(d, i){
+    labelsX
+        .html(function(d, i){
             var key = d.parentData.keys ? d.parentData.keys[i] : i;
             if(config.labelFormatterX){
                 return config.labelFormatterX(key, i);
@@ -159,7 +151,9 @@ dadavis.render.axisX = function(config, cache){
         })
         .style(dadavis.getAttr.axis.labelX(config, cache))
         .style({
-            display: function(d, i){ return (i % config.axisXTickSkip) ? 'none' : 'block'; }
+            display: function(d, i){
+                return (i % config.axisXTickSkip) ? 'none' : 'block';
+            }
         });
 
     labelsX.exit().remove();
@@ -190,7 +184,8 @@ dadavis.render.axisY = function(config, cache){
 
     labelsY.enter().append('div').classed('label', true);
 
-    labelsY.html(function(d, i){
+    labelsY
+        .html(function(d, i){
             if(config.subtype === 'stacked'){
                 return d.stackedLabel;
             }
@@ -212,10 +207,10 @@ dadavis.render.axisY = function(config, cache){
     ticksY.exit().remove();
 };
 
-if (typeof define === "function" && define.amd){
+if(typeof define === "function" && define.amd){
     define(dadavis);
 }
-else if (typeof module === "object" && module.exports){
+else if(typeof module === "object" && module.exports){
     var d3 = require('d3');
     module.exports = dadavis;
 }
