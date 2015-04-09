@@ -16,7 +16,8 @@ dadavis.init = function(_config){
         tickYCount: 5,
         axisXTickSkip: null,
         dotSize: 2,
-        gutterPercent: 10
+        gutterPercent: 10,
+        colors: ['skyblue', 'orange', 'lime', 'orangered', 'violet', 'yellow', 'brown', 'pink']
     };
 
     var cache = {
@@ -70,6 +71,7 @@ dadavis.init = function(_config){
         cache.axesLayout = dadavis.getLayout.axes.call(this, config, cache);
 
         dadavis.render.chart(config, cache);
+        dadavis.interaction.hovering(config, cache);
 
         return this;
     };

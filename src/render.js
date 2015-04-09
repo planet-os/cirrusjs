@@ -21,19 +21,18 @@ dadavis.render.chart = function(config, cache){
     var panel = two.makeGroup();
 
     var shapeAttr = dadavis.getAttr[config.type][config.subtype](config, cache);
-    var colors = ['skyblue', 'orange', 'lime', 'orangered', 'violet', 'yellow', 'brown', 'pink'];
 
     console.time('rendering');
     if(config.type === 'line'){
         cache.layout.forEach(function(d, i){
             var curve = two.makePolygon.apply(two, shapeAttr[i].concat([true]));
             if(config.subtype === 'area'){
-                curve.fill = colors[i];
+                curve.fill = config.colors[i];
             }
             else{
                 curve.fill = 'transparent';
             }
-            curve.stroke = colors[i];
+            curve.stroke = config.colors[i];
             var layer = two.makeGroup(curve);
             panel.add(layer);
         });
@@ -49,7 +48,7 @@ dadavis.render.chart = function(config, cache){
                 var height = shapeAttr.height(layout, iB, i);
 
                 var rect = two.makeRectangle(x, y, width, height);
-                rect.fill = colors[i];
+                rect.fill = config.colors[i];
                 layer.add(rect);
             });
             panel.add(layer);

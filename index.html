@@ -13,6 +13,7 @@
     <script type='text/javascript' src="src/layout.js"></script>
     <script type='text/javascript' src="src/attribute.js"></script>
     <script type='text/javascript' src="src/template.js"></script>
+    <script type='text/javascript' src="src/interaction.js"></script>
     <script type='text/javascript' src="src/render.js"></script>
 
     <link href="style.css" rel="stylesheet" />
@@ -57,19 +58,13 @@ var data = [
   {name: 'name1', keys: dateKeys, values: [1, 2, 3]}
 ];
 
-//var config = {
-//    containerSelector: '.container',
-//    type: 'bar',
-//    subtype: 'grouped'
-//};
-//
-var data = dadavis.utils.getRandomTimeData(100, 5);
+var data = dadavis.utils.getRandomTimeData(50, 5);
 
 var config = {
     containerSelector: '.container',
     margin: {top: 10, right: 10, bottom: 40, left: 70},
     type: 'line',
-    subtype: 'area',
+    subtype: 'stacked',
     axisXAngle: -30,
     axisXTickSkip: 5,
     tickYCount: 5,
@@ -78,17 +73,6 @@ var config = {
 };
 
 var ds = dadavis.init(config).render(data);
-
-// var chartIndex = 0;
-// setInterval(function(){
-//     data = dadavis.utils.getRandomData(30, 5);
-//     var chartSubtypes = ['simple', 'grouped', 'stacked', 'percent'];
-//     var chartSubtype = chartSubtypes[chartIndex++ % chartSubtypes.length];
-//
-//     ds.setConfig({subtype: chartSubtype})
-//         .render(data);
-//
-// }, 1000);
 
 </script>
 </body>
