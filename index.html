@@ -19,9 +19,10 @@
     <link href="style.css" rel="stylesheet" />
     <style>
         .container {
-            width: 800px;
+            width: 100%;
             height: 400px;
             margin-top: 100px;
+            border: 1px solid #eee;
         }
     </style>
 </head>
@@ -62,14 +63,16 @@ var data = dadavis.utils.getRandomTimeData(50, 5);
 
 var config = {
     containerSelector: '.container',
-    margin: {top: 10, right: 10, bottom: 40, left: 70},
+    margin: {top: 10, right: 10, bottom: 50, left: 70},
     type: 'line',
     subtype: 'stacked',
-    axisXAngle: -30,
+    axisXAngle: 0,
     axisXTickSkip: 5,
     tickYCount: 5,
     dotSize: 0,
-    labelFormatterX: function(d, i){ return d3.time.format('%e %b %Y')(new Date(d)); }
+    labelFormatterX: function(d, i){
+        return d3.time.format('%e %b')(new Date(d)) + '<br>' + d3.time.format('%Y')(new Date(d));
+    }
 };
 
 var ds = dadavis.init(config).render(data);

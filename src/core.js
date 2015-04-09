@@ -37,11 +37,20 @@ dadavis.init = function(_config){
     cache.container = d3.select(config.containerSelector);
     cache.container.html(dadavis.template.main);
 
+    d3.select(window).on('resize', dadavis.utils.throttle(function(){
+        exports.resize();
+    }, 200));
+
     exports = {};
 
     exports.setConfig = function(newConfig){
         dadavis.utils.override(newConfig, config);
         return this;
+    };
+
+    exports.resize = function(){
+        cache.container.html(dadavis.template.main);
+        this.render();
     };
 
     exports.render = function(data){

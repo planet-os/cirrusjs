@@ -41,3 +41,20 @@ dadavis.utils.getRandomTimeData = function(shapeCount, layerCount){
         };
     })
 };
+
+dadavis.utils.throttle = function(callback, limit){
+    var wait = false;
+    var timer = null;
+    return function(){
+        if(!wait){
+            callback.apply(this, arguments);
+            wait = true;
+            clearTimeout(timer);
+            timer = setTimeout(function(){
+                wait = false;
+                console.log(1);
+                callback.apply(this, arguments);
+            }, limit);
+        }
+    };
+};
