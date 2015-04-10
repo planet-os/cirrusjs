@@ -6,7 +6,8 @@ dadavis.interaction.hovering = function(config, cache){
         .style({
             width: cache.chartWidth + 'px',
             height: cache.chartHeight + 'px',
-            position: 'absolute'
+            position: 'absolute',
+            opacity: 0
         })
         .on('mousemove', function(){
             var mouse = d3.mouse(this);

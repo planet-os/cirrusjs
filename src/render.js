@@ -132,7 +132,8 @@ dadavis.render.axisX = function(config, cache){
         height: config.margin.bottom + 'px',
         position: 'absolute',
         top: cache.chartHeight + config.margin.top + 'px',
-        left: config.margin.left + 'px'
+        left: config.margin.left + 'px',
+        'border-top': '1px solid black'
     });
 
     var labelsX = this.selectAll('div.label')
@@ -180,7 +181,8 @@ dadavis.render.axisY = function(config, cache){
         height: cache.chartHeight + 'px',
         position: 'absolute',
         top: config.margin.top + 'px',
-        left: 0 + 'px'
+        left: 0 + 'px',
+        'border-right': '1px solid black'
     });
 
     var labelsY = this.selectAll('div.label')
@@ -204,7 +206,8 @@ dadavis.render.axisY = function(config, cache){
     var ticksY = this.selectAll('div.tick')
         .data(cache.axesLayout);
 
-    ticksY.enter().append('div').classed('tick', true);
+    ticksY.enter().append('div').classed('tick', true)
+        .style({'background-color': 'black'});
 
     ticksY.style(dadavis.getAttr.axis.tickY(config, cache));
 

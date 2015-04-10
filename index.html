@@ -29,6 +29,7 @@
 <body>
 
 <div class="container"></div>
+<button class="download">Download</button>
 
 <script>
 
@@ -76,6 +77,10 @@ var config = {
 };
 
 var ds = dadavis.init(config).render(data);
+
+d3.select('.download').on('click', function(){
+    ds.downloadAsPNG();
+});
 
 </script>
 </body>

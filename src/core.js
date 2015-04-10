@@ -53,6 +53,10 @@ dadavis.init = function(_config){
         this.render();
     };
 
+    exports.downloadAsPNG = function(){
+        dadavis.utils.convertToImage(config, cache);
+    };
+
     exports.render = function(data){
         if(data){
             cache.previousData = data;
@@ -81,8 +85,6 @@ dadavis.init = function(_config){
 
         dadavis.render.chart(config, cache);
         dadavis.interaction.hovering(config, cache);
-
-        //console.log(dadavis.utils.convertToImage(config, cache));
 
         return this;
     };

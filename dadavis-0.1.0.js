@@ -51,6 +51,9 @@ dadavis.init = function(_config) {
         cache.container.html(dadavis.template.main);
         this.render();
     };
+    exports.downloadAsPNG = function() {
+        dadavis.utils.convertToImage(config, cache);
+    };
     exports.render = function(data) {
         if (data) {
             cache.previousData = data;
@@ -139,7 +142,34 @@ dadavis.utils.throttle = function(callback, limit) {
 };
 
 dadavis.utils.convertToImage = function(config, cache) {
-    return "data:image/svg+xml;base64," + btoa(new XMLSerializer().serializeToString(cache.container.node()));
+    var clickEvent = new MouseEvent("click", {
+        view: window,
+        bubbles: true,
+        cancelable: false
+    });
+    var chartNode = cache.container.node();
+    var xhtml = new XMLSerializer().serializeToString(chartNode);
+    var size = {
+        width: chartNode.offsetWidth,
+        height: chartNode.offsetHeight,
+        rootFontSize: 14
+    };
+    var XMLString = '<svg xmlns="http://www.w3.org/2000/svg"' + ' width="' + size.width + '"' + ' height="' + size.height + '"' + ' font-size="' + size.rootFontSize + '"' + ">" + "<foreignObject>" + xhtml + "</foreignObject>" + "</svg>";
+    var canvas = document.createElement("canvas");
+    canvas.width = size.width;
+    canvas.height = size.height;
+    var ctx = canvas.getContext("2d");
+    var img = new Image();
+    img.onload = function() {
+        ctx.drawImage(img, 0, 0);
+        var png = canvas.toDataURL("image/png");
+        var result = '<a href="' + png + '" download="converted-image">Download</a>';
+        var pngContainer = document.createElement("div");
+        pngContainer.id = "#png-container";
+        pngContainer.innerHTML = result;
+        pngContainer.querySelector("a").dispatchEvent(clickEvent);
+    };
+    img.src = "data:image/svg+xml;base64," + btoa(XMLString);
 };
 
 dadavis.template = {};
@@ -445,7 +475,8 @@ dadavis.interaction.hovering = function(config, cache) {
     var hoveringContainer = cache.container.select(".hovering").style({
         width: cache.chartWidth + "px",
         height: cache.chartHeight + "px",
-        position: "absolute"
+        position: "absolute",
+        opacity: 0
     }).on("mousemove", function() {
         var mouse = d3.mouse(this);
         var x = cache.layout[0].map(function(d, i) {
@@ -630,7 +661,8 @@ dadavis.render.axisX = function(config, cache) {
         height: config.margin.bottom + "px",
         position: "absolute",
         top: cache.chartHeight + config.margin.top + "px",
-        left: config.margin.left + "px"
+        left: config.margin.left + "px",
+        "border-top": "1px solid black"
     });
     var labelsX = this.selectAll("div.label").data(cache.layout[0]);
     labelsX.enter().append("div").classed("label", true).style({
@@ -663,7 +695,8 @@ dadavis.render.axisY = function(config, cache) {
         height: cache.chartHeight + "px",
         position: "absolute",
         top: config.margin.top + "px",
-        left: 0 + "px"
+        left: 0 + "px",
+        "border-right": "1px solid black"
     });
     var labelsY = this.selectAll("div.label").data(cache.axesLayout);
     labelsY.enter().append("div").classed("label", true);
@@ -676,7 +709,9 @@ dadavis.render.axisY = function(config, cache) {
     }).style(dadavis.getAttr.axis.labelY(config, cache));
     labelsY.exit().remove();
     var ticksY = this.selectAll("div.tick").data(cache.axesLayout);
-    ticksY.enter().append("div").classed("tick", true);
+    ticksY.enter().append("div").classed("tick", true).style({
+        "background-color": "black"
+    });
     ticksY.style(dadavis.getAttr.axis.tickY(config, cache));
     ticksY.exit().remove();
 };
