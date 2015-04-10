@@ -146,7 +146,6 @@ dadavis.getAttr.axis.labelX = function(config, cache){
                     return d.index * d.paddedW + d.paddedW / 2 - this.offsetWidth + 'px';
                 }
             },
-            top: config.tickSize + 'px',
             'transform-origin': '100%',
             transform: 'rotate(' + config.axisXAngle + 'deg)'
         };
@@ -161,7 +160,6 @@ dadavis.getAttr.axis.labelX = function(config, cache){
                     return d.index * d.paddedW + d.paddedW / 2 + 'px';
                 }
             },
-            top: config.tickSize + 'px',
             'transform-origin': '0%',
             transform: 'rotate(' + config.axisXAngle + 'deg)'
         };
@@ -175,10 +173,14 @@ dadavis.getAttr.axis.labelX = function(config, cache){
                 else{
                     return d.index * d.paddedW + d.paddedW / 2 - this.offsetWidth / 2 + 'px';
                 }
-            },
-            top: config.tickSize + 'px'
+            }
         }
     }
+
+    labelAttr.display = function(d, i){
+        return (i % (cache.axisXTickSkipAuto || config.axisXTickSkip)) ? 'none' : 'block';
+    };
+    labelAttr.top = config.tickSize + 'px';
     return labelAttr;
 };
 
@@ -194,7 +196,7 @@ dadavis.getAttr.axis.tickX = function(config, cache){
         },
         width: 1 + 'px',
         height: function(d, i){
-            return ((i % config.axisXTickSkip) ? config.minorTickSize : config.tickSize) + 'px';
+            return ((i % (cache.axisXTickSkipAuto || config.axisXTickSkip)) ? config.minorTickSize : config.tickSize) + 'px';
         }
     };
 };

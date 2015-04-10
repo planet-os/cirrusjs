@@ -154,12 +154,16 @@ dadavis.render.axisX = function(config, cache){
                 return key;
             }
         })
-        .style(dadavis.getAttr.axis.labelX(config, cache))
-        .style({
-            display: function(d, i){
-                return (i % config.axisXTickSkip) ? 'none' : 'block';
-            }
-        });
+        .style(dadavis.getAttr.axis.labelX(config, cache));
+
+    if(config.axisXTickSkip === 'auto'){
+        var widestLabel = d3.max(labelsX[0].map(function(d){
+            return d.offsetWidth;
+        }));
+        cache.axisXTickSkipAuto = Math.ceil(cache.layout[0].length / ~~(cache.chartWidth / widestLabel));
+    }
+
+    labelsX.style(dadavis.getAttr.axis.labelX(config, cache));
 
     labelsX.exit().remove();
 
