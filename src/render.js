@@ -167,7 +167,8 @@ dadavis.render.axisX = function(config, cache){
         .data(cache.layout[0]);
 
     ticksX.enter().append('div').classed('tick', true)
-        .style({position: 'absolute'});
+        .style({position: 'absolute'})
+        .style({'background-color': 'black'});
 
     ticksX.style(dadavis.getAttr.axis.tickX(config, cache));
 
