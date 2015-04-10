@@ -39,7 +39,7 @@ dadavis.utils.getRandomTimeData = function(shapeCount, layerCount){
             values: dadavis.utils.computeRandomNumericArray(shapeCount, 10, 100),
             keys: dadavis.utils.computeRandomTimeArray(shapeCount, dateNow),
         };
-    })
+    });
 };
 
 dadavis.utils.throttle = function(callback, limit){
@@ -52,9 +52,12 @@ dadavis.utils.throttle = function(callback, limit){
             clearTimeout(timer);
             timer = setTimeout(function(){
                 wait = false;
-                console.log(1);
                 callback.apply(this, arguments);
             }, limit);
         }
     };
+};
+
+dadavis.utils.convertToImage = function(config, cache){
+    return "data:image/svg+xml;base64," + btoa(new XMLSerializer().serializeToString(cache.container.node()));
 };

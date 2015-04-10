@@ -82,6 +82,8 @@ dadavis.init = function(_config){
         dadavis.render.chart(config, cache);
         dadavis.interaction.hovering(config, cache);
 
+        //console.log(dadavis.utils.convertToImage(config, cache));
+
         return this;
     };
 

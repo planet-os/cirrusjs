@@ -58,23 +58,35 @@ dadavis.getLayout.data = function(config, cache){
 };
 
 dadavis.getLayout.axes = function(config, cache){
-    var axisStackedScaleY = cache.scaleY.copy();
-    var stackedDomainMax = d3.max(cache.data.map(function(d, i){
-        return d3.sum(d.values);
-    }));
-    axisStackedScaleY.domain([stackedDomainMax, 0]);
+    var scaleY = cache.scaleY.copy();
+    var percentScaleY = cache.scaleY.copy();
+    var stackedScaleY = cache.scaleY.copy();
 
-    var axisScaleY = cache.scaleY.copy();
-    var domainMax = d3.max(cache.data.map(function(d, i){
+    var transposed = d3.transpose(cache.data.map(function(d){
+        return d.values;
+    }));
+
+    var domainMax = d3.max(cache.data.map(function(d){
         return d3.max(d.values);
     }));
-    axisScaleY.domain([domainMax, 0]);
+    scaleY.domain([domainMax, 0]);
+
+    var stackedDomainMax = d3.max(transposed.map(function(d){
+        return d3.sum(d);
+    }));
+    stackedScaleY.domain([stackedDomainMax, 0]);
+
+    var percentDomainMax = d3.max(transposed.map(function(d){
+        return d3.sum(d);
+    }));
+    percentScaleY.domain([percentDomainMax, 0]);
 
     return d3.range(config.tickYCount).map(function(d, i){
+        var value = i * domainMax / (config.tickYCount - 1);
         return {
-            label: i * domainMax / (config.tickYCount - 1),
+            label: value,
             stackedLabel: i * stackedDomainMax / (config.tickYCount - 1),
-            labelY: axisScaleY(i * domainMax / (config.tickYCount - 1))
+            labelY: scaleY(value)
         };
     });
 };

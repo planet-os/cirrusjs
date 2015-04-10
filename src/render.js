@@ -190,11 +190,11 @@ dadavis.render.axisY = function(config, cache){
 
     labelsY
         .html(function(d, i){
-            if(config.subtype === 'stacked'){
-                return d.stackedLabel;
+            if(config.subtype === 'simple'){
+                return d.label;
             }
             else{
-                return d.label;
+                return d.stackedLabel;
             }
         })
         .style(dadavis.getAttr.axis.labelY(config, cache));
