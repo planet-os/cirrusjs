@@ -53,8 +53,8 @@ dadavis.init = function(_config){
         this.render();
     };
 
-    exports.downloadAsPNG = function(){
-        dadavis.utils.convertToImage(config, cache);
+    exports.downloadAsPNG = function(callback){
+        dadavis.utils.convertToImage(config, cache, callback);
     };
 
     exports.render = function(data){

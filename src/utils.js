@@ -58,7 +58,7 @@ dadavis.utils.throttle = function(callback, limit){
     };
 };
 
-dadavis.utils.convertToImage = function(config, cache){
+dadavis.utils.convertToImage = function(config, cache, callback){
 
     var clickEvent = new MouseEvent("click", {"view": window, "bubbles": true, "cancelable": false});
 
@@ -86,11 +86,16 @@ dadavis.utils.convertToImage = function(config, cache){
     img.onload = function(){
         ctx.drawImage(img, 0, 0);
         var png = canvas.toDataURL("image/png");
-        var result = '<a href="' + png + '" download="converted-image">Download</a>';
-        var pngContainer = document.createElement('div');
-        pngContainer.id = '#png-container';
-        pngContainer.innerHTML = result;
-        pngContainer.querySelector('a').dispatchEvent(clickEvent);
+        if(!callback){
+            var result = '<a href="' + png + '" download="converted-image">Download</a>';
+            var pngContainer = document.createElement('div');
+            pngContainer.id = '#png-container';
+            pngContainer.innerHTML = result;
+            pngContainer.querySelector('a').dispatchEvent(clickEvent);
+        }
+        else{
+            callback.call(this, png);
+        }
     };
     img.src = "data:image/svg+xml;base64," + btoa(XMLString);
 };
