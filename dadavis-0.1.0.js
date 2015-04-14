@@ -34,7 +34,9 @@ dadavis.init = function(_config) {
         scaleY: null,
         previousData: null,
         container: null,
-        noPadding: false
+        noPadding: false,
+        events: d3.dispatch("hover", "hoverOut"),
+        internalEvents: d3.dispatch("setHover", "hideHover")
     };
     dadavis.utils.override(_config, config);
     cache.container = d3.select(config.containerSelector);
@@ -50,9 +52,19 @@ dadavis.init = function(_config) {
     exports.resize = function() {
         cache.container.html(dadavis.template.main);
         this.render();
+        return this;
     };
-    exports.downloadAsPNG = function() {
-        dadavis.utils.convertToImage(config, cache);
+    exports.downloadAsPNG = function(callback) {
+        dadavis.utils.convertToImage(config, cache, callback);
+        return this;
+    };
+    exports.setHovering = function(hoverData) {
+        cache.internalEvents.setHover(hoverData);
+        return this;
+    };
+    exports.hideHovering = function() {
+        cache.internalEvents.hideHover();
+        return this;
     };
     exports.render = function(data) {
         if (data) {
@@ -78,6 +90,7 @@ dadavis.init = function(_config) {
         dadavis.interaction.hovering(config, cache);
         return this;
     };
+    d3.rebind(exports, cache.events, "on");
     return exports;
 };
 
@@ -141,7 +154,7 @@ dadavis.utils.throttle = function(callback, limit) {
     };
 };
 
-dadavis.utils.convertToImage = function(config, cache) {
+dadavis.utils.convertToImage = function(config, cache, callback) {
     var clickEvent = new MouseEvent("click", {
         view: window,
         bubbles: true,
@@ -163,11 +176,15 @@ dadavis.utils.convertToImage = function(config, cache) {
     img.onload = function() {
         ctx.drawImage(img, 0, 0);
         var png = canvas.toDataURL("image/png");
-        var result = '<a href="' + png + '" download="converted-image">Download</a>';
-        var pngContainer = document.createElement("div");
-        pngContainer.id = "#png-container";
-        pngContainer.innerHTML = result;
-        pngContainer.querySelector("a").dispatchEvent(clickEvent);
+        if (!callback) {
+            var result = '<a href="' + png + '" download="converted-image">Download</a>';
+            var pngContainer = document.createElement("div");
+            pngContainer.id = "#png-container";
+            pngContainer.innerHTML = result;
+            pngContainer.querySelector("a").dispatchEvent(clickEvent);
+        } else {
+            callback.call(this, png);
+        }
     };
     img.src = "data:image/svg+xml;base64," + btoa(XMLString);
 };
@@ -395,7 +412,6 @@ dadavis.getAttr.axis.labelX = function(config, cache) {
                     return d.index * d.paddedW + d.paddedW / 2 - this.offsetWidth + "px";
                 }
             },
-            top: config.tickSize + "px",
             "transform-origin": "100%",
             transform: "rotate(" + config.axisXAngle + "deg)"
         };
@@ -408,7 +424,6 @@ dadavis.getAttr.axis.labelX = function(config, cache) {
                     return d.index * d.paddedW + d.paddedW / 2 + "px";
                 }
             },
-            top: config.tickSize + "px",
             "transform-origin": "0%",
             transform: "rotate(" + config.axisXAngle + "deg)"
         };
@@ -420,10 +435,13 @@ dadavis.getAttr.axis.labelX = function(config, cache) {
                 } else {
                     return d.index * d.paddedW + d.paddedW / 2 - this.offsetWidth / 2 + "px";
                 }
-            },
-            top: config.tickSize + "px"
+            }
         };
     }
+    labelAttr.display = function(d, i) {
+        return i % (cache.axisXTickSkipAuto || config.axisXTickSkip) ? "none" : "block";
+    };
+    labelAttr.top = config.tickSize + "px";
     return labelAttr;
 };
 
@@ -438,7 +456,7 @@ dadavis.getAttr.axis.tickX = function(config, cache) {
         },
         width: 1 + "px",
         height: function(d, i) {
-            return (i % config.axisXTickSkip ? config.minorTickSize : config.tickSize) + "px";
+            return (i % (cache.axisXTickSkipAuto || config.axisXTickSkip) ? config.minorTickSize : config.tickSize) + "px";
         }
     };
 };
@@ -483,12 +501,12 @@ dadavis.interaction.hovering = function(config, cache) {
             return d.x;
         });
         var idxUnderMouse = d3.bisect(x, mouse[0] - cache.layout[0][0].w / 2);
-        var dataUnderMouse = cache.layout[0][idxUnderMouse];
-        var tooltipsData = cache.layout.map(function(d, i) {
-            return d[idxUnderMouse];
+        setHovering(idxUnderMouse);
+        cache.events.hover({
+            mouse: mouse,
+            x: x,
+            idx: idxUnderMouse
         });
-        hoverLine(dataUnderMouse);
-        tooltip(tooltipsData);
     }).on("mouseenter", function() {
         hoveringContainer.style({
             opacity: 1
@@ -497,9 +515,29 @@ dadavis.interaction.hovering = function(config, cache) {
         hoveringContainer.style({
             opacity: 0
         });
+        cache.events.hoverOut();
     });
     var hoverLine = dadavis.interaction.hoverLine(config, cache);
     var tooltip = dadavis.interaction.tooltip(config, cache);
+    cache.internalEvents.on("setHover", function(hoverData) {
+        setHovering(hoverData.idx);
+    });
+    cache.internalEvents.on("hideHover", function(hoverData) {
+        hoveringContainer.style({
+            opacity: 0
+        });
+    });
+    var setHovering = function(idxUnderMouse) {
+        var dataUnderMouse = cache.layout[0][idxUnderMouse];
+        var tooltipsData = cache.layout.map(function(d, i) {
+            return d[idxUnderMouse];
+        });
+        hoveringContainer.style({
+            opacity: 1
+        });
+        hoverLine(dataUnderMouse);
+        tooltip(tooltipsData);
+    };
 };
 
 dadavis.interaction.tooltip = function(config, cache) {
@@ -675,15 +713,20 @@ dadavis.render.axisX = function(config, cache) {
         } else {
             return key;
         }
-    }).style(dadavis.getAttr.axis.labelX(config, cache)).style({
-        display: function(d, i) {
-            return i % config.axisXTickSkip ? "none" : "block";
-        }
-    });
+    }).style(dadavis.getAttr.axis.labelX(config, cache));
+    if (config.axisXTickSkip === "auto") {
+        var widestLabel = d3.max(labelsX[0].map(function(d) {
+            return d.offsetWidth;
+        }));
+        cache.axisXTickSkipAuto = Math.ceil(cache.layout[0].length / ~~(cache.chartWidth / widestLabel));
+    }
+    labelsX.style(dadavis.getAttr.axis.labelX(config, cache));
     labelsX.exit().remove();
     var ticksX = this.selectAll("div.tick").data(cache.layout[0]);
     ticksX.enter().append("div").classed("tick", true).style({
         position: "absolute"
+    }).style({
+        "background-color": "black"
     });
     ticksX.style(dadavis.getAttr.axis.tickX(config, cache));
     ticksX.exit().remove();
