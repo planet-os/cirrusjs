@@ -16,24 +16,45 @@ dadavis.interaction.hovering = function(config, cache){
             });
 
             var idxUnderMouse = d3.bisect(x, mouse[0] - cache.layout[0][0].w / 2);
-            var dataUnderMouse = cache.layout[0][idxUnderMouse];
 
-            var tooltipsData = cache.layout.map(function(d, i){
-                return d[idxUnderMouse];
+            setHovering(idxUnderMouse);
+
+            cache.events.hover({
+                mouse: mouse,
+                x: x,
+                idx: idxUnderMouse
             });
-
-            hoverLine(dataUnderMouse);
-            tooltip(tooltipsData);
         })
         .on('mouseenter', function(){
             hoveringContainer.style({opacity: 1});
         })
         .on('mouseout', function(){
             hoveringContainer.style({opacity: 0});
+            cache.events.hoverOut();
         });
 
     var hoverLine = dadavis.interaction.hoverLine(config, cache);
     var tooltip = dadavis.interaction.tooltip(config, cache);
+
+    cache.internalEvents.on('setHover', function(hoverData){
+        setHovering(hoverData.idx);
+    });
+
+    cache.internalEvents.on('hideHover', function(hoverData){
+        hoveringContainer.style({opacity: 0});
+    });
+
+    var setHovering = function(idxUnderMouse){
+        var dataUnderMouse = cache.layout[0][idxUnderMouse];
+
+        var tooltipsData = cache.layout.map(function(d, i){
+            return d[idxUnderMouse];
+        });
+
+        hoveringContainer.style({opacity: 1});
+        hoverLine(dataUnderMouse);
+        tooltip(tooltipsData);
+    };
 };
 
 dadavis.interaction.tooltip = function(config, cache){

@@ -29,7 +29,9 @@ dadavis.init = function(_config){
         scaleY: null,
         previousData: null,
         container: null,
-        noPadding: false
+        noPadding: false,
+        events: d3.dispatch('hover', 'hoverOut'),
+        internalEvents: d3.dispatch('setHover', 'hideHover')
     };
 
     dadavis.utils.override(_config, config);
@@ -51,10 +53,22 @@ dadavis.init = function(_config){
     exports.resize = function(){
         cache.container.html(dadavis.template.main);
         this.render();
+        return this;
     };
 
     exports.downloadAsPNG = function(callback){
         dadavis.utils.convertToImage(config, cache, callback);
+        return this;
+    };
+
+    exports.setHovering = function(hoverData){
+        cache.internalEvents.setHover(hoverData);
+        return this;
+    };
+
+    exports.hideHovering = function(){
+        cache.internalEvents.hideHover();
+        return this;
     };
 
     exports.render = function(data){
@@ -88,6 +102,8 @@ dadavis.init = function(_config){
 
         return this;
     };
+
+    d3.rebind(exports, cache.events, "on");
 
     return exports;
 };
