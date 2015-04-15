@@ -17,7 +17,8 @@ dadavis.init = function(_config){
         axisXTickSkip: null,
         dotSize: 2,
         gutterPercent: 10,
-        colors: ['skyblue', 'orange', 'lime', 'orangered', 'violet', 'yellow', 'brown', 'pink']
+        colors: ['skyblue', 'orange', 'lime', 'orangered', 'violet', 'yellow', 'brown', 'pink'],
+        renderer: 'svg'
     };
 
     var cache = {

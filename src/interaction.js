@@ -12,10 +12,11 @@ dadavis.interaction.hovering = function(config, cache){
         .on('mousemove', function(){
             var mouse = d3.mouse(this);
             var x = cache.layout[0].map(function(d, i){
-                return d.x;
+                return (config.type === 'bar') ? d.paddedX : d.x;
             });
 
-            var idxUnderMouse = d3.bisect(x, mouse[0] - cache.layout[0][0].w / 2);
+            var mouseOffset = (config.type === 'bar') ? cache.layout[0][0].paddedW : cache.layout[0][0].w / 2;
+            var idxUnderMouse = d3.bisect(x, mouse[0] - mouseOffset);
 
             setHovering(idxUnderMouse);
 
@@ -40,7 +41,7 @@ dadavis.interaction.hovering = function(config, cache){
         setHovering(hoverData.idx);
     });
 
-    cache.internalEvents.on('hideHover', function(hoverData){
+    cache.internalEvents.on('hideHover', function(){
         hoveringContainer.style({opacity: 0});
     });
 

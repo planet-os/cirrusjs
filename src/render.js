@@ -2,63 +2,52 @@ dadavis.render = {};
 
 dadavis.render.chart = function(config, cache){
     var chartContainer = cache.container.select('.chart').style({
-        position: 'absolute'
+        position: 'absolute',
+        width: cache.chartWidth + 'px',
+        height: cache.chartHeight + 'px'
     });
 
     var panelContainer = chartContainer.select('.panel').style({
         position: 'absolute',
         left: config.margin.left + 'px',
-        top: config.margin.top + 'px'
+        top: config.margin.top + 'px',
+        width: cache.chartWidth + 'px',
+        height: cache.chartHeight + 'px'
     });
 
-    var params = {
-        width: config.width,
-        height: config.height,
-        type: Two.Types.svg
-    };
-    var two = new Two(params).appendTo(panelContainer.node());
-
-    var panel = two.makeGroup();
+    var shapeContainer = chartContainer.select('.shape').style({
+        position: 'absolute',
+        width: cache.chartWidth + 'px',
+        height: cache.chartHeight + 'px'
+    });
 
     var shapeAttr = dadavis.getAttr[config.type][config.subtype](config, cache);
 
+
+    var renderer = dadavis.renderer[config.renderer](shapeContainer.node());
+
     console.time('rendering');
+
     if(config.type === 'line'){
-        cache.layout.forEach(function(d, i){
-            var curve = two.makePolygon.apply(two, shapeAttr[i].concat([true]));
+        shapeAttr.forEach(function(d, i){
+            var color = null;
             if(config.subtype === 'area'){
-                curve.fill = config.colors[i];
+                color = config.colors[i];
             }
             else{
-                curve.fill = 'transparent';
+                color = 'none';
             }
-            curve.stroke = config.colors[i];
-            var layer = two.makeGroup(curve);
-            panel.add(layer);
+            renderer.polygon({points: d, fill: color, stroke: config.colors[i]});
         });
     }
     else{
-        cache.layout.forEach(function(d, i){
-            var layer = two.makeGroup();
+        shapeAttr.forEach(function(d, i){
             d.forEach(function(dB, iB){
-                var layout = d[iB];
-                var x = shapeAttr.x(layout, iB, i);
-                var y = shapeAttr.y(layout, iB, i);
-                var width = shapeAttr.width(layout, iB, i);
-                var height = shapeAttr.height(layout, iB, i);
-
-                var rect = two.makeRectangle(x, y, width, height);
-                rect.fill = config.colors[i];
-                layer.add(rect);
+                var line = renderer.rect({rect: dB, fill: config.colors[i], stroke: config.colors[i]});
             });
-            panel.add(layer);
         });
     }
     console.timeEnd('rendering');
-
-    console.time('update');
-    two.update();
-    console.timeEnd('update');
 
     cache.container.select('.axis-x').call(function(){
         dadavis.render.axisX.call(this, config, cache);
@@ -67,62 +56,6 @@ dadavis.render.chart = function(config, cache){
     cache.container.select('.axis-y').call(function(){
         dadavis.render.axisY.call(this, config, cache);
     });
-};
-
-dadavis.render.bar = function(config, cache){
-    var shapes = this.selectAll('.shape')
-        .data(function(d, i){
-            return d;
-        });
-
-    shapes.enter().append('rect')
-        .attr({
-            'class': function(d, i){
-                return 'shape layer' + d.layerIndex + ' index' + d.index;
-            }
-        })
-        .attr(dadavis.getAttr[config.type][config.subtype](config, cache))
-        .style({opacity: 0});
-
-    shapes.transition()
-        .attr(dadavis.getAttr[config.type][config.subtype](config, cache))
-        .style({opacity: 1});
-
-    shapes.exit().remove();
-};
-
-dadavis.render.line = function(config, cache){
-
-    var lines = this.selectAll('.line')
-        .data(function(d, i){
-            return d;
-        });
-
-    lines.enter().append('path').classed('line', true)
-        .attr(dadavis.getAttr[config.type][config.subtype](config, cache))
-        .style({opacity: 0});
-
-    lines.transition()
-        .attr(dadavis.getAttr[config.type][config.subtype](config, cache))
-        .style({opacity: 1});
-
-    lines.exit().remove();
-
-    var shapes = this.selectAll('.shape')
-        .data(function(d, i){
-            return d;
-        });
-
-    shapes.enter().append('circle').classed('shape', true)
-        .attr(dadavis.getAttr['point'][config.subtype](config, cache))
-        .attr({r: config.dotSize})
-        .style({opacity: 0});
-
-    shapes.transition()
-        .attr(dadavis.getAttr['point'][config.subtype](config, cache))
-        .style({opacity: 1});
-
-    shapes.exit().remove();
 };
 
 dadavis.render.axisX = function(config, cache){

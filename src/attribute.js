@@ -6,77 +6,45 @@ dadavis.getAttr = {
 };
 
 dadavis.getAttr.bar.simple = function(config, cache){
-    return {
-        x: function(d, i){
-            return d.paddedX + d.paddedW / 2;
-        },
-        y: function(d, i){
-            return d.y + d.h / 2;
-        },
-        width: function(d, i){
-            var gutterW = d.paddedW / 100 * config.gutterPercent;
-            return d.paddedW - gutterW;
-        },
-        height: function(d, i){
-            return d.h;
-        }
-    };
-};
-
-dadavis.getAttr.bar.grouped = function(config, cache){
-    return {
-        x: function(d, i, j){
-            var gutterW = (d.paddedW / d.layerCount) / 100 * config.gutterPercent;
-            var groupedW = d.paddedW / d.layerCount - gutterW;
-            return d.paddedX + j * (groupedW) + groupedW / 2 + (d.layerCount * gutterW) / 2;
-        },
-        y: function(d, i){
-            return d.y + d.h / 2;
-        },
-        width: function(d, i){
-            var gutterW = (d.paddedW / d.layerCount) / 100 * gutterPercent;
-            return d.paddedW / d.layerCount - gutterW;
-        },
-        height: function(d, i){
-            return d.h;
-        }
-    };
+    return cache.layout.map(function(d, i){
+        return d.map(function(dB, iB){
+            var gutterW = dB.paddedW / 100 * config.gutterPercent;
+            return {
+                x: dB.paddedX,
+                y: dB.y,
+                width: dB.paddedW - gutterW,
+                height: dB.h
+            };
+        });
+    });
 };
 
 dadavis.getAttr.bar.percent = function(config, cache){
-    return {
-        x: function(d, i){
-            return d.paddedX + d.paddedW / 2;
-        },
-        y: function(d, i){
-            return d.stackedPercentY + d.stackedPercentH / 2;
-        },
-        width: function(d, i){
-            var gutterW = d.paddedW / 100 * config.gutterPercent;
-            return d.paddedW - gutterW;
-        },
-        height: function(d, i){
-            return d.stackedPercentH;
-        }
-    };
+    return cache.layout.map(function(d, i){
+        return d.map(function(dB, iB){
+            var gutterW = dB.paddedW / 100 * config.gutterPercent;
+            return {
+                x: dB.paddedX,
+                y: dB.stackedPercentY,
+                width: dB.paddedW - gutterW,
+                height: dB.stackedPercentH
+            };
+        });
+    });
 };
 
 dadavis.getAttr.bar.stacked = function(config, cache){
-    return {
-        x: function(d, i){
-            return d.paddedX + d.paddedW / 2;
-        },
-        y: function(d, i){
-            return d.stackedY + d.stackedH / 2;
-        },
-        width: function(d, i){
-            var gutterW = d.paddedW / 100 * config.gutterPercent;
-            return d.paddedW - gutterW;
-        },
-        height: function(d, i){
-            return d.stackedH;
-        }
-    };
+    return cache.layout.map(function(d, i){
+        return d.map(function(dB, iB){
+            var gutterW = dB.paddedW / 100 * config.gutterPercent;
+            return {
+                x: dB.paddedX,
+                y: dB.stackedY,
+                width: dB.paddedW - gutterW,
+                height: dB.stackedH
+            };
+        });
+    });
 };
 
 dadavis.getAttr.point.stacked = function(config, cache){
@@ -98,17 +66,17 @@ dadavis.getAttr.point.stacked = function(config, cache){
 
 dadavis.getAttr.line.simple = function(config, cache){
     return cache.layout.map(function(d, i){
-        return d3.merge(d.map(function(dB, iB){
+        return d.map(function(dB, iB){
             return [dB.x, dB.y];
-        }));
+        });
     });
 };
 
 dadavis.getAttr.line.stacked = function(config, cache){
     return cache.layout.map(function(d, i){
-        return d3.merge(d.map(function(dB, iB){
+        return d.map(function(dB, iB){
             return [dB.x, dB.stackedY];
-        }));
+        });
     });
 };
 
@@ -130,7 +98,7 @@ dadavis.getAttr.line.area = function(config, cache){
             }).reverse();
         }
 
-        return d3.merge(line.concat(previousLine));
+        return line.concat(previousLine);
     });
 };
 

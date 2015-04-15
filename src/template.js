@@ -2,6 +2,7 @@ dadavis.template = {};
 
 dadavis.template.main = '<div class="chart">' +
 '<div class="panel">' +
+'<div class="shape"></div>' +
 '<div class="hovering"></div>' +
 '</div>' +
 '<div class="axis-x"></div>' +
