@@ -1,11 +1,11 @@
-dadavis.getAttr = {
+dadavis.attribute = {
     bar: {},
     line: {},
     point: {},
     axis: {}
 };
 
-dadavis.getAttr.bar.simple = function(config, cache){
+dadavis.attribute.bar.simple = function(config, cache){
     return cache.layout.map(function(d, i){
         return d.map(function(dB, iB){
             var gutterW = dB.paddedW / 100 * config.gutterPercent;
@@ -19,7 +19,7 @@ dadavis.getAttr.bar.simple = function(config, cache){
     });
 };
 
-dadavis.getAttr.bar.percent = function(config, cache){
+dadavis.attribute.bar.percent = function(config, cache){
     return cache.layout.map(function(d, i){
         return d.map(function(dB, iB){
             var gutterW = dB.paddedW / 100 * config.gutterPercent;
@@ -33,7 +33,7 @@ dadavis.getAttr.bar.percent = function(config, cache){
     });
 };
 
-dadavis.getAttr.bar.stacked = function(config, cache){
+dadavis.attribute.bar.stacked = function(config, cache){
     return cache.layout.map(function(d, i){
         return d.map(function(dB, iB){
             var gutterW = dB.paddedW / 100 * config.gutterPercent;
@@ -47,7 +47,7 @@ dadavis.getAttr.bar.stacked = function(config, cache){
     });
 };
 
-dadavis.getAttr.point.stacked = function(config, cache){
+dadavis.attribute.point.stacked = function(config, cache){
     return {
         cx: function(d, i){
             if(cache.noPadding){
@@ -64,7 +64,7 @@ dadavis.getAttr.point.stacked = function(config, cache){
     };
 };
 
-dadavis.getAttr.line.simple = function(config, cache){
+dadavis.attribute.line.simple = function(config, cache){
     return cache.layout.map(function(d, i){
         return d.map(function(dB, iB){
             return [dB.x, dB.y];
@@ -72,7 +72,7 @@ dadavis.getAttr.line.simple = function(config, cache){
     });
 };
 
-dadavis.getAttr.line.stacked = function(config, cache){
+dadavis.attribute.line.stacked = function(config, cache){
     return cache.layout.map(function(d, i){
         return d.map(function(dB, iB){
             return [dB.x, dB.stackedY];
@@ -80,7 +80,7 @@ dadavis.getAttr.line.stacked = function(config, cache){
     });
 };
 
-dadavis.getAttr.line.area = function(config, cache){
+dadavis.attribute.line.area = function(config, cache){
     return cache.layout.map(function(d, i){
         var line = d.map(function(dB, iB){
             return [dB.x, dB.stackedY];
@@ -102,7 +102,7 @@ dadavis.getAttr.line.area = function(config, cache){
     });
 };
 
-dadavis.getAttr.axis.labelX = function(config, cache){
+dadavis.attribute.axis.labelX = function(config, cache){
     var labelAttr = {};
     if(config.axisXAngle < 0){
         labelAttr = {
@@ -152,7 +152,7 @@ dadavis.getAttr.axis.labelX = function(config, cache){
     return labelAttr;
 };
 
-dadavis.getAttr.axis.tickX = function(config, cache){
+dadavis.attribute.axis.tickX = function(config, cache){
     return {
         left: function(d, i){
             if(cache.noPadding){
@@ -169,7 +169,7 @@ dadavis.getAttr.axis.tickX = function(config, cache){
     };
 };
 
-dadavis.getAttr.axis.labelY = function(config, cache){
+dadavis.attribute.axis.labelY = function(config, cache){
     return {
         position: 'absolute',
         left: function(d, i){
@@ -183,7 +183,7 @@ dadavis.getAttr.axis.labelY = function(config, cache){
     };
 };
 
-dadavis.getAttr.axis.tickY = function(config, cache){
+dadavis.attribute.axis.tickY = function(config, cache){
     return {
         width: config.tickSize + 'px',
         height: 1 + 'px',

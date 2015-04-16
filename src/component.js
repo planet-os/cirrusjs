@@ -21,7 +21,7 @@ dadavis.component.chart = function(config, cache){
         height: cache.chartHeight + 'px'
     });
 
-    var shapeAttr = dadavis.getAttr[config.type][config.subtype](config, cache);
+    var shapeAttr = dadavis.attribute[config.type][config.subtype](config, cache);
 
     var renderer = dadavis.renderer[config.renderer](shapeContainer.node());
 
@@ -81,7 +81,7 @@ dadavis.component.axisX = function(config, cache){
                 return key;
             }
         })
-        .style(dadavis.getAttr.axis.labelX(config, cache));
+        .style(dadavis.attribute.axis.labelX(config, cache));
 
     if(config.axisXTickSkip === 'auto'){
         var widestLabel = d3.max(labelsX[0].map(function(d){
@@ -90,7 +90,7 @@ dadavis.component.axisX = function(config, cache){
         cache.axisXTickSkipAuto = Math.ceil(cache.layout[0].length / ~~(cache.chartWidth / widestLabel));
     }
 
-    labelsX.style(dadavis.getAttr.axis.labelX(config, cache));
+    labelsX.style(dadavis.attribute.axis.labelX(config, cache));
 
     labelsX.exit().remove();
 
@@ -101,7 +101,7 @@ dadavis.component.axisX = function(config, cache){
         .style({position: 'absolute'})
         .style({'background-color': 'black'});
 
-    ticksX.style(dadavis.getAttr.axis.tickX(config, cache));
+    ticksX.style(dadavis.attribute.axis.tickX(config, cache));
 
     ticksX.exit().remove();
 };
@@ -132,7 +132,7 @@ dadavis.component.axisY = function(config, cache){
                 return d.stackedLabel;
             }
         })
-        .style(dadavis.getAttr.axis.labelY(config, cache));
+        .style(dadavis.attribute.axis.labelY(config, cache));
 
     labelsY.exit().remove();
 
@@ -142,7 +142,7 @@ dadavis.component.axisY = function(config, cache){
     ticksY.enter().append('div').classed('tick', true)
         .style({'background-color': 'black'});
 
-    ticksY.style(dadavis.getAttr.axis.tickY(config, cache));
+    ticksY.style(dadavis.attribute.axis.tickY(config, cache));
 
     ticksY.exit().remove();
 };

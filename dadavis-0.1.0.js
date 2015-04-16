@@ -288,14 +288,14 @@ dadavis.layout.axes = function(config, cache) {
     });
 };
 
-dadavis.getAttr = {
+dadavis.attribute = {
     bar: {},
     line: {},
     point: {},
     axis: {}
 };
 
-dadavis.getAttr.bar.simple = function(config, cache) {
+dadavis.attribute.bar.simple = function(config, cache) {
     return cache.layout.map(function(d, i) {
         return d.map(function(dB, iB) {
             var gutterW = dB.paddedW / 100 * config.gutterPercent;
@@ -309,7 +309,7 @@ dadavis.getAttr.bar.simple = function(config, cache) {
     });
 };
 
-dadavis.getAttr.bar.percent = function(config, cache) {
+dadavis.attribute.bar.percent = function(config, cache) {
     return cache.layout.map(function(d, i) {
         return d.map(function(dB, iB) {
             var gutterW = dB.paddedW / 100 * config.gutterPercent;
@@ -323,7 +323,7 @@ dadavis.getAttr.bar.percent = function(config, cache) {
     });
 };
 
-dadavis.getAttr.bar.stacked = function(config, cache) {
+dadavis.attribute.bar.stacked = function(config, cache) {
     return cache.layout.map(function(d, i) {
         return d.map(function(dB, iB) {
             var gutterW = dB.paddedW / 100 * config.gutterPercent;
@@ -337,7 +337,7 @@ dadavis.getAttr.bar.stacked = function(config, cache) {
     });
 };
 
-dadavis.getAttr.point.stacked = function(config, cache) {
+dadavis.attribute.point.stacked = function(config, cache) {
     return {
         cx: function(d, i) {
             if (cache.noPadding) {
@@ -352,7 +352,7 @@ dadavis.getAttr.point.stacked = function(config, cache) {
     };
 };
 
-dadavis.getAttr.line.simple = function(config, cache) {
+dadavis.attribute.line.simple = function(config, cache) {
     return cache.layout.map(function(d, i) {
         return d.map(function(dB, iB) {
             return [ dB.x, dB.y ];
@@ -360,7 +360,7 @@ dadavis.getAttr.line.simple = function(config, cache) {
     });
 };
 
-dadavis.getAttr.line.stacked = function(config, cache) {
+dadavis.attribute.line.stacked = function(config, cache) {
     return cache.layout.map(function(d, i) {
         return d.map(function(dB, iB) {
             return [ dB.x, dB.stackedY ];
@@ -368,7 +368,7 @@ dadavis.getAttr.line.stacked = function(config, cache) {
     });
 };
 
-dadavis.getAttr.line.area = function(config, cache) {
+dadavis.attribute.line.area = function(config, cache) {
     return cache.layout.map(function(d, i) {
         var line = d.map(function(dB, iB) {
             return [ dB.x, dB.stackedY ];
@@ -387,7 +387,7 @@ dadavis.getAttr.line.area = function(config, cache) {
     });
 };
 
-dadavis.getAttr.axis.labelX = function(config, cache) {
+dadavis.attribute.axis.labelX = function(config, cache) {
     var labelAttr = {};
     if (config.axisXAngle < 0) {
         labelAttr = {
@@ -431,7 +431,7 @@ dadavis.getAttr.axis.labelX = function(config, cache) {
     return labelAttr;
 };
 
-dadavis.getAttr.axis.tickX = function(config, cache) {
+dadavis.attribute.axis.tickX = function(config, cache) {
     return {
         left: function(d, i) {
             if (cache.noPadding) {
@@ -447,7 +447,7 @@ dadavis.getAttr.axis.tickX = function(config, cache) {
     };
 };
 
-dadavis.getAttr.axis.labelY = function(config, cache) {
+dadavis.attribute.axis.labelY = function(config, cache) {
     return {
         position: "absolute",
         left: function(d, i) {
@@ -461,7 +461,7 @@ dadavis.getAttr.axis.labelY = function(config, cache) {
     };
 };
 
-dadavis.getAttr.axis.tickY = function(config, cache) {
+dadavis.attribute.axis.tickY = function(config, cache) {
     return {
         width: config.tickSize + "px",
         height: 1 + "px",
@@ -578,6 +578,85 @@ dadavis.interaction.hoverLine = function(config, cache) {
     };
 };
 
+dadavis.scale = {};
+
+dadavis.scale.x = function(config, cache) {
+    return d3.scale.linear().range([ 0, cache.chartWidth ]);
+};
+
+dadavis.scale.y = function(config, cache) {
+    return d3.scale.linear().range([ 0, cache.chartHeight ]);
+};
+
+dadavis.renderer = {
+    svg: null,
+    canvas: null
+};
+
+dadavis.renderer.svg = function(element) {
+    var svgRenderer = {};
+    var svg = d3.select(element).append("svg").attr({
+        width: element.offsetWidth,
+        height: element.offsetHeight
+    }).style({
+        position: "absolute"
+    });
+    svgRenderer.polygon = function(attributes) {
+        svg.append("path").attr({
+            d: "M" + attributes.points.join("L"),
+            fill: attributes.fill || "silver",
+            stroke: attributes.stroke || "silver"
+        });
+        return this;
+    };
+    svgRenderer.rect = function(attributes) {
+        path = svg.append("rect").attr(attributes.rect).attr({
+            fill: attributes.fill || "silver",
+            stroke: attributes.stroke || "silver"
+        });
+        return this;
+    };
+    return svgRenderer;
+};
+
+dadavis.renderer.canvas = function(element) {
+    var canvasRenderer = {};
+    var canvas = d3.select(element).append("canvas").attr({
+        width: element.offsetWidth,
+        height: element.offsetHeight
+    }).style({
+        position: "absolute"
+    });
+    var path = null;
+    var ctx = canvas.node().getContext("2d");
+    canvasRenderer.polygon = function(attributes) {
+        var fill = attributes.fill;
+        if (attributes.fill === "none" || !attributes.fill) {
+            fill = "transparent";
+        }
+        ctx.fillStyle = fill;
+        ctx.strokeStyle = attributes.stroke;
+        ctx.beginPath();
+        attributes.points.forEach(function(d, i) {
+            if (i === 0) {
+                ctx.moveTo(d[0], d[1]);
+            } else {
+                ctx.lineTo(d[0], d[1]);
+            }
+        });
+        ctx.fill();
+        ctx.stroke();
+        return this;
+    };
+    canvasRenderer.rect = function(attributes) {
+        ctx.fillStyle = attributes.fill;
+        ctx.strokeStyle = attributes.stroke;
+        ctx.fillRect(attributes.rect.x, attributes.rect.y, attributes.rect.width, attributes.rect.height);
+        return this;
+    };
+    return canvasRenderer;
+};
+
 dadavis.component = {};
 
 dadavis.component.chart = function(config, cache) {
@@ -598,7 +677,7 @@ dadavis.component.chart = function(config, cache) {
         width: cache.chartWidth + "px",
         height: cache.chartHeight + "px"
     });
-    var shapeAttr = dadavis.getAttr[config.type][config.subtype](config, cache);
+    var shapeAttr = dadavis.attribute[config.type][config.subtype](config, cache);
     var renderer = dadavis.renderer[config.renderer](shapeContainer.node());
     console.time("rendering");
     if (config.type === "line") {
@@ -650,14 +729,14 @@ dadavis.component.axisX = function(config, cache) {
         } else {
             return key;
         }
-    }).style(dadavis.getAttr.axis.labelX(config, cache));
+    }).style(dadavis.attribute.axis.labelX(config, cache));
     if (config.axisXTickSkip === "auto") {
         var widestLabel = d3.max(labelsX[0].map(function(d) {
             return d.offsetWidth;
         }));
         cache.axisXTickSkipAuto = Math.ceil(cache.layout[0].length / ~~(cache.chartWidth / widestLabel));
     }
-    labelsX.style(dadavis.getAttr.axis.labelX(config, cache));
+    labelsX.style(dadavis.attribute.axis.labelX(config, cache));
     labelsX.exit().remove();
     var ticksX = axisXContainer.selectAll("div.tick").data(cache.layout[0]);
     ticksX.enter().append("div").classed("tick", true).style({
@@ -665,7 +744,7 @@ dadavis.component.axisX = function(config, cache) {
     }).style({
         "background-color": "black"
     });
-    ticksX.style(dadavis.getAttr.axis.tickX(config, cache));
+    ticksX.style(dadavis.attribute.axis.tickX(config, cache));
     ticksX.exit().remove();
 };
 
@@ -686,13 +765,13 @@ dadavis.component.axisY = function(config, cache) {
         } else {
             return d.stackedLabel;
         }
-    }).style(dadavis.getAttr.axis.labelY(config, cache));
+    }).style(dadavis.attribute.axis.labelY(config, cache));
     labelsY.exit().remove();
     var ticksY = axisYContainer.selectAll("div.tick").data(cache.axesLayout);
     ticksY.enter().append("div").classed("tick", true).style({
         "background-color": "black"
     });
-    ticksY.style(dadavis.getAttr.axis.tickY(config, cache));
+    ticksY.style(dadavis.attribute.axis.tickY(config, cache));
     ticksY.exit().remove();
 };
 
