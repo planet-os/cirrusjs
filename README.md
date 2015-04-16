@@ -7,7 +7,7 @@ The project will be officially launched when API will stabilize and test/documen
 
 Current features:
 
-* Multiple renderer using two.js (SVG, Canvas, WebGL)
+* Multiple renderer (SVG, Canvas)
 * Multiple chart types (simple/grouped/stacked/percent bar chart and simple/stacked/area line chart)
 * Tooltips
 

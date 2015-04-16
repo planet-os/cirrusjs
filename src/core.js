@@ -35,14 +35,48 @@ dadavis.init = function(_config){
         internalEvents: d3.dispatch('setHover', 'hideHover', 'resize')
     };
 
-    dadavis.utils.override(_config, config);
+    (function initialize(config, cache){
+        dadavis.utils.override(_config, config);
 
-    cache.container = d3.select(config.containerSelector);
-    cache.container.html(dadavis.template.main);
+        cache.container = d3.select(config.containerSelector);
+        cache.container.html(dadavis.template.main);
 
-    d3.select(window).on('resize.namespace' + ~~(Math.random()*1000), dadavis.utils.throttle(function(){
-        cache.internalEvents.resize();
-    }, 200));
+        d3.select(window).on('resize.namespace' + ~~(Math.random()*1000), dadavis.utils.throttle(function(){
+            cache.internalEvents.resize();
+        }, 200));
+
+    })(config, cache);
+
+    function rebindEvents(config, cache){
+        var that = this;
+        cache.internalEvents.on('resize', function(){
+            that.resize();
+        });
+    }
+
+    function computeAutomaticConfig(config, cache){
+        this.setConfig({
+            width: cache.container.node().offsetWidth,
+            height: cache.container.node().offsetHeight
+        });
+    }
+
+    function computeCache(config, cache, data){
+        if(data){
+            cache.previousData = data;
+            cache.data = data;
+        }
+        else{
+            cache.data = cache.previousData;
+        }
+
+        cache.chartWidth = config.width - config.margin.left - config.margin.right;
+        cache.chartHeight = config.height - config.margin.top - config.margin.bottom;
+
+        if(config.type === 'line'){
+            cache.noPadding = true;
+        }
+    }
 
     exports = {};
 
@@ -74,37 +108,19 @@ dadavis.init = function(_config){
 
     exports.render = function(data){
 
-        var that = this;
-        cache.internalEvents.on('resize', function(){
-            that.resize();
-        });
+        rebindEvents.call(this, config, cache);
+        computeAutomaticConfig.call(this, config, cache);
+        computeCache.call(this, config, cache, data);
 
-        if(data){
-            cache.previousData = data;
-            cache.data = data;
-        }
-        else{
-            cache.data = cache.previousData;
-        }
+        cache.scaleX = dadavis.scale.x(config, cache);
+        cache.scaleY = dadavis.scale.y(config, cache);
 
-        this.setConfig({
-            width: cache.container.node().offsetWidth,
-            height: cache.container.node().offsetHeight
-        });
-        cache.chartWidth = config.width - config.margin.left - config.margin.right;
-        cache.chartHeight = config.height - config.margin.top - config.margin.bottom;
+        cache.layout = dadavis.layout.data(config, cache);
+        cache.axesLayout = dadavis.layout.axes(config, cache);
 
-        if(config.type === 'line'){
-            cache.noPadding = true;
-        }
-
-        cache.scaleX = d3.scale.linear().range([0, cache.chartWidth]);
-        cache.scaleY = d3.scale.linear().range([0, cache.chartHeight]);
-
-        cache.layout = dadavis.getLayout.data.call(this, config, cache);
-        cache.axesLayout = dadavis.getLayout.axes.call(this, config, cache);
-
-        dadavis.render.chart(config, cache);
+        dadavis.component.chart(config, cache);
+        dadavis.component.axisX(config, cache);
+        dadavis.component.axisY(config, cache);
         dadavis.interaction.hovering(config, cache);
 
         return this;

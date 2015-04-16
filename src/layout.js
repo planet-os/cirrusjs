@@ -1,9 +1,9 @@
-dadavis.getLayout = {
+dadavis.layout = {
     data: {},
     axes: {}
 };
 
-dadavis.getLayout.data = function(config, cache){
+dadavis.layout.data = function(config, cache){
 
     var percentScaleY = cache.scaleY.copy();
     var stackedScaleY = cache.scaleY.copy();
@@ -57,7 +57,7 @@ dadavis.getLayout.data = function(config, cache){
     });
 };
 
-dadavis.getLayout.axes = function(config, cache){
+dadavis.layout.axes = function(config, cache){
     var scaleY = cache.scaleY.copy();
     var percentScaleY = cache.scaleY.copy();
     var stackedScaleY = cache.scaleY.copy();

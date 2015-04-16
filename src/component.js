@@ -1,6 +1,6 @@
-dadavis.render = {};
+dadavis.component = {};
 
-dadavis.render.chart = function(config, cache){
+dadavis.component.chart = function(config, cache){
     var chartContainer = cache.container.select('.chart').style({
         position: 'absolute',
         width: cache.chartWidth + 'px',
@@ -42,33 +42,28 @@ dadavis.render.chart = function(config, cache){
     else{
         shapeAttr.forEach(function(d, i){
             d.forEach(function(dB, iB){
-                var line = renderer.rect({rect: dB, fill: config.colors[i], stroke: config.colors[i]});
+                renderer.rect({rect: dB, fill: config.colors[i], stroke: config.colors[i]});
             });
         });
     }
     console.timeEnd('rendering');
 
-    cache.container.select('.axis-x').call(function(){
-        dadavis.render.axisX.call(this, config, cache);
-    });
-
-    cache.container.select('.axis-y').call(function(){
-        dadavis.render.axisY.call(this, config, cache);
-    });
+    return this;
 };
 
-dadavis.render.axisX = function(config, cache){
+dadavis.component.axisX = function(config, cache){
 
-    this.style({
-        width: cache.chartWidth + 'px',
-        height: config.margin.bottom + 'px',
-        position: 'absolute',
-        top: cache.chartHeight + config.margin.top + 'px',
-        left: config.margin.left + 'px',
-        'border-top': '1px solid black'
-    });
+    var axisXContainer = cache.container.select('.axis-x')
+        .style({
+            width: cache.chartWidth + 'px',
+            height: config.margin.bottom + 'px',
+            position: 'absolute',
+            top: cache.chartHeight + config.margin.top + 'px',
+            left: config.margin.left + 'px',
+            'border-top': '1px solid black'
+        });
 
-    var labelsX = this.selectAll('div.label')
+    var labelsX = axisXContainer.selectAll('div.label')
         .data(cache.layout[0]);
 
     labelsX.enter().append('div').classed('label', true)
@@ -99,7 +94,7 @@ dadavis.render.axisX = function(config, cache){
 
     labelsX.exit().remove();
 
-    var ticksX = this.selectAll('div.tick')
+    var ticksX = axisXContainer.selectAll('div.tick')
         .data(cache.layout[0]);
 
     ticksX.enter().append('div').classed('tick', true)
@@ -111,18 +106,19 @@ dadavis.render.axisX = function(config, cache){
     ticksX.exit().remove();
 };
 
-dadavis.render.axisY = function(config, cache){
+dadavis.component.axisY = function(config, cache){
 
-    this.style({
-        width: config.margin.left + 'px',
-        height: cache.chartHeight + 'px',
-        position: 'absolute',
-        top: config.margin.top + 'px',
-        left: 0 + 'px',
-        'border-right': '1px solid black'
-    });
+    var axisYContainer = cache.container.select('.axis-y')
+        .style({
+            width: config.margin.left + 'px',
+            height: cache.chartHeight + 'px',
+            position: 'absolute',
+            top: config.margin.top + 'px',
+            left: 0 + 'px',
+            'border-right': '1px solid black'
+        });
 
-    var labelsY = this.selectAll('div.label')
+    var labelsY = axisYContainer.selectAll('div.label')
         .data(cache.axesLayout);
 
     labelsY.enter().append('div').classed('label', true);
@@ -140,7 +136,7 @@ dadavis.render.axisY = function(config, cache){
 
     labelsY.exit().remove();
 
-    var ticksY = this.selectAll('div.tick')
+    var ticksY = axisYContainer.selectAll('div.tick')
         .data(cache.axesLayout);
 
     ticksY.enter().append('div').classed('tick', true)
