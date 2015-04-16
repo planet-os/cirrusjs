@@ -14,7 +14,7 @@ dadavis.init = function(_config){
         tickSize: 10,
         minorTickSize: 3,
         tickYCount: 5,
-        axisXTickSkip: null,
+        axisXTickSkip: 'auto',
         dotSize: 2,
         gutterPercent: 10,
         colors: ['skyblue', 'orange', 'lime', 'orangered', 'violet', 'yellow', 'brown', 'pink'],

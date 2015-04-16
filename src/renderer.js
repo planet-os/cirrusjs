@@ -23,7 +23,11 @@ dadavis.renderer.svg = function(element){
 
     svgRenderer.rect = function(attributes){
         path = svg.append('rect')
-            .attr(attributes);
+            .attr(attributes.rect)
+            .attr({
+                fill: attributes.fill || 'silver',
+                stroke: attributes.stroke || 'silver'
+            });
         return this;
     };
 
