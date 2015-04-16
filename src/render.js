@@ -23,7 +23,6 @@ dadavis.render.chart = function(config, cache){
 
     var shapeAttr = dadavis.getAttr[config.type][config.subtype](config, cache);
 
-
     var renderer = dadavis.renderer[config.renderer](shapeContainer.node());
 
     console.time('rendering');

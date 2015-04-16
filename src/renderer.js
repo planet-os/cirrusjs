@@ -62,7 +62,6 @@ dadavis.renderer.canvas = function(element){
             else{
                 ctx.lineTo(d[0], d[1]);
             }
-            return ;
         });
         ctx.fill();
         ctx.stroke();

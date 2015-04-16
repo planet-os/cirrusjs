@@ -32,7 +32,7 @@ dadavis.init = function(_config){
         container: null,
         noPadding: false,
         events: d3.dispatch('hover', 'hoverOut'),
-        internalEvents: d3.dispatch('setHover', 'hideHover')
+        internalEvents: d3.dispatch('setHover', 'hideHover', 'resize')
     };
 
     dadavis.utils.override(_config, config);
@@ -40,8 +40,8 @@ dadavis.init = function(_config){
     cache.container = d3.select(config.containerSelector);
     cache.container.html(dadavis.template.main);
 
-    d3.select(window).on('resize', dadavis.utils.throttle(function(){
-        exports.resize();
+    d3.select(window).on('resize.namespace' + ~~(Math.random()*1000), dadavis.utils.throttle(function(){
+        cache.internalEvents.resize();
     }, 200));
 
     exports = {};
@@ -73,6 +73,12 @@ dadavis.init = function(_config){
     };
 
     exports.render = function(data){
+
+        var that = this;
+        cache.internalEvents.on('resize', function(){
+            that.resize();
+        });
+
         if(data){
             cache.previousData = data;
             cache.data = data;
