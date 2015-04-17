@@ -38,16 +38,16 @@ dadavis.init = function(_config){
     (function initialize(config, cache){
         dadavis.utils.override(_config, config);
 
-        cache.container = d3.select(config.containerSelector);
-        cache.container.html(dadavis.template.main);
-
         d3.select(window).on('resize.namespace' + ~~(Math.random()*1000), dadavis.utils.throttle(function(){
             cache.internalEvents.resize();
         }, 200));
 
     })(config, cache);
 
-    function rebindEvents(config, cache){
+    function initContainers(config, cache){
+        cache.container = d3.select(config.containerSelector);
+        cache.container.html(dadavis.template.main);
+
         var that = this;
         cache.internalEvents.on('resize', function(){
             that.resize();
@@ -61,15 +61,29 @@ dadavis.init = function(_config){
         });
     }
 
-    function computeCache(config, cache, data){
-        if(data){
-            cache.previousData = data;
-            cache.data = data;
-        }
-        else{
-            cache.data = cache.previousData;
+    function validateData(_data){
+        if(_data && typeof _data === 'object'){
+            var isNotNull = false;
+            _data.forEach(function(d){
+                isNotNull = isNotNull || !!d.values.length;
+            });
+
+            if(isNotNull){
+                cache.previousData = data;
+                cache.data = data;
+                return true
+            }
         }
 
+        if(cache.previousData){
+            cache.data = cache.previousData;
+            return true;
+        }
+
+        return false;
+    }
+
+    function computeCache(config, cache, data){
         cache.chartWidth = config.width - config.margin.left - config.margin.right;
         cache.chartHeight = config.height - config.margin.top - config.margin.bottom;
 
@@ -108,7 +122,11 @@ dadavis.init = function(_config){
 
     exports.render = function(data){
 
-        rebindEvents.call(this, config, cache);
+        if(!validateData(data)){
+            console.error('Invalid data', data);
+            return this;
+        }
+        initContainers.call(this, config, cache);
         computeAutomaticConfig.call(this, config, cache);
         computeCache.call(this, config, cache, data);
 

@@ -17,6 +17,7 @@ dadavis.interaction.hovering = function(config, cache){
 
             var mouseOffset = (config.type === 'bar') ? cache.layout[0][0].paddedW : cache.layout[0][0].w / 2;
             var idxUnderMouse = d3.bisect(x, mouse[0] - mouseOffset);
+            idxUnderMouse = Math.min(idxUnderMouse, x.length - 1);
 
             setHovering(idxUnderMouse);
 
