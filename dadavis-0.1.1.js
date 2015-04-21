@@ -28,7 +28,9 @@ dadavis.init = function(_config) {
         scaleType: "time",
         keyX: "x",
         keyY: "y",
-        outerPadding: 0
+        outerPadding: 0,
+        showFringe: false,
+        autoTypeThreshold: 30
     };
     var cache = {
         chartWidth: 500,
@@ -58,6 +60,14 @@ dadavis.init = function(_config) {
         });
     }
     function computeAutomaticConfig(config, cache) {
+        if (config.type === "auto") {
+            var dataLength = cache.data[0].values.length;
+            if (dataLength < config.autoTypeThreshold) {
+                config.type = "bar";
+            } else {
+                config.type = "line";
+            }
+        }
         this.setConfig({
             width: cache.container.node().offsetWidth,
             height: cache.container.node().offsetHeight
@@ -157,21 +167,36 @@ dadavis.utils.computeRandomTimeArray = function(count, dateNow) {
 };
 
 dadavis.utils.getRandomNumericData = function(shapeCount, layerCount) {
+    var x = d3.range(shapeCount);
     return d3.range(layerCount).map(function(d, i) {
+        var y = dadavis.utils.computeRandomNumericArray(shapeCount, 10, 100);
+        var values = d3.zip(x, y).map(function(d, i) {
+            return {
+                x: d[0],
+                y: d[1]
+            };
+        });
         return {
             name: "name" + i,
-            values: dadavis.utils.computeRandomNumericArray(shapeCount, 10, 100)
+            values: values
         };
     });
 };
 
 dadavis.utils.getRandomTimeData = function(shapeCount, layerCount) {
     var dateNow = new Date().getTime();
+    var x = dadavis.utils.computeRandomTimeArray(shapeCount, dateNow);
     return d3.range(layerCount).map(function(d, i) {
+        var y = dadavis.utils.computeRandomNumericArray(shapeCount, 10, 100);
+        var values = d3.zip(x, y).map(function(d, i) {
+            return {
+                x: d[0],
+                y: d[1]
+            };
+        });
         return {
             name: "name" + i,
-            values: dadavis.utils.computeRandomNumericArray(shapeCount, 10, 100),
-            keys: dadavis.utils.computeRandomTimeArray(shapeCount, dateNow)
+            values: values
         };
     });
 };
@@ -273,6 +298,7 @@ dadavis.layout.data = function(config, cache) {
             var datum = {
                 key: dB[config.keyX],
                 value: value,
+                normalizedValue: value / cache.scaleY.domain()[1],
                 index: iB,
                 parentData: d,
                 x: cache.scaleX(key),
@@ -452,13 +478,32 @@ dadavis.attribute.axis.labelX = function(config, cache) {
 };
 
 dadavis.attribute.axis.tickX = function(config, cache) {
+    var tickW = 1;
     return {
         left: function(d, i) {
-            return d.x - this.offsetWidth + "px";
+            return d.x - tickW / 2 - this.offsetWidth + "px";
         },
-        width: 1 + "px",
+        width: tickW + "px",
         height: function(d, i) {
             return (i % (cache.axisXTickSkipAuto || config.axisXTickSkip) ? config.minorTickSize : config.tickSize) + "px";
+        }
+    };
+};
+
+dadavis.attribute.axis.fringeX = function(config, cache) {
+    var fringeColorScale = d3.scale.linear().domain([ 0, 1 ]).range([ "yellow", "limegreen" ]);
+    return {
+        left: function(d, i) {
+            return d.x - d.w / 2 - this.offsetWidth + "px";
+        },
+        width: function(d) {
+            return d.w + "px";
+        },
+        height: function(d, i) {
+            return config.tickSize / 2 + "px";
+        },
+        "background-color": function(d) {
+            return fringeColorScale(d.normalizedValue);
         }
     };
 };
@@ -485,6 +530,26 @@ dadavis.attribute.axis.tickY = function(config, cache) {
         left: config.margin.left - config.tickSize + "px",
         top: function(d, i) {
             return d.labelY + "px";
+        }
+    };
+};
+
+dadavis.attribute.axis.fringeY = function(config, cache) {
+    var fringeColorScale = d3.scale.linear().domain([ 0, 1 ]).range([ "yellow", "limegreen" ]);
+    return {
+        position: "absolute",
+        left: config.tickSize / 2 + config.margin.left - config.tickSize + "px",
+        top: function(d, i) {
+            return d.y + "px";
+        },
+        width: function(d) {
+            return config.tickSize / 2 + "px";
+        },
+        height: function(d, i) {
+            return 3 + "px";
+        },
+        "background-color": function(d) {
+            return fringeColorScale(d.normalizedValue);
         }
     };
 };
@@ -684,6 +749,15 @@ dadavis.renderer.canvas = function(element) {
         ctx.fillRect(attributes.rect.x, attributes.rect.y, attributes.rect.width, attributes.rect.height);
         return this;
     };
+    canvasRenderer.circle = function(attributes) {
+        ctx.fillStyle = attributes.fill;
+        ctx.strokeStyle = attributes.stroke;
+        context.beginPath();
+        context.arc(attributes.circle.x, attributes.circle.y, attributes.circle.r, 0, 2 * Math.PI, false);
+        context.fill();
+        context.stroke();
+        return this;
+    };
     return canvasRenderer;
 };
 
@@ -773,6 +847,14 @@ dadavis.component.axisX = function(config, cache) {
     });
     ticksX.style(dadavis.attribute.axis.tickX(config, cache));
     ticksX.exit().remove();
+    if (config.showFringe) {
+        var fringeX = axisXContainer.selectAll("div.fringe-x").data(cache.layout[0]);
+        fringeX.enter().append("div").classed("fringe-x", true).style({
+            position: "absolute"
+        });
+        fringeX.style(dadavis.attribute.axis.fringeX(config, cache));
+        fringeX.exit().remove();
+    }
 };
 
 dadavis.component.axisY = function(config, cache) {
@@ -800,6 +882,14 @@ dadavis.component.axisY = function(config, cache) {
     });
     ticksY.style(dadavis.attribute.axis.tickY(config, cache));
     ticksY.exit().remove();
+    if (config.showFringe) {
+        var fringeY = axisYContainer.selectAll("div.fringe-y").data(cache.layout[0]);
+        fringeY.enter().append("div").classed("fringe-y", true).style({
+            position: "absolute"
+        });
+        fringeY.style(dadavis.attribute.axis.fringeY(config, cache));
+        fringeY.exit().remove();
+    }
 };
 
 if (typeof define === "function" && define.amd) {

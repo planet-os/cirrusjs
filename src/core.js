@@ -64,7 +64,6 @@ dadavis.init = function(_config){
 
         if(config.type === 'auto'){
             var dataLength = cache.data[0].values.length;
-            console.log(dataLength, config.autoTypeThreshold);
             if(dataLength < config.autoTypeThreshold){
                 config.type = 'bar';
             }
