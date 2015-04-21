@@ -138,13 +138,32 @@ dadavis.attribute.axis.labelX = function(config, cache){
 };
 
 dadavis.attribute.axis.tickX = function(config, cache){
+    var tickW = 1;
     return {
         left: function(d, i){
-            return d.x - this.offsetWidth + 'px';
+            return d.x - tickW / 2 - this.offsetWidth + 'px';
         },
-        width: 1 + 'px',
+        width: tickW + 'px',
         height: function(d, i){
             return ((i % (cache.axisXTickSkipAuto || config.axisXTickSkip)) ? config.minorTickSize : config.tickSize) + 'px';
+        }
+    };
+};
+
+dadavis.attribute.axis.fringeX = function(config, cache){
+    var fringeColorScale = d3.scale.linear().domain([0, 1]).range(['yellow', 'limegreen']);
+    return {
+        left: function(d, i){
+            return d.x - d.w / 2 - this.offsetWidth + 'px';
+        },
+        width: function(d){
+            return d.w + 'px';
+        },
+        height: function(d, i){
+            return config.tickSize / 2 + 'px';
+        },
+        'background-color': function(d){
+            return fringeColorScale(d.normalizedValue);
         }
     };
 };
@@ -171,6 +190,26 @@ dadavis.attribute.axis.tickY = function(config, cache){
         left: config.margin.left - config.tickSize + 'px',
         top: function(d, i){
             return d.labelY + 'px';
+        }
+    };
+};
+
+dadavis.attribute.axis.fringeY = function(config, cache){
+    var fringeColorScale = d3.scale.linear().domain([0, 1]).range(['yellow', 'limegreen']);
+    return {
+        position: 'absolute',
+        left: config.tickSize / 2 + config.margin.left - config.tickSize + 'px',
+        top: function(d, i){
+            return d.y + 'px';
+        },
+        width: function(d){
+            return config.tickSize / 2 + 'px';
+        },
+        height: function(d, i){
+            return 3 + 'px';
+        },
+        'background-color': function(d){
+            return fringeColorScale(d.normalizedValue);
         }
     };
 };

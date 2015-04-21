@@ -75,5 +75,16 @@ dadavis.renderer.canvas = function(element){
         return this;
     };
 
+    canvasRenderer.circle = function(attributes){
+        ctx.fillStyle = attributes.fill;
+        ctx.strokeStyle = attributes.stroke;
+        context.beginPath();
+        context.arc(attributes.circle.x, attributes.circle.y, attributes.circle.r, 0, 2 * Math.PI, false);
+        context.fill();
+        context.stroke();
+
+        return this;
+    };
+
     return canvasRenderer;
 };

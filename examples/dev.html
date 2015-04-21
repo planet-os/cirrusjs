@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta http-equiv="content-type" content="text/html; charset=UTF-8">
+    <title></title>
+    <script type='text/javascript' src="../d3.js"></script>
+
+    <!--<script type='text/javascript' src="../dadavis-0.1.1.js"></script>-->
+
+    <script type='text/javascript' src="../src/core.js"></script>
+    <script type='text/javascript' src="../src/utils.js"></script>
+    <script type='text/javascript' src="../src/layout.js"></script>
+    <script type='text/javascript' src="../src/attribute.js"></script>
+    <script type='text/javascript' src="../src/template.js"></script>
+    <script type='text/javascript' src="../src/interaction.js"></script>
+    <script type='text/javascript' src="../src/renderer.js"></script>
+    <script type='text/javascript' src="../src/scale.js"></script>
+    <script type='text/javascript' src="../src/component.js"></script>
+
+    <link href="style.css" rel="stylesheet"/>
+    <style>
+        .container {
+            width: 100%;
+            height: 400px;
+            margin-top: 100px;
+            border: 1px solid #eee;
+        }
+    </style>
+</head>
+<body>
+
+<div class="container"></div>
+
+<script>
+
+    var data = dadavis.utils.getRandomTimeData(20, 5);
+
+    var config = {
+        containerSelector: '.container',
+        margin: {top: 20, right: 40, bottom: 50, left: 60},
+        type: 'auto',
+        subtype: 'stacked',
+        axisXTickSkip: 7,
+        gutterPercent: 50,
+        scaleType: 'time',
+        showFringe: true,
+        labelFormatterX: function(d, i){
+            return d3.time.format('%e %b')(new Date(d)) + '<br>' + d3.time.format('%Y')(new Date(d));
+        }
+    };
+
+    var ds = dadavis.init(config).render(data);
+
+</script>
+</body>
+</html>

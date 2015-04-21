@@ -42,6 +42,7 @@ dadavis.layout.data = function(config, cache){
             var datum = {
                 key: dB[config.keyX],
                 value: value,
+                normalizedValue: value / cache.scaleY.domain()[1],
                 index: iB,
                 parentData: d,
                 x: cache.scaleX(key),

@@ -93,6 +93,7 @@ dadavis.component.axisX = function(config, cache){
 
     labelsX.exit().remove();
 
+
     var ticksX = axisXContainer.selectAll('div.tick')
         .data(cache.layout[0]);
 
@@ -103,6 +104,18 @@ dadavis.component.axisX = function(config, cache){
     ticksX.style(dadavis.attribute.axis.tickX(config, cache));
 
     ticksX.exit().remove();
+
+    if(config.showFringe){
+        var fringeX = axisXContainer.selectAll('div.fringe-x')
+            .data(cache.layout[0]);
+
+        fringeX.enter().append('div').classed('fringe-x', true)
+            .style({position: 'absolute'});
+
+        fringeX.style(dadavis.attribute.axis.fringeX(config, cache));
+
+        fringeX.exit().remove();
+    }
 };
 
 dadavis.component.axisY = function(config, cache){
@@ -144,6 +157,18 @@ dadavis.component.axisY = function(config, cache){
     ticksY.style(dadavis.attribute.axis.tickY(config, cache));
 
     ticksY.exit().remove();
+
+    if(config.showFringe){
+        var fringeY = axisYContainer.selectAll('div.fringe-y')
+            .data(cache.layout[0]);
+
+        fringeY.enter().append('div').classed('fringe-y', true)
+            .style({position: 'absolute'});
+
+        fringeY.style(dadavis.attribute.axis.fringeY(config, cache));
+
+        fringeY.exit().remove();
+    }
 };
 
 if(typeof define === "function" && define.amd){

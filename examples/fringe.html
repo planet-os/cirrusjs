@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta http-equiv="content-type" content="text/html; charset=UTF-8">
+    <title></title>
+    <script type='text/javascript' src="../d3.js"></script>
+
+    <!--<script type='text/javascript' src="../dadavis-0.1.1.js"></script>-->
+
+    <script type='text/javascript' src="../src/core.js"></script>
+    <script type='text/javascript' src="../src/utils.js"></script>
+    <script type='text/javascript' src="../src/layout.js"></script>
+    <script type='text/javascript' src="../src/attribute.js"></script>
+    <script type='text/javascript' src="../src/template.js"></script>
+    <script type='text/javascript' src="../src/interaction.js"></script>
+    <script type='text/javascript' src="../src/renderer.js"></script>
+    <script type='text/javascript' src="../src/scale.js"></script>
+    <script type='text/javascript' src="../src/component.js"></script>
+
+    <link href="style.css" rel="stylesheet"/>
+    <style>
+        .container {
+            width: 100%;
+            height: 400px;
+            margin-top: 100px;
+            border: 1px solid #eee;
+        }
+    </style>
+</head>
+<body>
+
+<div class="container"></div>
+
+<script>
+
+    var data = [{
+        name: 'test',
+        values: [{"x": "2013-08-01 00:00:00", "y": 200}, {
+            "x": "2013-08-02 00:00:00",
+            "y": 200
+        }, {"x": "2013-08-03 00:00:00", "y": 200}, {"x": "2013-08-05 00:00:00", "y": 200}, {
+            "x": "2013-08-08 00:00:00",
+            "y": 200
+        }, {"x": "2013-08-11 00:00:00", "y": 200}, {"x": "2013-08-12 00:00:00", "y": 200}, {
+            "x": "2013-08-15 00:00:00",
+            "y": 200
+        }, {"x": "2013-08-16 00:00:00", "y": 400}, {"x": "2013-08-17 00:00:00", "y": 200}, {
+            "x": "2013-08-18 00:00:00",
+            "y": 200
+        }, {"x": "2013-08-19 00:00:00", "y": 400}, {"x": "2013-08-21 00:00:00", "y": 200}, {
+            "x": "2013-08-22 00:00:00",
+            "y": 200
+        }, {"x": "2013-08-23 00:00:00", "y": 200}, {"x": "2013-08-25 00:00:00", "y": 200}, {
+            "x": "2013-08-31 00:00:00",
+            "y": 200
+        }, {"x": "2013-09-10 00:00:00", "y": 400}, {"x": "2013-09-15 00:00:00", "y": 200}, {
+            "x": "2013-09-20 00:00:00",
+            "y": 200
+        }, {"x": "2013-09-22 00:00:00", "y": 200}, {"x": "2013-09-25 00:00:00", "y": 200}, {
+            "x": "2013-09-27 00:00:00",
+            "y": 200
+        }, {"x": "2013-09-30 00:00:00", "y": 200}, {"x": "2013-10-03 00:00:00", "y": 200}, {
+            "x": "2013-10-04 00:00:00",
+            "y": 200
+        }, {"x": "2013-10-16 00:00:00", "y": 200}]
+    }];
+
+    var config = {
+        containerSelector: '.container',
+        margin: {top: 20, right: 40, bottom: 50, left: 60},
+        type: 'auto',
+        subtype: 'simple',
+        axisXTickSkip: 7,
+        gutterPercent: 50,
+        scaleType: 'time',
+        showFringe: true,
+        labelFormatterX: function(d, i){
+            return d3.time.format('%e %b')(new Date(d)) + '<br>' + d3.time.format('%Y')(new Date(d));
+        }
+    };
+
+    var ds = dadavis.init(config).render(data);
+
+</script>
+</body>
+</html>

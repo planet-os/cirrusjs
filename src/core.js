@@ -22,7 +22,8 @@ dadavis.init = function(_config){
         scaleType: 'time',
         keyX: 'x',
         keyY: 'y',
-        outerPadding: 0
+        outerPadding: 0,
+        showFringe: false
     };
 
     var cache = {
