@@ -5,7 +5,7 @@
     <title></title>
     <script type='text/javascript' src="../d3.js"></script>
 
-    <!--<script type='text/javascript' src="../dadavis-0.1.0.js"></script>-->
+    <!--<script type='text/javascript' src="../dadavis-0.1.1.js"></script>-->
 
     <script type='text/javascript' src="../src/core.js"></script>
     <script type='text/javascript' src="../src/utils.js"></script>
@@ -30,37 +30,10 @@
 <body>
 
 <div class="container"></div>
-<button class="download">Download</button>
 
 <script>
 
-var data = dadavis.utils.getRandomNumericData(20, 5);
-
-var data = [
-  {name: 'name1', keys: [1, 2, 3, 4], values: [7, 2, 3, 4]},
-  {name: 'name2', keys: [1, 2, 3, 4], values:[5, 6, 2, 8]},
-  {name: 'name3', keys: [1, 2, 3, 4], values:[5, 6, 2, 1]}
-];
-
-var data = [
-  {name: 'name1', keys: ['A', 'B', 'C', 'D'], values: [7, 2, 3, 4]},
-  {name: 'name2', keys: ['A', 'B', 'C', 'D'], values:[5, 6, 2, 8]},
-  {name: 'name3', keys: ['A', 'B', 'C', 'D'], values:[5, 6, 2, 1]}
-];
-
-var dateKeys = [
-    'Mon Mar 01 2015 13:55:07 GMT-0400 (EDT)',
-    'Mon Mar 02 2015 13:55:08 GMT-0400 (EDT)',
-    'Mon Mar 03 2015 13:55:09 GMT-0400 (EDT)',
-    'Mon Mar 04 2015 13:55:10 GMT-0400 (EDT)',
-    'Mon Mar 05 2015 13:55:10 GMT-0400 (EDT)'
-];
-
-var data = [
-  {name: 'name1', keys: dateKeys, values: [1, 20, 10]},
-  {name: 'name1', keys: dateKeys, values: [1, 2, 3]}
-];
-
+//var data = dadavis.utils.getRandomNumericData(20, 5);
 var data = dadavis.utils.getRandomTimeData(50, 5);
 
 var config = {
@@ -72,16 +45,13 @@ var config = {
     axisXTickSkip: 'auto',
     tickYCount: 5,
     dotSize: 0,
+    scaleType: 'time',
     labelFormatterX: function(d, i){
         return d3.time.format('%e %b')(new Date(d)) + '<br>' + d3.time.format('%Y')(new Date(d));
     }
 };
 
 var ds = dadavis.init(config).render(data);
-
-d3.select('.download').on('click', function(){
-    ds.downloadAsPNG();
-});
 
 </script>
 </body>
