@@ -12,10 +12,10 @@ dadavis.interaction.hovering = function(config, cache){
         .on('mousemove', function(){
             var mouse = d3.mouse(this);
             var x = cache.layout[0].map(function(d, i){
-                return (config.type === 'bar') ? d.paddedX : d.x;
+                return d.x;
             });
 
-            var mouseOffset = (config.type === 'bar') ? cache.layout[0][0].paddedW : cache.layout[0][0].w / 2;
+            var mouseOffset = cache.layout[0][0].w / 2;
             var idxUnderMouse = d3.bisect(x, mouse[0] - mouseOffset);
             idxUnderMouse = Math.min(idxUnderMouse, x.length - 1);
 
@@ -78,7 +78,7 @@ dadavis.interaction.tooltip = function(config, cache){
             })
             .style({
                 left: function(d, i){
-                    return ((config.type === 'bar') ? d.paddedX + d.paddedW / 2 : d.x) + 'px';
+                    return d.x + 'px';
                 },
                 top: function(d, i){
                     var y = d.stackedY;
@@ -112,10 +112,9 @@ dadavis.interaction.hoverLine = function(config, cache){
         });
 
     return function(dataUnderMouse){
-        var hoverLineX = (config.type === 'bar') ? dataUnderMouse.paddedX + dataUnderMouse.paddedW / 2 : dataUnderMouse.x;
 
         hoverLine.style({
-            left: hoverLineX + 'px'
+            left: dataUnderMouse.x + 'px'
         });
     };
 };

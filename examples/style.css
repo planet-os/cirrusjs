@@ -10,3 +10,7 @@
     padding: 3px;
     border-radius: 0px 10px 10px 10px;
 }
+
+.label {
+    white-space: nowrap;
+}

@@ -25,7 +25,7 @@ dadavis.component.chart = function(config, cache){
 
     var renderer = dadavis.renderer[config.renderer](shapeContainer.node());
 
-    console.time('rendering');
+    //console.time('rendering');
 
     if(config.type === 'line'){
         shapeAttr.forEach(function(d, i){
@@ -46,7 +46,7 @@ dadavis.component.chart = function(config, cache){
             });
         });
     }
-    console.timeEnd('rendering');
+    //console.timeEnd('rendering');
 
     return this;
 };
@@ -73,12 +73,11 @@ dadavis.component.axisX = function(config, cache){
 
     labelsX
         .html(function(d, i){
-            var key = d.parentData.keys ? d.parentData.keys[i] : i;
             if(config.labelFormatterX){
-                return config.labelFormatterX(key, i);
+                return config.labelFormatterX(d.key, i);
             }
             else{
-                return key;
+                return d.key;
             }
         })
         .style(dadavis.attribute.axis.labelX(config, cache));

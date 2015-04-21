@@ -8,11 +8,11 @@ dadavis.attribute = {
 dadavis.attribute.bar.simple = function(config, cache){
     return cache.layout.map(function(d, i){
         return d.map(function(dB, iB){
-            var gutterW = dB.paddedW / 100 * config.gutterPercent;
+            var gutterW = dB.w / 100 * config.gutterPercent;
             return {
-                x: dB.paddedX,
+                x: dB.x - dB.w / 2 + gutterW / 2,
                 y: dB.y,
-                width: dB.paddedW - gutterW,
+                width: dB.w - gutterW,
                 height: dB.h
             };
         });
@@ -22,11 +22,11 @@ dadavis.attribute.bar.simple = function(config, cache){
 dadavis.attribute.bar.percent = function(config, cache){
     return cache.layout.map(function(d, i){
         return d.map(function(dB, iB){
-            var gutterW = dB.paddedW / 100 * config.gutterPercent;
+            var gutterW = dB.w / 100 * config.gutterPercent;
             return {
-                x: dB.paddedX,
+                x: dB.x - dB.w / 2 + gutterW / 2,
                 y: dB.stackedPercentY,
-                width: dB.paddedW - gutterW,
+                width: dB.w - gutterW,
                 height: dB.stackedPercentH
             };
         });
@@ -36,11 +36,11 @@ dadavis.attribute.bar.percent = function(config, cache){
 dadavis.attribute.bar.stacked = function(config, cache){
     return cache.layout.map(function(d, i){
         return d.map(function(dB, iB){
-            var gutterW = dB.paddedW / 100 * config.gutterPercent;
+            var gutterW = dB.w / 100 * config.gutterPercent;
             return {
-                x: dB.paddedX,
+                x: dB.x - dB.w / 2 + gutterW / 2,
                 y: dB.stackedY,
-                width: dB.paddedW - gutterW,
+                width: dB.w - gutterW,
                 height: dB.stackedH
             };
         });
@@ -54,7 +54,7 @@ dadavis.attribute.point.stacked = function(config, cache){
                 return d.x;
             }
             else{
-                return d.paddedX + d.paddedW / 2
+                return d.centerX
             }
         },
         // cx: function(d, i){ return d.x + d.w / 2; },
@@ -107,12 +107,7 @@ dadavis.attribute.axis.labelX = function(config, cache){
     if(config.axisXAngle < 0){
         labelAttr = {
             left: function(d, i){
-                if(cache.noPadding){
-                    return d.index * d.w - this.offsetWidth + 'px';
-                }
-                else{
-                    return d.index * d.paddedW + d.paddedW / 2 - this.offsetWidth + 'px';
-                }
+                return d.x - this.offsetWidth + 'px';
             },
             'transform-origin': '100%',
             transform: 'rotate(' + config.axisXAngle + 'deg)'
@@ -121,12 +116,7 @@ dadavis.attribute.axis.labelX = function(config, cache){
     else if(config.axisXAngle > 0){
         labelAttr = {
             left: function(d, i){
-                if(cache.noPadding){
-                    return d.index * d.w + 'px';
-                }
-                else{
-                    return d.index * d.paddedW + d.paddedW / 2 + 'px';
-                }
+                return d.x + 'px';
             },
             'transform-origin': '0%',
             transform: 'rotate(' + config.axisXAngle + 'deg)'
@@ -135,12 +125,7 @@ dadavis.attribute.axis.labelX = function(config, cache){
     else{
         labelAttr = {
             left: function(d, i){
-                if(cache.noPadding){
-                    return d.index * d.w - this.offsetWidth / 2 + 'px';
-                }
-                else{
-                    return d.index * d.paddedW + d.paddedW / 2 - this.offsetWidth / 2 + 'px';
-                }
+                return d.x - this.offsetWidth / 2 + 'px';
             }
         }
     }
@@ -155,12 +140,7 @@ dadavis.attribute.axis.labelX = function(config, cache){
 dadavis.attribute.axis.tickX = function(config, cache){
     return {
         left: function(d, i){
-            if(cache.noPadding){
-                return d.index * d.w - this.offsetWidth + 'px';
-            }
-            else{
-                return d.index * d.paddedW + d.paddedW / 2 - this.offsetWidth + 'px';
-            }
+            return d.x - this.offsetWidth + 'px';
         },
         width: 1 + 'px',
         height: function(d, i){

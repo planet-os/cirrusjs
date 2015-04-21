@@ -99,3 +99,11 @@ dadavis.utils.convertToImage = function(config, cache, callback){
     };
     img.src = "data:image/svg+xml;base64," + btoa(XMLString);
 };
+
+dadavis.utils.extractValues = function(data, key){
+    return data.map(function(d){
+        return d.values.map(function(dB){
+            return dB[key];
+        });
+    });
+};

@@ -1,4 +1,4 @@
-var dadavis = {version: '0.1.0'};
+var dadavis = {version: '0.1.1'};
 
 dadavis.init = function(_config){
 
@@ -18,7 +18,11 @@ dadavis.init = function(_config){
         dotSize: 2,
         gutterPercent: 10,
         colors: ['skyblue', 'orange', 'lime', 'orangered', 'violet', 'yellow', 'brown', 'pink'],
-        renderer: 'svg'
+        renderer: 'svg',
+        scaleType: 'time',
+        keyX: 'x',
+        keyY: 'y',
+        outerPadding: 0
     };
 
     var cache = {
@@ -69,8 +73,8 @@ dadavis.init = function(_config){
             });
 
             if(isNotNull){
-                cache.previousData = data;
-                cache.data = data;
+                cache.previousData = _data;
+                cache.data = _data;
                 return true
             }
         }

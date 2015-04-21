@@ -20,52 +20,261 @@
     <link href="style.css" rel="stylesheet" />
     <style>
         .container {
-            width: 100%;
-            height: 400px;
-            margin-top: 100px;
+            width: 300px;
+            height: 200px;
+            margin-top: 20px;
             border: 1px solid #eee;
+            float: left;
         }
     </style>
 </head>
 <body>
 
-<div class="container"></div>
-<button class="download">Download</button>
+<div class="container" id="chart1"></div>
+<div class="container" id="chart2"></div>
+<div class="container" id="chart3"></div>
+<div class="container" id="chart4"></div>
+<div class="container" id="chart5"></div>
+<div class="container" id="chart6"></div>
+<div class="container" id="chart7"></div>
+<div class="container" id="chart8"></div>
+<div class="container" id="chart9"></div>
+<div class="container" id="chart10"></div>
+<div class="container" id="chart11"></div>
+<div class="container" id="chart12"></div>
+<div class="container" id="chart13"></div>
+<div class="container" id="chart14"></div>
+<div class="container" id="chart15"></div>
+<div class="container" id="chart16"></div>
+<div class="container" id="chart17"></div>
+<div class="container" id="chart18"></div>
 
 <script>
 
-var dateKeys = [
-    'Mon Mar 01 2015 13:55:07 GMT-0400 (EDT)',
-//    'Mon Mar 01 2015 13:55:07 GMT-0400 (EDT)'
+var data1 = [
+    {name: 'name1', values: [
+        {x: 'Fri May 01 2015 13:00:00 GMT-0400 (EDT)', y: 1},
+        {x: 'Sat May 02 2015 13:00:00 GMT-0400 (EDT)', y: 2},
+        {x: 'Mon May 04 2015 13:00:00 GMT-0400 (EDT)', y: 3},
+        {x: 'Tue May 05 2015 13:00:00 GMT-0400 (EDT)', y: 8}
+    ]},
+    {name: 'name2', values: [
+        {x: 'Fri May 01 2015 13:00:00 GMT-0400 (EDT)', y: 1},
+        {x: 'Sat May 02 2015 13:00:00 GMT-0400 (EDT)', y: 2},
+        {x: 'Mon May 04 2015 13:00:00 GMT-0400 (EDT)', y: 3},
+        {x: 'Tue May 05 2015 13:00:00 GMT-0400 (EDT)', y: 8}
+    ]}
 ];
 
-var data = [
-//  {name: 'name1', keys: dateKeys, values: [1, 20]}
-  {name: 'name1', keys: dateKeys, values: [1]}
-//  {name: 'name1', keys: [], values: []}
+var data2 = [
+    {name: 'name1', values: [
+        {x: 1, y: 1},
+        {x: 2, y: 2},
+        {x: 6, y: 2}
+    ]},
+    {name: 'name1', values: [
+        {x: 1, y: 1},
+        {x: 2, y: 2},
+        {x: 6, y: 2}
+    ]}
 ];
 
-var config = {
-    containerSelector: '.container',
-    margin: {top: 10, right: 10, bottom: 50, left: 70},
-    type: 'bar',
-    subtype: 'stacked',
-    axisXAngle: 0,
-    axisXTickSkip: 'auto',
-    tickYCount: 5,
-    dotSize: 0,
-    labelFormatterX: function(d, i){
-        return d3.time.format('%e %b')(new Date(d)) + '<br>' + d3.time.format('%Y')(new Date(d));
-    }
+var data3 = [
+    {name: 'name1', values: [
+        {x: 'A', y: 1},
+        {x: 'B', y: 2},
+        {x: 'D', y: 6}
+    ]},
+    {name: 'name1', values: [
+        {x: 'A', y: 4},
+        {x: 'B', y: 5},
+        {x: 'D', y: 3}
+    ]}
+];
+
+var renderer = 'svg';
+var scaleType = 'linear';
+
+var labelFormatter = function(d, i){
+    return d3.time.format('%e %b')(new Date(d));
 };
 
-var ds = dadavis.init(config).render(data);
-ds.render();
-ds.render();
+var config = {
+    containerSelector: '#chart1',
+    type: 'line',
+    subtype: 'area',
+    renderer: renderer,
+    labelFormatterX: labelFormatter,
+    scaleType: 'time'
+};
+var ds = dadavis.init(config).render(data1);
 
-d3.select('.download').on('click', function(){
-    ds.downloadAsPNG();
-});
+var config = {
+    containerSelector: '#chart2',
+    type: 'line',
+    subtype: 'stacked',
+    renderer: renderer,
+    labelFormatterX: labelFormatter,
+    scaleType: 'time'
+};
+var ds = dadavis.init(config).render(data1);
+
+var config = {
+    containerSelector: '#chart3',
+    type: 'line',
+    subtype: 'simple',
+    renderer: renderer,
+    labelFormatterX: labelFormatter,
+    scaleType: 'time'
+};
+var ds = dadavis.init(config).render(data1);
+
+var config = {
+    containerSelector: '#chart4',
+    type: 'bar',
+    subtype: 'simple',
+    renderer: renderer,
+    labelFormatterX: labelFormatter,
+    scaleType: 'time',
+    outerPadding: 20
+};
+var ds = dadavis.init(config).render(data1);
+
+var config = {
+    containerSelector: '#chart5',
+    type: 'bar',
+    subtype: 'stacked',
+    renderer: renderer,
+    labelFormatterX: labelFormatter,
+    scaleType: 'time',
+    outerPadding: 20
+};
+var ds = dadavis.init(config).render(data1);
+
+var config = {
+    containerSelector: '#chart6',
+    type: 'bar',
+    subtype: 'percent',
+    renderer: renderer,
+    labelFormatterX: labelFormatter,
+    scaleType: 'time',
+    outerPadding: 20
+};
+var ds = dadavis.init(config).render(data1);
+
+var config = {
+    containerSelector: '#chart7',
+    type: 'line',
+    subtype: 'area',
+    renderer: renderer,
+    scaleType: 'ordinal'
+};
+var ds = dadavis.init(config).render(data3);
+
+var config = {
+    containerSelector: '#chart8',
+    type: 'line',
+    subtype: 'stacked',
+    renderer: renderer,
+    scaleType: 'ordinal'
+};
+var ds = dadavis.init(config).render(data3);
+
+var config = {
+    containerSelector: '#chart9',
+    type: 'line',
+    subtype: 'simple',
+    renderer: renderer,
+    scaleType: 'ordinal'
+};
+var ds = dadavis.init(config).render(data3);
+
+var config = {
+    containerSelector: '#chart10',
+    type: 'bar',
+    subtype: 'simple',
+    renderer: renderer,
+    scaleType: 'ordinal',
+    outerPadding: 40
+};
+var ds = dadavis.init(config).render(data3);
+
+var config = {
+    containerSelector: '#chart11',
+    type: 'bar',
+    subtype: 'stacked',
+    renderer: renderer,
+    scaleType: 'ordinal',
+    outerPadding: 40
+};
+var ds = dadavis.init(config).render(data3);
+
+var config = {
+    containerSelector: '#chart12',
+    type: 'bar',
+    subtype: 'percent',
+    renderer: renderer,
+    scaleType: 'ordinal',
+    outerPadding: 40
+};
+var ds = dadavis.init(config).render(data3);
+
+var config = {
+    containerSelector: '#chart13',
+    type: 'line',
+    subtype: 'area',
+    renderer: renderer,
+    scaleType: 'linear'
+};
+var ds = dadavis.init(config).render(data2);
+
+var config = {
+    containerSelector: '#chart14',
+    type: 'line',
+    subtype: 'stacked',
+    renderer: renderer,
+    scaleType: 'linear'
+};
+var ds = dadavis.init(config).render(data2);
+
+var config = {
+    containerSelector: '#chart15',
+    type: 'line',
+    subtype: 'simple',
+    renderer: renderer,
+    scaleType: 'linear'
+};
+var ds = dadavis.init(config).render(data2);
+
+var config = {
+    containerSelector: '#chart16',
+    type: 'bar',
+    subtype: 'simple',
+    renderer: renderer,
+    scaleType: 'linear',
+    outerPadding: 20
+};
+var ds = dadavis.init(config).render(data2);
+
+var config = {
+    containerSelector: '#chart17',
+    type: 'bar',
+    subtype: 'stacked',
+    renderer: renderer,
+    scaleType: 'linear',
+    outerPadding: 20
+};
+var ds = dadavis.init(config).render(data2);
+
+var config = {
+    containerSelector: '#chart18',
+    type: 'bar',
+    subtype: 'percent',
+    renderer: renderer,
+    scaleType: 'linear',
+    outerPadding: 20
+};
+var ds = dadavis.init(config).render(data2);
 
 </script>
 </body>
