@@ -23,7 +23,8 @@ dadavis.init = function(_config){
         keyX: 'x',
         keyY: 'y',
         outerPadding: 0,
-        showFringe: false
+        showFringe: false,
+        autoTypeThreshold: 30
     };
 
     var cache = {
@@ -60,6 +61,18 @@ dadavis.init = function(_config){
     }
 
     function computeAutomaticConfig(config, cache){
+
+        if(config.type === 'auto'){
+            var dataLength = cache.data[0].values.length;
+            console.log(dataLength, config.autoTypeThreshold);
+            if(dataLength < config.autoTypeThreshold){
+                config.type = 'bar';
+            }
+            else{
+                config.type = 'line';
+            }
+        }
+
         this.setConfig({
             width: cache.container.node().offsetWidth,
             height: cache.container.node().offsetHeight
