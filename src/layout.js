@@ -10,8 +10,27 @@ dadavis.layout.data = function(config, cache){
 
     var values = dadavis.utils.extractValues(cache.data, config.keyY);
     var valuesTransposed = d3.transpose(values);
-    var firstPoint = cache.data[0].values[0][config.keyX];
-    var secondPoint = cache.data[0].values[1][config.keyX];
+
+    var previousValue = null;
+    var minW = Number.MAX_VALUE;
+    cache.data[0].values.forEach(function(d, i){
+
+        var value = d[config.keyX];
+        if(config.scaleType === 'time'){
+            value = new Date(value);
+        }
+        else if(config.scaleType === 'ordinal'){
+            value = i;
+        }
+
+        var diff = cache.scaleX(value) - cache.scaleX(previousValue);
+        if(i !== 0 && diff < minW){
+            minW = diff;
+        }
+
+        previousValue = value;
+    });
+    minW = Math.max(minW, 1);
 
     return cache.data.map(function(d, i){
 
@@ -23,22 +42,16 @@ dadavis.layout.data = function(config, cache){
                 return d3.sum(d);
             }))]);
 
-            var w = null;
             var key = dB[config.keyX];
             if(config.scaleType === 'time'){
                 key = new Date(key);
-                w = cache.scaleX(new Date(secondPoint)) - cache.scaleX(new Date(firstPoint));
             }
             else if(config.scaleType === 'ordinal'){
-                w = cache.scaleX(1) - cache.scaleX(0);
                 key = iB;
-            }
-            else{
-                w = cache.scaleX(secondPoint) - cache.scaleX(firstPoint);
             }
 
             var value = dB[config.keyY];
-            var gutterW = w / 100 * config.gutterPercent;
+            var gutterW = minW / 100 * config.gutterPercent;
 
             var datum = {
                 key: dB[config.keyX],
@@ -50,14 +63,14 @@ dadavis.layout.data = function(config, cache){
                 y: cache.chartHeight - cache.scaleY(value),
                 stackedPercentY: cache.chartHeight - percentScaleY(d3.sum(valuesTransposed[iB].slice(0, i + 1))),
                 stackedY: cache.chartHeight - stackedScaleY(d3.sum(valuesTransposed[iB].slice(0, i + 1))),
-                w: w,
+                w: minW,
                 h: cache.scaleY(value),
                 gutterW: gutterW,
                 stackedPercentH: percentScaleY(value),
                 stackedH: stackedScaleY(value),
                 layerCount: cache.data.length,
                 layerIndex: i,
-                centerX: cache.scaleX(key) + w / 2
+                centerX: cache.scaleX(key) + minW / 2
             };
 
             datum.previous = previous || datum;
