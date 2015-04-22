@@ -5,8 +5,10 @@ dadavis.scale.x = function(config, cache){
     var keys = dadavis.utils.extractValues(cache.data, config.keyX);
     var allKeys = d3.merge(dadavis.utils.extractValues(cache.data, config.keyX));
 
-    var scaleX = d3.time.scale().range([config.outerPadding, cache.chartWidth - config.outerPadding]);;
+    var range = [config.outerPadding, cache.chartWidth - config.outerPadding];
+    var scaleX = null;
     if(config.scaleType === 'time'){
+        scaleX = d3.time.scale().range(range);
         allKeys = allKeys.map(function(d, i){
             return new Date(d);
         });
@@ -14,9 +16,11 @@ dadavis.scale.x = function(config, cache){
         scaleX.domain(d3.extent(allKeys));
     }
     else if(config.scaleType === 'ordinal'){
+        scaleX = d3.scale.linear().range(range);
         scaleX.domain([0, keys[0].length - 1]);
     }
     else{
+        scaleX = d3.scale.linear().range(range);
         scaleX.domain(d3.extent(allKeys));
     }
 

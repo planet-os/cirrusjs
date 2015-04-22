@@ -64,7 +64,7 @@ dadavis.component.axisX = function(config, cache){
         });
 
     var labelsX = axisXContainer.selectAll('div.label')
-        .data(cache.layout[0]);
+        .data(cache.axesLayout.x);
 
     labelsX.enter().append('div').classed('label', true)
         .style({
@@ -73,12 +73,7 @@ dadavis.component.axisX = function(config, cache){
 
     labelsX
         .html(function(d, i){
-            if(config.labelFormatterX){
-                return config.labelFormatterX(d.key, i);
-            }
-            else{
-                return d.key;
-            }
+            return config.labelFormatterX(d.key, i);
         })
         .style(dadavis.attribute.axis.labelX(config, cache));
 
@@ -86,7 +81,7 @@ dadavis.component.axisX = function(config, cache){
         var widestLabel = d3.max(labelsX[0].map(function(d){
             return d.offsetWidth;
         }));
-        cache.axisXTickSkipAuto = Math.ceil(cache.layout[0].length / ~~(cache.chartWidth / widestLabel));
+        cache.axisXTickSkipAuto = Math.ceil(cache.axesLayout.x.length / ~~(cache.chartWidth / widestLabel));
     }
 
     labelsX.style(dadavis.attribute.axis.labelX(config, cache));
@@ -95,7 +90,7 @@ dadavis.component.axisX = function(config, cache){
 
 
     var ticksX = axisXContainer.selectAll('div.tick')
-        .data(cache.layout[0]);
+        .data(cache.axesLayout.x);
 
     ticksX.enter().append('div').classed('tick', true)
         .style({position: 'absolute'})
@@ -131,7 +126,7 @@ dadavis.component.axisY = function(config, cache){
         });
 
     var labelsY = axisYContainer.selectAll('div.label')
-        .data(cache.axesLayout);
+        .data(cache.axesLayout.y);
 
     labelsY.enter().append('div').classed('label', true);
 
@@ -149,7 +144,7 @@ dadavis.component.axisY = function(config, cache){
     labelsY.exit().remove();
 
     var ticksY = axisYContainer.selectAll('div.tick')
-        .data(cache.axesLayout);
+        .data(cache.axesLayout.y);
 
     ticksY.enter().append('div').classed('tick', true)
         .style({'background-color': 'black'});

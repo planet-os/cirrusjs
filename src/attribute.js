@@ -160,7 +160,7 @@ dadavis.attribute.axis.fringeX = function(config, cache){
             return d.w + 'px';
         },
         height: function(d, i){
-            return config.tickSize / 2 + 'px';
+            return config.fringeSize + 'px';
         },
         'background-color': function(d){
             return fringeColorScale(d.normalizedValue);
@@ -203,7 +203,7 @@ dadavis.attribute.axis.fringeY = function(config, cache){
             return d.y + 'px';
         },
         width: function(d){
-            return config.tickSize / 2 + 'px';
+            return config.fringeSize + 'px';
         },
         height: function(d, i){
             return 3 + 'px';

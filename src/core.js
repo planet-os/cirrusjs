@@ -9,12 +9,14 @@ dadavis.init = function(_config){
         margin: {top: 20, right: 20, bottom: 50, left: 50},
         type: 'bar',
         subtype: 'stacked',
-        labelFormatterX: null,
+        labelFormatterX: function(d){ return d; },
         axisXAngle: null,
-        tickSize: 10,
-        minorTickSize: 3,
+        tickSize: 15,
+        minorTickSize: 10,
+        fringeSize: 8,
         tickYCount: 5,
         axisXTickSkip: 'auto',
+        continuousXAxis: false,
         dotSize: 2,
         gutterPercent: 10,
         colors: ['skyblue', 'orange', 'lime', 'orangered', 'violet', 'yellow', 'brown', 'pink'],
@@ -34,6 +36,7 @@ dadavis.init = function(_config){
         layout: null,
         scaleX: null,
         scaleY: null,
+        axesLayout: {},
         previousData: null,
         container: null,
         noPadding: false,
@@ -151,7 +154,8 @@ dadavis.init = function(_config){
         cache.scaleY = dadavis.scale.y(config, cache);
 
         cache.layout = dadavis.layout.data(config, cache);
-        cache.axesLayout = dadavis.layout.axes(config, cache);
+        cache.axesLayout.x = dadavis.layout.axes.x(config, cache);
+        cache.axesLayout.y = dadavis.layout.axes.y(config, cache);
 
         dadavis.component.chart(config, cache);
         dadavis.component.axisX(config, cache);

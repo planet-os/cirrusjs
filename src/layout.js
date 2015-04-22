@@ -66,7 +66,38 @@ dadavis.layout.data = function(config, cache){
     });
 };
 
-dadavis.layout.axes = function(config, cache){
+dadavis.layout.axes.x = function(config, cache){
+    var scaleX = cache.scaleX.copy();
+
+    if(config.continuousXAxis){
+
+        return scaleX.ticks().map(function(d, i){
+            return {
+                key: d,
+                x: scaleX(d)
+            };
+        });
+    }
+    else{
+        return cache.data[0].values.map(function(d, i){
+
+            var key = d[config.keyX];
+            if(config.scaleType === 'time'){
+                key = new Date(key);
+            }
+            else if(config.scaleType === 'ordinal'){
+                key = i;
+            }
+
+            return {
+                key: d[config.keyX],
+                x: scaleX(key)
+            };
+        });
+    }
+};
+
+dadavis.layout.axes.y = function(config, cache){
     var scaleY = cache.scaleY.copy();
     var percentScaleY = cache.scaleY.copy();
     var stackedScaleY = cache.scaleY.copy();

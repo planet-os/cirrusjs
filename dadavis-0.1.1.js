@@ -15,12 +15,16 @@ dadavis.init = function(_config) {
         },
         type: "bar",
         subtype: "stacked",
-        labelFormatterX: null,
+        labelFormatterX: function(d) {
+            return d;
+        },
         axisXAngle: null,
-        tickSize: 10,
-        minorTickSize: 3,
+        tickSize: 15,
+        minorTickSize: 10,
+        fringeSize: 8,
         tickYCount: 5,
         axisXTickSkip: "auto",
+        continuousXAxis: false,
         dotSize: 2,
         gutterPercent: 10,
         colors: [ "skyblue", "orange", "lime", "orangered", "violet", "yellow", "brown", "pink" ],
@@ -39,6 +43,7 @@ dadavis.init = function(_config) {
         layout: null,
         scaleX: null,
         scaleY: null,
+        axesLayout: {},
         previousData: null,
         container: null,
         noPadding: false,
@@ -131,7 +136,8 @@ dadavis.init = function(_config) {
         cache.scaleX = dadavis.scale.x(config, cache);
         cache.scaleY = dadavis.scale.y(config, cache);
         cache.layout = dadavis.layout.data(config, cache);
-        cache.axesLayout = dadavis.layout.axes(config, cache);
+        cache.axesLayout.x = dadavis.layout.axes.x(config, cache);
+        cache.axesLayout.y = dadavis.layout.axes.y(config, cache);
         dadavis.component.chart(config, cache);
         dadavis.component.axisX(config, cache);
         dadavis.component.axisY(config, cache);
@@ -320,7 +326,32 @@ dadavis.layout.data = function(config, cache) {
     });
 };
 
-dadavis.layout.axes = function(config, cache) {
+dadavis.layout.axes.x = function(config, cache) {
+    var scaleX = cache.scaleX.copy();
+    if (config.continuousXAxis) {
+        return scaleX.ticks().map(function(d, i) {
+            return {
+                key: d,
+                x: scaleX(d)
+            };
+        });
+    } else {
+        return cache.data[0].values.map(function(d, i) {
+            var key = d[config.keyX];
+            if (config.scaleType === "time") {
+                key = new Date(key);
+            } else if (config.scaleType === "ordinal") {
+                key = i;
+            }
+            return {
+                key: d[config.keyX],
+                x: scaleX(key)
+            };
+        });
+    }
+};
+
+dadavis.layout.axes.y = function(config, cache) {
     var scaleY = cache.scaleY.copy();
     var percentScaleY = cache.scaleY.copy();
     var stackedScaleY = cache.scaleY.copy();
@@ -500,7 +531,7 @@ dadavis.attribute.axis.fringeX = function(config, cache) {
             return d.w + "px";
         },
         height: function(d, i) {
-            return config.tickSize / 2 + "px";
+            return config.fringeSize + "px";
         },
         "background-color": function(d) {
             return fringeColorScale(d.normalizedValue);
@@ -543,7 +574,7 @@ dadavis.attribute.axis.fringeY = function(config, cache) {
             return d.y + "px";
         },
         width: function(d) {
-            return config.tickSize / 2 + "px";
+            return config.fringeSize + "px";
         },
         height: function(d, i) {
             return 3 + "px";
@@ -664,15 +695,19 @@ dadavis.scale = {};
 dadavis.scale.x = function(config, cache) {
     var keys = dadavis.utils.extractValues(cache.data, config.keyX);
     var allKeys = d3.merge(dadavis.utils.extractValues(cache.data, config.keyX));
-    var scaleX = d3.time.scale().range([ config.outerPadding, cache.chartWidth - config.outerPadding ]);
+    var range = [ config.outerPadding, cache.chartWidth - config.outerPadding ];
+    var scaleX = null;
     if (config.scaleType === "time") {
+        scaleX = d3.time.scale().range(range);
         allKeys = allKeys.map(function(d, i) {
             return new Date(d);
         });
         scaleX.domain(d3.extent(allKeys));
     } else if (config.scaleType === "ordinal") {
+        scaleX = d3.scale.linear().range(range);
         scaleX.domain([ 0, keys[0].length - 1 ]);
     } else {
+        scaleX = d3.scale.linear().range(range);
         scaleX.domain(d3.extent(allKeys));
     }
     return scaleX;
@@ -820,26 +855,22 @@ dadavis.component.axisX = function(config, cache) {
         left: config.margin.left + "px",
         "border-top": "1px solid black"
     });
-    var labelsX = axisXContainer.selectAll("div.label").data(cache.layout[0]);
+    var labelsX = axisXContainer.selectAll("div.label").data(cache.axesLayout.x);
     labelsX.enter().append("div").classed("label", true).style({
         position: "absolute"
     });
     labelsX.html(function(d, i) {
-        if (config.labelFormatterX) {
-            return config.labelFormatterX(d.key, i);
-        } else {
-            return d.key;
-        }
+        return config.labelFormatterX(d.key, i);
     }).style(dadavis.attribute.axis.labelX(config, cache));
     if (config.axisXTickSkip === "auto") {
         var widestLabel = d3.max(labelsX[0].map(function(d) {
             return d.offsetWidth;
         }));
-        cache.axisXTickSkipAuto = Math.ceil(cache.layout[0].length / ~~(cache.chartWidth / widestLabel));
+        cache.axisXTickSkipAuto = Math.ceil(cache.axesLayout.x.length / ~~(cache.chartWidth / widestLabel));
     }
     labelsX.style(dadavis.attribute.axis.labelX(config, cache));
     labelsX.exit().remove();
-    var ticksX = axisXContainer.selectAll("div.tick").data(cache.layout[0]);
+    var ticksX = axisXContainer.selectAll("div.tick").data(cache.axesLayout.x);
     ticksX.enter().append("div").classed("tick", true).style({
         position: "absolute"
     }).style({
@@ -866,7 +897,7 @@ dadavis.component.axisY = function(config, cache) {
         left: 0 + "px",
         "border-right": "1px solid black"
     });
-    var labelsY = axisYContainer.selectAll("div.label").data(cache.axesLayout);
+    var labelsY = axisYContainer.selectAll("div.label").data(cache.axesLayout.y);
     labelsY.enter().append("div").classed("label", true);
     labelsY.html(function(d, i) {
         if (config.subtype === "simple") {
@@ -876,7 +907,7 @@ dadavis.component.axisY = function(config, cache) {
         }
     }).style(dadavis.attribute.axis.labelY(config, cache));
     labelsY.exit().remove();
-    var ticksY = axisYContainer.selectAll("div.tick").data(cache.axesLayout);
+    var ticksY = axisYContainer.selectAll("div.tick").data(cache.axesLayout.y);
     ticksY.enter().append("div").classed("tick", true).style({
         "background-color": "black"
     });
