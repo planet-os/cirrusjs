@@ -38,6 +38,7 @@ dadavis.layout.data = function(config, cache){
             }
 
             var value = dB[config.keyY];
+            var gutterW = w / 100 * config.gutterPercent;
 
             var datum = {
                 key: dB[config.keyX],
@@ -51,6 +52,7 @@ dadavis.layout.data = function(config, cache){
                 stackedY: cache.chartHeight - stackedScaleY(d3.sum(valuesTransposed[iB].slice(0, i + 1))),
                 w: w,
                 h: cache.scaleY(value),
+                gutterW: gutterW,
                 stackedPercentH: percentScaleY(value),
                 stackedH: stackedScaleY(value),
                 layerCount: cache.data.length,

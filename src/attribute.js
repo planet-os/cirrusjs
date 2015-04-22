@@ -8,11 +8,10 @@ dadavis.attribute = {
 dadavis.attribute.bar.simple = function(config, cache){
     return cache.layout.map(function(d, i){
         return d.map(function(dB, iB){
-            var gutterW = dB.w / 100 * config.gutterPercent;
             return {
-                x: dB.x - dB.w / 2 + gutterW / 2,
+                x: dB.x - dB.w / 2 + dB.gutterW / 2,
                 y: dB.y,
-                width: dB.w - gutterW,
+                width: dB.w - dB.gutterW,
                 height: dB.h
             };
         });
@@ -22,11 +21,10 @@ dadavis.attribute.bar.simple = function(config, cache){
 dadavis.attribute.bar.percent = function(config, cache){
     return cache.layout.map(function(d, i){
         return d.map(function(dB, iB){
-            var gutterW = dB.w / 100 * config.gutterPercent;
             return {
-                x: dB.x - dB.w / 2 + gutterW / 2,
+                x: dB.x - dB.w / 2 + dB.gutterW / 2,
                 y: dB.stackedPercentY,
-                width: dB.w - gutterW,
+                width: dB.w - dB.gutterW,
                 height: dB.stackedPercentH
             };
         });
@@ -36,11 +34,10 @@ dadavis.attribute.bar.percent = function(config, cache){
 dadavis.attribute.bar.stacked = function(config, cache){
     return cache.layout.map(function(d, i){
         return d.map(function(dB, iB){
-            var gutterW = dB.w / 100 * config.gutterPercent;
             return {
-                x: dB.x - dB.w / 2 + gutterW / 2,
+                x: dB.x - dB.w / 2 + dB.gutterW / 2,
                 y: dB.stackedY,
-                width: dB.w - gutterW,
+                width: dB.w - dB.gutterW,
                 height: dB.stackedH
             };
         });
@@ -131,7 +128,7 @@ dadavis.attribute.axis.labelX = function(config, cache){
     }
 
     labelAttr.display = function(d, i){
-        return (i % (cache.axisXTickSkipAuto || config.axisXTickSkip)) ? 'none' : 'block';
+        return (i % config.axisXTickSkip) ? 'none' : 'block';
     };
     labelAttr.top = config.tickSize + 'px';
     return labelAttr;
@@ -145,7 +142,7 @@ dadavis.attribute.axis.tickX = function(config, cache){
         },
         width: tickW + 'px',
         height: function(d, i){
-            return ((i % (cache.axisXTickSkipAuto || config.axisXTickSkip)) ? config.minorTickSize : config.tickSize) + 'px';
+            return ((i % config.axisXTickSkip) ? config.minorTickSize : config.tickSize) + 'px';
         }
     };
 };
@@ -154,10 +151,10 @@ dadavis.attribute.axis.fringeX = function(config, cache){
     var fringeColorScale = d3.scale.linear().domain([0, 1]).range(['yellow', 'limegreen']);
     return {
         left: function(d, i){
-            return d.x - d.w / 2 - this.offsetWidth + 'px';
+            return d.x - d.w / 2 + d.gutterW / 2 - this.offsetWidth + 'px';
         },
         width: function(d){
-            return d.w + 'px';
+            return Math.max(d.w - d.gutterW, 1) + 'px';
         },
         height: function(d, i){
             return config.fringeSize + 'px';
@@ -196,17 +193,18 @@ dadavis.attribute.axis.tickY = function(config, cache){
 
 dadavis.attribute.axis.fringeY = function(config, cache){
     var fringeColorScale = d3.scale.linear().domain([0, 1]).range(['yellow', 'limegreen']);
+    var h = 3;
     return {
         position: 'absolute',
-        left: config.tickSize / 2 + config.margin.left - config.tickSize + 'px',
+        left: config.margin.left - config.fringeSize + 'px',
         top: function(d, i){
-            return d.y + 'px';
+            return d.y - h / 2 + 'px';
         },
         width: function(d){
             return config.fringeSize + 'px';
         },
         height: function(d, i){
-            return 3 + 'px';
+            return h + 'px';
         },
         'background-color': function(d){
             return fringeColorScale(d.normalizedValue);

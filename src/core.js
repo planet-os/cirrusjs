@@ -69,10 +69,18 @@ dadavis.init = function(_config){
             var dataLength = cache.data[0].values.length;
             if(dataLength < config.autoTypeThreshold){
                 config.type = 'bar';
+                config.continuousXAxis = false;
+                config.outerPadding = 'auto';
             }
             else{
                 config.type = 'line';
+                config.continuousXAxis = true;
             }
+        }
+
+        if(config.outerPadding === 'auto'){
+            var keys = dadavis.utils.extractValues(cache.data, config.keyX);
+            config.outerPadding = cache.chartWidth / keys[0].length / 4;
         }
 
         this.setConfig({

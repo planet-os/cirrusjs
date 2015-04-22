@@ -69,9 +69,16 @@ dadavis.init = function(_config) {
             var dataLength = cache.data[0].values.length;
             if (dataLength < config.autoTypeThreshold) {
                 config.type = "bar";
+                config.continuousXAxis = false;
+                config.outerPadding = "auto";
             } else {
                 config.type = "line";
+                config.continuousXAxis = true;
             }
+        }
+        if (config.outerPadding === "auto") {
+            var keys = dadavis.utils.extractValues(cache.data, config.keyX);
+            config.outerPadding = cache.chartWidth / keys[0].length / 4;
         }
         this.setConfig({
             width: cache.container.node().offsetWidth,
@@ -301,6 +308,7 @@ dadavis.layout.data = function(config, cache) {
                 w = cache.scaleX(secondPoint) - cache.scaleX(firstPoint);
             }
             var value = dB[config.keyY];
+            var gutterW = w / 100 * config.gutterPercent;
             var datum = {
                 key: dB[config.keyX],
                 value: value,
@@ -313,6 +321,7 @@ dadavis.layout.data = function(config, cache) {
                 stackedY: cache.chartHeight - stackedScaleY(d3.sum(valuesTransposed[iB].slice(0, i + 1))),
                 w: w,
                 h: cache.scaleY(value),
+                gutterW: gutterW,
                 stackedPercentH: percentScaleY(value),
                 stackedH: stackedScaleY(value),
                 layerCount: cache.data.length,
@@ -387,11 +396,10 @@ dadavis.attribute = {
 dadavis.attribute.bar.simple = function(config, cache) {
     return cache.layout.map(function(d, i) {
         return d.map(function(dB, iB) {
-            var gutterW = dB.w / 100 * config.gutterPercent;
             return {
-                x: dB.x - dB.w / 2 + gutterW / 2,
+                x: dB.x - dB.w / 2 + dB.gutterW / 2,
                 y: dB.y,
-                width: dB.w - gutterW,
+                width: dB.w - dB.gutterW,
                 height: dB.h
             };
         });
@@ -401,11 +409,10 @@ dadavis.attribute.bar.simple = function(config, cache) {
 dadavis.attribute.bar.percent = function(config, cache) {
     return cache.layout.map(function(d, i) {
         return d.map(function(dB, iB) {
-            var gutterW = dB.w / 100 * config.gutterPercent;
             return {
-                x: dB.x - dB.w / 2 + gutterW / 2,
+                x: dB.x - dB.w / 2 + dB.gutterW / 2,
                 y: dB.stackedPercentY,
-                width: dB.w - gutterW,
+                width: dB.w - dB.gutterW,
                 height: dB.stackedPercentH
             };
         });
@@ -415,11 +422,10 @@ dadavis.attribute.bar.percent = function(config, cache) {
 dadavis.attribute.bar.stacked = function(config, cache) {
     return cache.layout.map(function(d, i) {
         return d.map(function(dB, iB) {
-            var gutterW = dB.w / 100 * config.gutterPercent;
             return {
-                x: dB.x - dB.w / 2 + gutterW / 2,
+                x: dB.x - dB.w / 2 + dB.gutterW / 2,
                 y: dB.stackedY,
-                width: dB.w - gutterW,
+                width: dB.w - dB.gutterW,
                 height: dB.stackedH
             };
         });
@@ -502,7 +508,7 @@ dadavis.attribute.axis.labelX = function(config, cache) {
         };
     }
     labelAttr.display = function(d, i) {
-        return i % (cache.axisXTickSkipAuto || config.axisXTickSkip) ? "none" : "block";
+        return i % config.axisXTickSkip ? "none" : "block";
     };
     labelAttr.top = config.tickSize + "px";
     return labelAttr;
@@ -516,7 +522,7 @@ dadavis.attribute.axis.tickX = function(config, cache) {
         },
         width: tickW + "px",
         height: function(d, i) {
-            return (i % (cache.axisXTickSkipAuto || config.axisXTickSkip) ? config.minorTickSize : config.tickSize) + "px";
+            return (i % config.axisXTickSkip ? config.minorTickSize : config.tickSize) + "px";
         }
     };
 };
@@ -525,10 +531,10 @@ dadavis.attribute.axis.fringeX = function(config, cache) {
     var fringeColorScale = d3.scale.linear().domain([ 0, 1 ]).range([ "yellow", "limegreen" ]);
     return {
         left: function(d, i) {
-            return d.x - d.w / 2 - this.offsetWidth + "px";
+            return d.x - d.w / 2 + d.gutterW / 2 - this.offsetWidth + "px";
         },
         width: function(d) {
-            return d.w + "px";
+            return Math.max(d.w - d.gutterW, 1) + "px";
         },
         height: function(d, i) {
             return config.fringeSize + "px";
@@ -567,17 +573,18 @@ dadavis.attribute.axis.tickY = function(config, cache) {
 
 dadavis.attribute.axis.fringeY = function(config, cache) {
     var fringeColorScale = d3.scale.linear().domain([ 0, 1 ]).range([ "yellow", "limegreen" ]);
+    var h = 3;
     return {
         position: "absolute",
-        left: config.tickSize / 2 + config.margin.left - config.tickSize + "px",
+        left: config.margin.left - config.fringeSize + "px",
         top: function(d, i) {
-            return d.y + "px";
+            return d.y - h / 2 + "px";
         },
         width: function(d) {
             return config.fringeSize + "px";
         },
         height: function(d, i) {
-            return 3 + "px";
+            return h + "px";
         },
         "background-color": function(d) {
             return fringeColorScale(d.normalizedValue);
@@ -694,7 +701,7 @@ dadavis.scale = {};
 
 dadavis.scale.x = function(config, cache) {
     var keys = dadavis.utils.extractValues(cache.data, config.keyX);
-    var allKeys = d3.merge(dadavis.utils.extractValues(cache.data, config.keyX));
+    var allKeys = d3.merge(keys);
     var range = [ config.outerPadding, cache.chartWidth - config.outerPadding ];
     var scaleX = null;
     if (config.scaleType === "time") {
@@ -863,10 +870,20 @@ dadavis.component.axisX = function(config, cache) {
         return config.labelFormatterX(d.key, i);
     }).style(dadavis.attribute.axis.labelX(config, cache));
     if (config.axisXTickSkip === "auto") {
-        var widestLabel = d3.max(labelsX[0].map(function(d) {
+        var previous = null;
+        labelsX[0].forEach(function(d) {
+            var hide = false;
+            if (previous) {
+                hide = parseFloat(d.style.left) - parseFloat(previous.style.left) < d.offsetWidth;
+            }
+            if (!hide) {
+                previous = d;
+            }
+            d3.select(d).style({
+                opacity: +!hide
+            });
             return d.offsetWidth;
-        }));
-        cache.axisXTickSkipAuto = Math.ceil(cache.axesLayout.x.length / ~~(cache.chartWidth / widestLabel));
+        });
     }
     labelsX.style(dadavis.attribute.axis.labelX(config, cache));
     labelsX.exit().remove();

@@ -78,10 +78,18 @@ dadavis.component.axisX = function(config, cache){
         .style(dadavis.attribute.axis.labelX(config, cache));
 
     if(config.axisXTickSkip === 'auto'){
-        var widestLabel = d3.max(labelsX[0].map(function(d){
+        var previous = null;
+        labelsX[0].forEach(function(d){
+            var hide = false;
+            if(previous){
+                hide = parseFloat(d.style.left) - parseFloat(previous.style.left) < d.offsetWidth;
+            }
+            if(!hide){
+                previous = d;
+            }
+            d3.select(d).style({opacity: +!hide});
             return d.offsetWidth;
-        }));
-        cache.axisXTickSkipAuto = Math.ceil(cache.axesLayout.x.length / ~~(cache.chartWidth / widestLabel));
+        });
     }
 
     labelsX.style(dadavis.attribute.axis.labelX(config, cache));

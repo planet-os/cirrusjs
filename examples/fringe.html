@@ -74,7 +74,9 @@
         gutterPercent: 50,
         scaleType: 'time',
         showFringe: true,
+        fringeSize: 10,
         continuousXAxis: true,
+        outerPadding: 'auto',
         labelFormatterX: function(d, i){
             return d3.time.format('%e %b')(new Date(d)) + '<br>' + d3.time.format('%Y')(new Date(d));
         }

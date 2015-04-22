@@ -3,7 +3,7 @@ dadavis.scale = {};
 dadavis.scale.x = function(config, cache){
 
     var keys = dadavis.utils.extractValues(cache.data, config.keyX);
-    var allKeys = d3.merge(dadavis.utils.extractValues(cache.data, config.keyX));
+    var allKeys = d3.merge(keys);
 
     var range = [config.outerPadding, cache.chartWidth - config.outerPadding];
     var scaleX = null;
