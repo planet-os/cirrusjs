@@ -53,6 +53,10 @@ dadavis.component.chart = function(config, cache){
 
 dadavis.component.axisX = function(config, cache){
 
+    if(!config.showAxes){
+        return ;
+    }
+
     var axisXContainer = cache.container.select('.axis-x')
         .style({
             width: cache.chartWidth + 'px',
@@ -122,6 +126,10 @@ dadavis.component.axisX = function(config, cache){
 };
 
 dadavis.component.axisY = function(config, cache){
+
+    if(!config.showAxes){
+        return ;
+    }
 
     var axisYContainer = cache.container.select('.axis-y')
         .style({

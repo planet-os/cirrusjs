@@ -34,6 +34,7 @@ dadavis.init = function(_config) {
         keyY: "y",
         outerPadding: 0,
         showFringe: false,
+        showAxes: true,
         autoTypeThreshold: 30
     };
     var cache = {
@@ -302,6 +303,7 @@ dadavis.layout.data = function(config, cache) {
         }
         previousValue = value;
     });
+    minW = Math.max(minW, 1);
     return cache.data.map(function(d, i) {
         var previous = null;
         return d.values.map(function(dB, iB) {
@@ -862,6 +864,9 @@ dadavis.component.chart = function(config, cache) {
 };
 
 dadavis.component.axisX = function(config, cache) {
+    if (!config.showAxes) {
+        return;
+    }
     var axisXContainer = cache.container.select(".axis-x").style({
         width: cache.chartWidth + "px",
         height: config.margin.bottom + "px",
@@ -914,6 +919,9 @@ dadavis.component.axisX = function(config, cache) {
 };
 
 dadavis.component.axisY = function(config, cache) {
+    if (!config.showAxes) {
+        return;
+    }
     var axisYContainer = cache.container.select(".axis-y").style({
         width: config.margin.left + "px",
         height: cache.chartHeight + "px",

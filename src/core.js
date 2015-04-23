@@ -26,6 +26,7 @@ dadavis.init = function(_config){
         keyY: 'y',
         outerPadding: 0,
         showFringe: false,
+        showAxes: true,
         autoTypeThreshold: 30
     };
 
