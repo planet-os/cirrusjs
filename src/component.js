@@ -3,8 +3,8 @@ dadavis.component = {};
 dadavis.component.chart = function(config, cache){
     var chartContainer = cache.container.select('.chart').style({
         position: 'absolute',
-        width: cache.chartWidth + 'px',
-        height: cache.chartHeight + 'px'
+        width: config.width + 'px',
+        height: config.height + 'px'
     });
 
     var panelContainer = chartContainer.select('.panel').style({
@@ -51,10 +51,44 @@ dadavis.component.chart = function(config, cache){
     return this;
 };
 
+dadavis.component.title = function(config, cache){
+
+    if(config.chartTitle){
+        d3.select('.title')
+            .html('Chart Title')
+            .style({
+                width: '100%',
+                'text-align': 'center'
+            });
+    }
+
+    if(config.axisXTitle){
+        d3.select('.axis-title-x')
+            .html('X Axis Title')
+            .style({
+                top: function(){
+                    return config.height - this.offsetHeight + 'px';
+                },
+                position: 'absolute',
+                width: '100%',
+                'text-align': 'center'
+            });
+    }
+
+    if(config.axisYTitle){
+        d3.select('.axis-title-y')
+            .html('Y Axis Title')
+            .style({
+                transform: 'rotate(-90deg) translate(-' + config.height / 2 + 'px)',
+                'transform-origin': '0 0'
+            });
+    }
+};
+
 dadavis.component.axisX = function(config, cache){
 
     if(!config.showAxes){
-        return ;
+        return;
     }
 
     var axisXContainer = cache.container.select('.axis-x')
@@ -100,7 +134,6 @@ dadavis.component.axisX = function(config, cache){
 
     labelsX.exit().remove();
 
-
     var ticksX = axisXContainer.selectAll('div.tick')
         .data(cache.axesLayout.x);
 
@@ -128,7 +161,7 @@ dadavis.component.axisX = function(config, cache){
 dadavis.component.axisY = function(config, cache){
 
     if(!config.showAxes){
-        return ;
+        return;
     }
 
     var axisYContainer = cache.container.select('.axis-y')

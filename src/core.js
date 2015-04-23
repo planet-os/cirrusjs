@@ -27,7 +27,10 @@ dadavis.init = function(_config){
         outerPadding: 0,
         showFringe: false,
         showAxes: true,
-        autoTypeThreshold: 30
+        autoTypeThreshold: 30,
+        chartTitle: null,
+        axisXTitle: null,
+        axisYTitle: null
     };
 
     var cache = {
@@ -69,13 +72,17 @@ dadavis.init = function(_config){
         if(config.type === 'auto'){
             var dataLength = cache.data[0].values.length;
             if(dataLength < config.autoTypeThreshold){
-                config.type = 'bar';
-                config.continuousXAxis = false;
-                config.outerPadding = 'auto';
+                this.setConfig({
+                    type: 'bar',
+                    continuousXAxis: false,
+                    outerPadding: 'auto'
+                });
             }
             else{
-                config.type = 'line';
-                config.continuousXAxis = true;
+                this.setConfig({
+                    type: 'line',
+                    continuousXAxis: true
+                });
             }
         }
 
@@ -169,6 +176,7 @@ dadavis.init = function(_config){
         dadavis.component.chart(config, cache);
         dadavis.component.axisX(config, cache);
         dadavis.component.axisY(config, cache);
+        dadavis.component.title(config, cache);
         dadavis.interaction.hovering(config, cache);
 
         return this;

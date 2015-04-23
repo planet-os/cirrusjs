@@ -20,8 +20,8 @@
     <link href="style.css" rel="stylesheet"/>
     <style>
         .container {
-            width: 100%;
-            height: 400px;
+            width: 600px;
+            height: 300px;
             margin-top: 100px;
             border: 1px solid #eee;
         }
@@ -37,13 +37,16 @@
 
     var config = {
         containerSelector: '.container',
-        margin: {top: 20, right: 40, bottom: 50, left: 60},
+        margin: {top: 40, right: 40, bottom: 80, left: 80},
         type: 'auto',
         subtype: 'stacked',
         axisXTickSkip: 'auto',
         gutterPercent: 50,
         scaleType: 'time',
         showFringe: true,
+        chartTitle: 'Chart Title',
+        axisXTitle: 'X Axis Title',
+        axisYTitle: 'Y Axis Title',
         labelFormatterX: function(d, i){
             return d3.time.format('%e %b')(new Date(d)) + '<br>' + d3.time.format('%Y')(new Date(d));
         }
