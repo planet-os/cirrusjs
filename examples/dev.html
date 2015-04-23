@@ -23,7 +23,7 @@
             width: 600px;
             height: 300px;
             margin-top: 100px;
-            border: 1px solid #eee;
+            /*border: 1px solid #eee;*/
         }
     </style>
 </head>
@@ -47,6 +47,8 @@
         chartTitle: 'Chart Title',
         axisXTitle: 'X Axis Title',
         axisYTitle: 'Y Axis Title',
+        showXGrid: true,
+        showYGrid: true,
         labelFormatterX: function(d, i){
             return d3.time.format('%e %b')(new Date(d)) + '<br>' + d3.time.format('%Y')(new Date(d));
         }

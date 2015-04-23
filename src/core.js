@@ -27,6 +27,8 @@ dadavis.init = function(_config){
         outerPadding: 0,
         showFringe: false,
         showAxes: true,
+        showXGrid: false,
+        showYGrid: false,
         autoTypeThreshold: 30,
         chartTitle: null,
         axisXTitle: null,
@@ -95,9 +97,16 @@ dadavis.init = function(_config){
             width: cache.container.node().offsetWidth,
             height: cache.container.node().offsetHeight
         });
+
+        cache.chartWidth = config.width - config.margin.left - config.margin.right;
+        cache.chartHeight = config.height - config.margin.top - config.margin.bottom;
+
+        if(config.type === 'line'){
+            cache.noPadding = true;
+        }
     }
 
-    function validateData(_data){
+    function validateData(config, cache, _data){
         if(_data && typeof _data === 'object'){
             var isNotNull = false;
             _data.forEach(function(d){
@@ -117,15 +126,6 @@ dadavis.init = function(_config){
         }
 
         return false;
-    }
-
-    function computeCache(config, cache, data){
-        cache.chartWidth = config.width - config.margin.left - config.margin.right;
-        cache.chartHeight = config.height - config.margin.top - config.margin.bottom;
-
-        if(config.type === 'line'){
-            cache.noPadding = true;
-        }
     }
 
     exports = {};
@@ -158,13 +158,12 @@ dadavis.init = function(_config){
 
     exports.render = function(data){
 
-        if(!validateData(data)){
+        if(!validateData(config, cache, data)){
             console.error('Invalid data', data);
             return this;
         }
         initContainers.call(this, config, cache);
         computeAutomaticConfig.call(this, config, cache);
-        computeCache.call(this, config, cache, data);
 
         cache.scaleX = dadavis.scale.x(config, cache);
         cache.scaleY = dadavis.scale.y(config, cache);

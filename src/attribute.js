@@ -147,6 +147,20 @@ dadavis.attribute.axis.tickX = function(config, cache){
     };
 };
 
+dadavis.attribute.axis.gridX = function(config, cache){
+    var lineW = 1;
+    return {
+        top: config.margin.top + 'px',
+        left: function(d, i){
+            return config.margin.left + d.x - lineW / 2 - this.offsetWidth + 'px';
+        },
+        width: lineW + 'px',
+        height: function(d, i){
+            return ((i % config.axisXTickSkip) ? 0 : cache.chartHeight) + 'px';
+        }
+    };
+};
+
 dadavis.attribute.axis.fringeX = function(config, cache){
     var fringeColorScale = d3.scale.linear().domain([0, 1]).range(['yellow', 'limegreen']);
     return {
@@ -180,13 +194,27 @@ dadavis.attribute.axis.labelY = function(config, cache){
 };
 
 dadavis.attribute.axis.tickY = function(config, cache){
+    var lineH = 1;
     return {
         width: config.tickSize + 'px',
-        height: 1 + 'px',
+        height: lineH + 'px',
         position: 'absolute',
         left: config.margin.left - config.tickSize + 'px',
         top: function(d, i){
             return d.labelY + 'px';
+        }
+    };
+};
+
+dadavis.attribute.axis.gridY = function(config, cache){
+    var lineH = 1;
+    return {
+        width: cache.chartWidth + 'px',
+        height: lineH + 'px',
+        position: 'absolute',
+        left: config.margin.left + 'px',
+        top: function(d, i){
+            return config.margin.top + d.labelY + 'px';
         }
     };
 };

@@ -156,6 +156,20 @@ dadavis.component.axisX = function(config, cache){
 
         fringeX.exit().remove();
     }
+
+    if(config.showXGrid){
+        var gridX = cache.container.select('.grid-x')
+            .selectAll('div.grid-line-x')
+            .data(cache.axesLayout.x);
+
+        gridX.enter().append('div').classed('grid-line-x', true)
+            .style({position: 'absolute'})
+            .style({'background-color': '#eee'});
+
+        gridX.style(dadavis.attribute.axis.gridX(config, cache));
+
+        gridX.exit().remove();
+    }
 };
 
 dadavis.component.axisY = function(config, cache){
@@ -212,6 +226,20 @@ dadavis.component.axisY = function(config, cache){
         fringeY.style(dadavis.attribute.axis.fringeY(config, cache));
 
         fringeY.exit().remove();
+    }
+
+    if(config.showYGrid){
+        var gridX = cache.container.select('.grid-y')
+            .selectAll('div.grid-line-y')
+            .data(cache.axesLayout.y);
+
+        gridX.enter().append('div').classed('grid-line-y', true)
+            .style({position: 'absolute'})
+            .style({'background-color': '#eee'});
+
+        gridX.style(dadavis.attribute.axis.gridY(config, cache));
+
+        gridX.exit().remove();
     }
 };
 
