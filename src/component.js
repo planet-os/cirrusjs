@@ -147,15 +147,19 @@ dadavis.component.axisX = function(config, cache){
         })
         .style(dadavis.attribute.axis.labelX(config, cache));
 
+    var skipped = [];
     if(config.axisXTickSkip === 'auto'){
         var previous = null;
-        labelsX[0].forEach(function(d){
+        labelsX[0].forEach(function(d, i){
             var hide = false;
             if(previous){
                 hide = parseFloat(d.style.left) - parseFloat(previous.style.left) < d.offsetWidth;
             }
             if(!hide){
                 previous = d;
+            }
+            else{
+                skipped.push(i);
             }
             d3.select(d).style({opacity: +!hide});
             return d.offsetWidth;
@@ -173,7 +177,16 @@ dadavis.component.axisX = function(config, cache){
         .style({position: 'absolute'})
         .style({'background-color': 'black'});
 
-    ticksX.style(dadavis.attribute.axis.tickX(config, cache));
+    ticksX.style(dadavis.attribute.axis.tickX(config, cache))
+        .style({
+            height: function(d, i){
+                if(config.axisXTickSkip === 'auto'){
+                    var toSkip = skipped.indexOf(i) !== -1;
+                    return (toSkip ? config.minorTickSize : config.tickSize) + 'px';
+                }
+                return ((i % config.axisXTickSkip) ? config.minorTickSize : config.tickSize) + 'px';
+            }
+        });
 
     ticksX.exit().remove();
 };
