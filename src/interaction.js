@@ -3,7 +3,12 @@ dadavis.interaction = {};
 dadavis.interaction.hovering = function(config, cache){
 
     var hoveringContainer = cache.container.select('.hovering')
-        .style({
+
+    if(!!hoveringContainer.on('mousemove')){
+        return this;
+    }
+
+    hoveringContainer.style({
             width: cache.chartWidth + 'px',
             height: cache.chartHeight + 'px',
             position: 'absolute',
@@ -70,11 +75,12 @@ dadavis.interaction.tooltip = function(config, cache){
             .attr({'class': 'tooltip'})
             .style({
                 position: 'absolute',
-                'pointer-events': 'none'
+                'pointer-events': 'none',
+                'z-index': 2
             });
         tooltip
             .html(function(d, i){
-                return d.value;
+                return config.tooltipFormatter(d);
             })
             .style({
                 left: function(d, i){
@@ -91,7 +97,7 @@ dadavis.interaction.tooltip = function(config, cache){
                     return y + 'px';
                 },
                 'background-color': function(d, i){
-                    return config.colors[i];
+                    return d.color;
                 }
             });
         tooltip.exit().remove();

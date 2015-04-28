@@ -25,7 +25,7 @@
             width: 100%;
             height: 300px;
             margin-top: 100px;
-            /*border: 1px solid #eee;*/
+            border: 1px solid #eee;
         }
     </style>
 </head>
@@ -40,10 +40,9 @@
     var config = {
         containerSelector: '.container',
         margin: {top: 40, right: 60, bottom: 80, left: 80},
-        type: 'line',
-        subtype: 'area',
-        axisXTickSkip: 5,
-        minorTickSize: 2,
+        type: 'auto',
+        subtype: 'stacked',
+        axisXTickSkip: 'auto',
         gutterPercent: 50,
         scaleType: 'time',
         showFringe: true,
@@ -52,7 +51,6 @@
         axisYTitle: 'Y Axis Title',
         showXGrid: true,
         showYGrid: true,
-        showLegend: true,
         labelFormatterX: function(d){
             return d3.time.format('%e %b')(new Date(d)) + '<br>' + d3.time.format('%Y')(new Date(d));
         },
@@ -61,7 +59,16 @@
         }
     };
 
-    var ds = dadavis.init(config).render(data);
+    var ds = dadavis.init(config).render(data)
+//        .on('legendClick', function(d){
+//            var filteredData = [];
+//            data.forEach(function(dB){
+//                if(d.indexOf(dB.name) !== -1){
+//                    filteredData.push(dB);
+//                }
+//            });
+//            ds.render(filteredData);
+//        });
 
 </script>
 </body>

@@ -12,7 +12,8 @@ dadavis.attribute.bar.simple = function(config, cache){
                 x: dB.x - dB.w / 2 + dB.gutterW / 2,
                 y: dB.y,
                 width: dB.w - dB.gutterW,
-                height: dB.h
+                height: dB.h,
+                color: d[0].color
             };
         });
     });
@@ -25,7 +26,8 @@ dadavis.attribute.bar.percent = function(config, cache){
                 x: dB.x - dB.w / 2 + dB.gutterW / 2,
                 y: dB.stackedPercentY,
                 width: dB.w - dB.gutterW,
-                height: dB.stackedPercentH
+                height: dB.stackedPercentH,
+                color: d[0].color
             };
         });
     });
@@ -38,7 +40,8 @@ dadavis.attribute.bar.stacked = function(config, cache){
                 x: dB.x - dB.w / 2 + dB.gutterW / 2,
                 y: dB.stackedY,
                 width: dB.w - dB.gutterW,
-                height: dB.stackedH
+                height: dB.stackedH,
+                color: d[0].color
             };
         });
     });
@@ -63,17 +66,24 @@ dadavis.attribute.point.stacked = function(config, cache){
 
 dadavis.attribute.line.simple = function(config, cache){
     return cache.layout.map(function(d, i){
-        return d.map(function(dB, iB){
-            return [dB.x, dB.y];
-        });
+
+        return {
+            points: d.map(function(dB, iB){
+                return [dB.x, dB.y];
+            }),
+            color: d[0].color
+        };
     });
 };
 
 dadavis.attribute.line.stacked = function(config, cache){
     return cache.layout.map(function(d, i){
-        return d.map(function(dB, iB){
-            return [dB.x, dB.stackedY];
-        });
+        return {
+            points: d.map(function(dB, iB){
+                    return [dB.x, dB.stackedY];
+                }),
+            color: d[0].color
+        };
     });
 };
 
@@ -95,7 +105,12 @@ dadavis.attribute.line.area = function(config, cache){
             }).reverse();
         }
 
-        return line.concat(previousLine);
+        var points = line.concat(previousLine);
+
+        return {
+            points: points,
+            color: d[0].color
+        };
     });
 };
 
@@ -138,7 +153,7 @@ dadavis.attribute.axis.tickX = function(config, cache){
     var tickW = 1;
     return {
         left: function(d, i){
-            return d.x - tickW / 2 - this.offsetWidth + 'px';
+            return d.x - tickW / 2+ 'px';
         },
         width: tickW + 'px',
         height: function(d, i){
@@ -165,7 +180,7 @@ dadavis.attribute.axis.fringeX = function(config, cache){
     var fringeColorScale = d3.scale.linear().domain([0, 1]).range(['yellow', 'limegreen']);
     return {
         left: function(d, i){
-            return d.x - d.w / 2 + d.gutterW / 2 - this.offsetWidth + 'px';
+            return d.x - d.w / 2 + d.gutterW / 2 + 'px';
         },
         width: function(d){
             return Math.max(d.w - d.gutterW, 1) + 'px';

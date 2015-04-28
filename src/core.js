@@ -10,6 +10,7 @@ dadavis.init = function(_config){
         type: 'bar',
         subtype: 'stacked',
         labelFormatterX: function(d){ return d; },
+        tooltipFormatter: function(d){ return d.value; },
         axisXAngle: null,
         tickSize: 15,
         minorTickSize: 10,
@@ -19,7 +20,6 @@ dadavis.init = function(_config){
         continuousXAxis: false,
         dotSize: 2,
         gutterPercent: 10,
-        colors: ['skyblue', 'orange', 'lime', 'orangered', 'violet', 'yellow', 'brown', 'pink'],
         renderer: 'svg',
         scaleType: 'time',
         keyX: 'x',
@@ -29,6 +29,7 @@ dadavis.init = function(_config){
         showAxes: true,
         showXGrid: false,
         showYGrid: false,
+        showLegend: false,
         autoTypeThreshold: 30,
         chartTitle: null,
         axisXTitle: null,
@@ -39,96 +40,42 @@ dadavis.init = function(_config){
         chartWidth: 500,
         chartHeight: 500,
         data: null,
+        visibleData: null,
         layout: null,
         scaleX: null,
         scaleY: null,
         axesLayout: {},
+        legendLayout: {},
+        fringeLayout: {},
         previousData: null,
         container: null,
         noPadding: false,
-        events: d3.dispatch('hover', 'hoverOut'),
-        internalEvents: d3.dispatch('setHover', 'hideHover', 'resize')
+        dataLayersToHide: [],
+        events: d3.dispatch('hover', 'hoverOut', 'legendClick'),
+        internalEvents: d3.dispatch('setHover', 'hideHover', 'resize', 'legendClick'),
     };
 
-    (function initialize(config, cache){
+    var exports = {};
+
+    exports.initialize = dadavis.utils.once(function(config, cache){
         dadavis.utils.override(_config, config);
+
+        cache.container = d3.select(config.containerSelector);
+        cache.container.html(dadavis.template.main);
 
         d3.select(window).on('resize.namespace' + ~~(Math.random()*1000), dadavis.utils.throttle(function(){
             cache.internalEvents.resize();
         }, 200));
 
-    })(config, cache);
-
-    function initContainers(config, cache){
-        cache.container = d3.select(config.containerSelector);
-        cache.container.html(dadavis.template.main);
-
         var that = this;
         cache.internalEvents.on('resize', function(){
             that.resize();
         });
-    }
-
-    function computeAutomaticConfig(config, cache){
-
-        if(config.type === 'auto'){
-            var dataLength = cache.data[0].values.length;
-            if(dataLength < config.autoTypeThreshold){
-                this.setConfig({
-                    type: 'bar',
-                    continuousXAxis: false,
-                    outerPadding: 'auto'
-                });
-            }
-            else{
-                this.setConfig({
-                    type: 'line',
-                    continuousXAxis: true
-                });
-            }
-        }
-
-        if(config.outerPadding === 'auto'){
-            var keys = dadavis.utils.extractValues(cache.data, config.keyX);
-            config.outerPadding = cache.chartWidth / keys[0].length / 4;
-        }
-
-        this.setConfig({
-            width: cache.container.node().offsetWidth,
-            height: cache.container.node().offsetHeight
+        cache.internalEvents.on('legendClick', function(toHide){
+            cache.dataLayersToHide = toHide;
+            that.render();
         });
-
-        cache.chartWidth = config.width - config.margin.left - config.margin.right;
-        cache.chartHeight = config.height - config.margin.top - config.margin.bottom;
-
-        if(config.type === 'line'){
-            cache.noPadding = true;
-        }
-    }
-
-    function validateData(config, cache, _data){
-        if(_data && typeof _data === 'object'){
-            var isNotNull = false;
-            _data.forEach(function(d){
-                isNotNull = isNotNull || !!d.values.length;
-            });
-
-            if(isNotNull){
-                cache.previousData = _data;
-                cache.data = _data;
-                return true
-            }
-        }
-
-        if(cache.previousData){
-            cache.data = cache.previousData;
-            return true;
-        }
-
-        return false;
-    }
-
-    exports = {};
+    });
 
     exports.setConfig = function(newConfig){
         dadavis.utils.override(newConfig, config);
@@ -136,7 +83,6 @@ dadavis.init = function(_config){
     };
 
     exports.resize = function(){
-        cache.container.html(dadavis.template.main);
         this.render();
         return this;
     };
@@ -158,12 +104,13 @@ dadavis.init = function(_config){
 
     exports.render = function(data){
 
-        if(!validateData(config, cache, data)){
+        if(!dadavis.data.validate(config, cache, data)){
             console.error('Invalid data', data);
             return this;
         }
-        initContainers.call(this, config, cache);
-        computeAutomaticConfig.call(this, config, cache);
+
+        this.initialize.call(this, config, cache);
+        dadavis.automatic.config.call(this, config, cache);
 
         cache.scaleX = dadavis.scale.x(config, cache);
         cache.scaleY = dadavis.scale.y(config, cache);
@@ -171,11 +118,17 @@ dadavis.init = function(_config){
         cache.layout = dadavis.layout.data(config, cache);
         cache.axesLayout.x = dadavis.layout.axes.x(config, cache);
         cache.axesLayout.y = dadavis.layout.axes.y(config, cache);
+        cache.legendLayout = dadavis.layout.legend(config, cache);
+
+        //cache.fringeLayout.y = dadavis.layout.fringes.y(config, cache);
+        //console.log(cache.fringeLayout.y);
 
         dadavis.component.chart(config, cache);
+        dadavis.component.shapes(config, cache);
         dadavis.component.axisX(config, cache);
         dadavis.component.axisY(config, cache);
         dadavis.component.title(config, cache);
+        dadavis.component.legend(config, cache);
         dadavis.interaction.hovering(config, cache);
 
         return this;

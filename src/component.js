@@ -21,8 +21,14 @@ dadavis.component.chart = function(config, cache){
         height: cache.chartHeight + 'px'
     });
 
+};
+
+dadavis.component.shapes = function(config, cache){
+
     var shapeAttr = dadavis.attribute[config.type][config.subtype](config, cache);
 
+    var shapeContainer = cache.container.select('.shape');
+    shapeContainer.html('');
     var renderer = dadavis.renderer[config.renderer](shapeContainer.node());
 
     //console.time('rendering');
@@ -31,18 +37,18 @@ dadavis.component.chart = function(config, cache){
         shapeAttr.forEach(function(d, i){
             var color = null;
             if(config.subtype === 'area'){
-                color = config.colors[i];
+                color = d.color;
             }
             else{
                 color = 'none';
             }
-            renderer.polygon({points: d, fill: color, stroke: config.colors[i]});
+            renderer.polygon({points: d.points, fill: color, stroke: d.color});
         });
     }
     else{
         shapeAttr.forEach(function(d, i){
             d.forEach(function(dB, iB){
-                renderer.rect({rect: dB, fill: config.colors[i], stroke: config.colors[i]});
+                renderer.rect({rect: dB, fill: dB.color, stroke: dB.color});
             });
         });
     }
@@ -101,6 +107,32 @@ dadavis.component.axisX = function(config, cache){
             'border-top': '1px solid black'
         });
 
+    if(config.showFringe){
+        var fringeX = axisXContainer.selectAll('div.fringe-x')
+            .data(cache.layout[0]);
+
+        fringeX.enter().append('div').classed('fringe-x', true)
+            .style({position: 'absolute'});
+
+        fringeX.style(dadavis.attribute.axis.fringeX(config, cache));
+
+        fringeX.exit().remove();
+    }
+
+    if(config.showXGrid){
+        var gridX = cache.container.select('.grid-x')
+            .selectAll('div.grid-line-x')
+            .data(cache.axesLayout.x);
+
+        gridX.enter().append('div').classed('grid-line-x', true)
+            .style({position: 'absolute'})
+            .style({'background-color': '#eee'});
+
+        gridX.style(dadavis.attribute.axis.gridX(config, cache));
+
+        gridX.exit().remove();
+    }
+
     var labelsX = axisXContainer.selectAll('div.label')
         .data(cache.axesLayout.x);
 
@@ -144,32 +176,6 @@ dadavis.component.axisX = function(config, cache){
     ticksX.style(dadavis.attribute.axis.tickX(config, cache));
 
     ticksX.exit().remove();
-
-    if(config.showFringe){
-        var fringeX = axisXContainer.selectAll('div.fringe-x')
-            .data(cache.layout[0]);
-
-        fringeX.enter().append('div').classed('fringe-x', true)
-            .style({position: 'absolute'});
-
-        fringeX.style(dadavis.attribute.axis.fringeX(config, cache));
-
-        fringeX.exit().remove();
-    }
-
-    if(config.showXGrid){
-        var gridX = cache.container.select('.grid-x')
-            .selectAll('div.grid-line-x')
-            .data(cache.axesLayout.x);
-
-        gridX.enter().append('div').classed('grid-line-x', true)
-            .style({position: 'absolute'})
-            .style({'background-color': '#eee'});
-
-        gridX.style(dadavis.attribute.axis.gridX(config, cache));
-
-        gridX.exit().remove();
-    }
 };
 
 dadavis.component.axisY = function(config, cache){
@@ -187,6 +193,32 @@ dadavis.component.axisY = function(config, cache){
             left: 0 + 'px',
             'border-right': '1px solid black'
         });
+
+    if(config.showFringe){
+        var fringeY = axisYContainer.selectAll('div.fringe-y')
+            .data(cache.layout[0]); // TODO only works for single layer
+
+        fringeY.enter().append('div').classed('fringe-y', true)
+            .style({position: 'absolute'});
+
+        fringeY.style(dadavis.attribute.axis.fringeY(config, cache));
+
+        fringeY.exit().remove();
+    }
+
+    if(config.showYGrid){
+        var gridX = cache.container.select('.grid-y')
+            .selectAll('div.grid-line-y')
+            .data(cache.axesLayout.y);
+
+        gridX.enter().append('div').classed('grid-line-y', true)
+            .style({position: 'absolute'})
+            .style({'background-color': '#eee'});
+
+        gridX.style(dadavis.attribute.axis.gridY(config, cache));
+
+        gridX.exit().remove();
+    }
 
     var labelsY = axisYContainer.selectAll('div.label')
         .data(cache.axesLayout.y);
@@ -215,32 +247,77 @@ dadavis.component.axisY = function(config, cache){
     ticksY.style(dadavis.attribute.axis.tickY(config, cache));
 
     ticksY.exit().remove();
+};
 
-    if(config.showFringe){
-        var fringeY = axisYContainer.selectAll('div.fringe-y')
-            .data(cache.layout[0]);
+dadavis.component.legend = function(config, cache){
 
-        fringeY.enter().append('div').classed('fringe-y', true)
-            .style({position: 'absolute'});
-
-        fringeY.style(dadavis.attribute.axis.fringeY(config, cache));
-
-        fringeY.exit().remove();
+    if(!config.showLegend){
+        return this;
     }
 
-    if(config.showYGrid){
-        var gridX = cache.container.select('.grid-y')
-            .selectAll('div.grid-line-y')
-            .data(cache.axesLayout.y);
+    var legend = cache.container.select('.legend')
+        .style({
+            position: 'absolute'
+        });
 
-        gridX.enter().append('div').classed('grid-line-y', true)
-            .style({position: 'absolute'})
-            .style({'background-color': '#eee'});
+    var legendItems = legend.selectAll('p.legend-item')
+        .data(cache.legendLayout);
 
-        gridX.style(dadavis.attribute.axis.gridY(config, cache));
+    legendItems.enter().append('p').classed('legend-item', true)
+        .each(function(d, i){
+            var that = this;
+            var a = d3.select(this)
+                .append('a')
+                .style({
+                    cursor: 'pointer'
+                })
+                .on('click', function(){
+                    var element = d3.select(that);
+                    d3.select(that).classed('unchecked', !element.classed('unchecked'));
+                    var toHide = [];
+                    legendItems.each(function(d){
+                        if(this.classList.contains('unchecked')){
+                            toHide.push(d.name);
+                        }
+                    });
 
-        gridX.exit().remove();
-    }
+                    cache.events.legendClick(toHide);
+                    cache.internalEvents.legendClick(toHide);
+                });
+
+            a.append('span')
+                .attr({
+                    'class': 'legend-color'
+                })
+                .style({
+                    display: 'inline-block',
+                    width: 10 + 'px',
+                    height: 10 + 'px',
+                    'border-radius': 5 + 'px',
+                    'background-color': function(d, i){
+                        return d.color;
+                    }
+                });
+
+            a.append('span')
+                .attr({
+                    'class': 'legend-name'
+                })
+                .style({
+                    display: 'inline-block'
+                })
+                .html(function(){
+                    return d.name;
+                });
+        });
+
+    legendItems.exit().remove();
+
+    legend.style({
+        left: function(){
+            return config.width - this.offsetWidth + 'px';
+        }
+    });
 };
 
 if(typeof define === "function" && define.amd){

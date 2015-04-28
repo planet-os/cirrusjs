@@ -18,6 +18,9 @@ dadavis.init = function(_config) {
         labelFormatterX: function(d) {
             return d;
         },
+        tooltipFormatter: function(d) {
+            return d.value;
+        },
         axisXAngle: null,
         tickSize: 15,
         minorTickSize: 10,
@@ -27,7 +30,6 @@ dadavis.init = function(_config) {
         continuousXAxis: false,
         dotSize: 2,
         gutterPercent: 10,
-        colors: [ "skyblue", "orange", "lime", "orangered", "violet", "yellow", "brown", "pink" ],
         renderer: "svg",
         scaleType: "time",
         keyX: "x",
@@ -35,89 +37,54 @@ dadavis.init = function(_config) {
         outerPadding: 0,
         showFringe: false,
         showAxes: true,
-        autoTypeThreshold: 30
+        showXGrid: false,
+        showYGrid: false,
+        showLegend: false,
+        autoTypeThreshold: 30,
+        chartTitle: null,
+        axisXTitle: null,
+        axisYTitle: null
     };
     var cache = {
         chartWidth: 500,
         chartHeight: 500,
         data: null,
+        visibleData: null,
         layout: null,
         scaleX: null,
         scaleY: null,
         axesLayout: {},
+        legendLayout: {},
+        fringeLayout: {},
         previousData: null,
         container: null,
         noPadding: false,
-        events: d3.dispatch("hover", "hoverOut"),
-        internalEvents: d3.dispatch("setHover", "hideHover", "resize")
+        dataLayersToHide: [],
+        events: d3.dispatch("hover", "hoverOut", "legendClick"),
+        internalEvents: d3.dispatch("setHover", "hideHover", "resize", "legendClick")
     };
-    (function initialize(config, cache) {
+    var exports = {};
+    exports.initialize = dadavis.utils.once(function(config, cache) {
         dadavis.utils.override(_config, config);
+        cache.container = d3.select(config.containerSelector);
+        cache.container.html(dadavis.template.main);
         d3.select(window).on("resize.namespace" + ~~(Math.random() * 1e3), dadavis.utils.throttle(function() {
             cache.internalEvents.resize();
         }, 200));
-    })(config, cache);
-    function initContainers(config, cache) {
-        cache.container = d3.select(config.containerSelector);
-        cache.container.html(dadavis.template.main);
         var that = this;
         cache.internalEvents.on("resize", function() {
             that.resize();
         });
-    }
-    function computeAutomaticConfig(config, cache) {
-        if (config.type === "auto") {
-            var dataLength = cache.data[0].values.length;
-            if (dataLength < config.autoTypeThreshold) {
-                config.type = "bar";
-                config.continuousXAxis = false;
-                config.outerPadding = "auto";
-            } else {
-                config.type = "line";
-                config.continuousXAxis = true;
-            }
-        }
-        if (config.outerPadding === "auto") {
-            var keys = dadavis.utils.extractValues(cache.data, config.keyX);
-            config.outerPadding = cache.chartWidth / keys[0].length / 4;
-        }
-        this.setConfig({
-            width: cache.container.node().offsetWidth,
-            height: cache.container.node().offsetHeight
+        cache.internalEvents.on("legendClick", function(toHide) {
+            cache.dataLayersToHide = toHide;
+            that.render();
         });
-    }
-    function validateData(_data) {
-        if (_data && typeof _data === "object") {
-            var isNotNull = false;
-            _data.forEach(function(d) {
-                isNotNull = isNotNull || !!d.values.length;
-            });
-            if (isNotNull) {
-                cache.previousData = _data;
-                cache.data = _data;
-                return true;
-            }
-        }
-        if (cache.previousData) {
-            cache.data = cache.previousData;
-            return true;
-        }
-        return false;
-    }
-    function computeCache(config, cache, data) {
-        cache.chartWidth = config.width - config.margin.left - config.margin.right;
-        cache.chartHeight = config.height - config.margin.top - config.margin.bottom;
-        if (config.type === "line") {
-            cache.noPadding = true;
-        }
-    }
-    exports = {};
+    });
     exports.setConfig = function(newConfig) {
         dadavis.utils.override(newConfig, config);
         return this;
     };
     exports.resize = function() {
-        cache.container.html(dadavis.template.main);
         this.render();
         return this;
     };
@@ -134,21 +101,24 @@ dadavis.init = function(_config) {
         return this;
     };
     exports.render = function(data) {
-        if (!validateData(data)) {
+        if (!dadavis.data.validate(config, cache, data)) {
             console.error("Invalid data", data);
             return this;
         }
-        initContainers.call(this, config, cache);
-        computeAutomaticConfig.call(this, config, cache);
-        computeCache.call(this, config, cache, data);
+        this.initialize.call(this, config, cache);
+        dadavis.automatic.config.call(this, config, cache);
         cache.scaleX = dadavis.scale.x(config, cache);
         cache.scaleY = dadavis.scale.y(config, cache);
         cache.layout = dadavis.layout.data(config, cache);
         cache.axesLayout.x = dadavis.layout.axes.x(config, cache);
         cache.axesLayout.y = dadavis.layout.axes.y(config, cache);
+        cache.legendLayout = dadavis.layout.legend(config, cache);
         dadavis.component.chart(config, cache);
+        dadavis.component.shapes(config, cache);
         dadavis.component.axisX(config, cache);
         dadavis.component.axisY(config, cache);
+        dadavis.component.title(config, cache);
+        dadavis.component.legend(config, cache);
         dadavis.interaction.hovering(config, cache);
         return this;
     };
@@ -182,6 +152,7 @@ dadavis.utils.computeRandomTimeArray = function(count, dateNow) {
 
 dadavis.utils.getRandomNumericData = function(shapeCount, layerCount) {
     var x = d3.range(shapeCount);
+    var colors = dadavis.utils.defaultColors;
     return d3.range(layerCount).map(function(d, i) {
         var y = dadavis.utils.computeRandomNumericArray(shapeCount, 10, 100);
         var values = d3.zip(x, y).map(function(d, i) {
@@ -192,14 +163,18 @@ dadavis.utils.getRandomNumericData = function(shapeCount, layerCount) {
         });
         return {
             name: "name" + i,
-            values: values
+            values: values,
+            color: colors[i % colors.length]
         };
     });
 };
 
+dadavis.utils.defaultColors = [ "skyblue", "orange", "lime", "orangered", "violet", "yellow", "brown", "pink" ];
+
 dadavis.utils.getRandomTimeData = function(shapeCount, layerCount) {
     var dateNow = new Date().getTime();
     var x = dadavis.utils.computeRandomTimeArray(shapeCount, dateNow);
+    var colors = dadavis.utils.defaultColors;
     return d3.range(layerCount).map(function(d, i) {
         var y = dadavis.utils.computeRandomNumericArray(shapeCount, 10, 100);
         var values = d3.zip(x, y).map(function(d, i) {
@@ -210,7 +185,8 @@ dadavis.utils.getRandomTimeData = function(shapeCount, layerCount) {
         });
         return {
             name: "name" + i,
-            values: values
+            values: values,
+            color: colors[i % colors.length]
         };
     });
 };
@@ -274,23 +250,102 @@ dadavis.utils.extractValues = function(data, key) {
     });
 };
 
+dadavis.utils.once = function once(fn, context) {
+    var result;
+    return function() {
+        if (fn) {
+            result = fn.apply(context || this, arguments);
+            fn = null;
+        }
+        return result;
+    };
+};
+
+dadavis.data = {};
+
+dadavis.data.validate = function(config, cache, _data) {
+    var dataIsValid = false;
+    if (_data && typeof _data === "object") {
+        var isNotNull = false;
+        _data.forEach(function(d) {
+            isNotNull = isNotNull || !!d.values.length;
+        });
+        if (isNotNull) {
+            cache.previousData = _data;
+            cache.data = _data;
+            dataIsValid = true;
+        }
+    }
+    if (cache.previousData) {
+        cache.data = cache.previousData;
+        dataIsValid = true;
+    }
+    cache.data.forEach(function(d, i) {
+        if (!d.color) {
+            d.color = dadavis.utils.defaultColors[i];
+        }
+    });
+    cache.visibleData = cache.data.filter(function(d) {
+        return cache.dataLayersToHide.indexOf(d.name) === -1;
+    });
+    return dataIsValid;
+};
+
+dadavis.automatic = {};
+
+dadavis.automatic.config = function(config, cache) {
+    if (config.type === "auto") {
+        var dataLength = cache.data[0].values.length;
+        if (dataLength < config.autoTypeThreshold) {
+            this.setConfig({
+                type: "bar",
+                continuousXAxis: false,
+                outerPadding: "auto"
+            });
+        } else {
+            this.setConfig({
+                type: "line",
+                continuousXAxis: true
+            });
+        }
+    }
+    if (config.outerPadding === "auto") {
+        var keys = dadavis.utils.extractValues(cache.data, config.keyX);
+        config.outerPadding = cache.chartWidth / keys[0].length / 4;
+    }
+    this.setConfig({
+        width: cache.container.node().offsetWidth,
+        height: cache.container.node().offsetHeight
+    });
+    cache.chartWidth = config.width - config.margin.left - config.margin.right;
+    cache.chartHeight = config.height - config.margin.top - config.margin.bottom;
+    if (config.type === "line") {
+        cache.noPadding = true;
+    }
+    return this;
+};
+
 dadavis.template = {};
 
-dadavis.template.main = '<div class="chart">' + '<div class="panel">' + '<div class="shape"></div>' + '<div class="hovering"></div>' + "</div>" + '<div class="axis-x"></div>' + '<div class="axis-y"></div>' + "</div>";
+dadavis.template.main = '<div class="chart">' + '<div class="title"></div>' + '<div class="axis-title-y"></div>' + '<div class="grid-x"></div>' + '<div class="grid-y"></div>' + '<div class="panel">' + '<div class="shape"></div>' + '<div class="hovering"></div>' + "</div>" + '<div class="axis-x"></div>' + '<div class="axis-y"></div>' + '<div class="axis-title-x"></div>' + '<div class="legend"></div>' + "</div>";
 
 dadavis.layout = {
     data: {},
-    axes: {}
+    axes: {},
+    fringes: {}
 };
 
 dadavis.layout.data = function(config, cache) {
+    cache.visibleData = cache.data.filter(function(d) {
+        return cache.dataLayersToHide.indexOf(d.name) === -1;
+    });
     var percentScaleY = cache.scaleY.copy();
     var stackedScaleY = cache.scaleY.copy();
-    var values = dadavis.utils.extractValues(cache.data, config.keyY);
+    var values = dadavis.utils.extractValues(cache.visibleData, config.keyY);
     var valuesTransposed = d3.transpose(values);
     var previousValue = null;
     var minW = Number.MAX_VALUE;
-    cache.data[0].values.forEach(function(d, i) {
+    cache.visibleData[0].values.forEach(function(d, i) {
         var value = d[config.keyX];
         if (config.scaleType === "time") {
             value = new Date(value);
@@ -304,7 +359,7 @@ dadavis.layout.data = function(config, cache) {
         previousValue = value;
     });
     minW = Math.max(minW, 1);
-    return cache.data.map(function(d, i) {
+    return cache.visibleData.map(function(d, i) {
         var previous = null;
         return d.values.map(function(dB, iB) {
             percentScaleY.domain([ 0, d3.sum(valuesTransposed[iB]) ]);
@@ -334,9 +389,10 @@ dadavis.layout.data = function(config, cache) {
                 gutterW: gutterW,
                 stackedPercentH: percentScaleY(value),
                 stackedH: stackedScaleY(value),
-                layerCount: cache.data.length,
+                layerCount: cache.visibleData.length,
                 layerIndex: i,
-                centerX: cache.scaleX(key) + minW / 2
+                centerX: cache.scaleX(key) + minW / 2,
+                color: d.color
             };
             datum.previous = previous || datum;
             previous = datum;
@@ -355,7 +411,7 @@ dadavis.layout.axes.x = function(config, cache) {
             };
         });
     } else {
-        return cache.data[0].values.map(function(d, i) {
+        return cache.visibleData[0].values.map(function(d, i) {
             var key = d[config.keyX];
             if (config.scaleType === "time") {
                 key = new Date(key);
@@ -374,7 +430,7 @@ dadavis.layout.axes.y = function(config, cache) {
     var scaleY = cache.scaleY.copy();
     var percentScaleY = cache.scaleY.copy();
     var stackedScaleY = cache.scaleY.copy();
-    var values = dadavis.utils.extractValues(cache.data, config.keyY);
+    var values = dadavis.utils.extractValues(cache.visibleData, config.keyY);
     var valuesTransposed = d3.transpose(values);
     var domainMax = d3.max(d3.merge(values));
     scaleY.domain([ domainMax, 0 ]);
@@ -396,6 +452,17 @@ dadavis.layout.axes.y = function(config, cache) {
     });
 };
 
+dadavis.layout.legend = function(config, cache) {
+    return cache.data.map(function(d, i) {
+        return {
+            name: d.name,
+            color: d.color
+        };
+    });
+};
+
+dadavis.layout.fringes.y = function(config, cache) {};
+
 dadavis.attribute = {
     bar: {},
     line: {},
@@ -410,7 +477,8 @@ dadavis.attribute.bar.simple = function(config, cache) {
                 x: dB.x - dB.w / 2 + dB.gutterW / 2,
                 y: dB.y,
                 width: dB.w - dB.gutterW,
-                height: dB.h
+                height: dB.h,
+                color: d[0].color
             };
         });
     });
@@ -423,7 +491,8 @@ dadavis.attribute.bar.percent = function(config, cache) {
                 x: dB.x - dB.w / 2 + dB.gutterW / 2,
                 y: dB.stackedPercentY,
                 width: dB.w - dB.gutterW,
-                height: dB.stackedPercentH
+                height: dB.stackedPercentH,
+                color: d[0].color
             };
         });
     });
@@ -436,7 +505,8 @@ dadavis.attribute.bar.stacked = function(config, cache) {
                 x: dB.x - dB.w / 2 + dB.gutterW / 2,
                 y: dB.stackedY,
                 width: dB.w - dB.gutterW,
-                height: dB.stackedH
+                height: dB.stackedH,
+                color: d[0].color
             };
         });
     });
@@ -459,17 +529,23 @@ dadavis.attribute.point.stacked = function(config, cache) {
 
 dadavis.attribute.line.simple = function(config, cache) {
     return cache.layout.map(function(d, i) {
-        return d.map(function(dB, iB) {
-            return [ dB.x, dB.y ];
-        });
+        return {
+            points: d.map(function(dB, iB) {
+                return [ dB.x, dB.y ];
+            }),
+            color: d[0].color
+        };
     });
 };
 
 dadavis.attribute.line.stacked = function(config, cache) {
     return cache.layout.map(function(d, i) {
-        return d.map(function(dB, iB) {
-            return [ dB.x, dB.stackedY ];
-        });
+        return {
+            points: d.map(function(dB, iB) {
+                return [ dB.x, dB.stackedY ];
+            }),
+            color: d[0].color
+        };
     });
 };
 
@@ -488,7 +564,11 @@ dadavis.attribute.line.area = function(config, cache) {
                 return [ dB.x, dB.stackedY ];
             }).reverse();
         }
-        return line.concat(previousLine);
+        var points = line.concat(previousLine);
+        return {
+            points: points,
+            color: d[0].color
+        };
     });
 };
 
@@ -528,7 +608,7 @@ dadavis.attribute.axis.tickX = function(config, cache) {
     var tickW = 1;
     return {
         left: function(d, i) {
-            return d.x - tickW / 2 - this.offsetWidth + "px";
+            return d.x - tickW / 2 + "px";
         },
         width: tickW + "px",
         height: function(d, i) {
@@ -537,11 +617,25 @@ dadavis.attribute.axis.tickX = function(config, cache) {
     };
 };
 
+dadavis.attribute.axis.gridX = function(config, cache) {
+    var lineW = 1;
+    return {
+        top: config.margin.top + "px",
+        left: function(d, i) {
+            return config.margin.left + d.x - lineW / 2 - this.offsetWidth + "px";
+        },
+        width: lineW + "px",
+        height: function(d, i) {
+            return (i % config.axisXTickSkip ? 0 : cache.chartHeight) + "px";
+        }
+    };
+};
+
 dadavis.attribute.axis.fringeX = function(config, cache) {
     var fringeColorScale = d3.scale.linear().domain([ 0, 1 ]).range([ "yellow", "limegreen" ]);
     return {
         left: function(d, i) {
-            return d.x - d.w / 2 + d.gutterW / 2 - this.offsetWidth + "px";
+            return d.x - d.w / 2 + d.gutterW / 2 + "px";
         },
         width: function(d) {
             return Math.max(d.w - d.gutterW, 1) + "px";
@@ -570,13 +664,27 @@ dadavis.attribute.axis.labelY = function(config, cache) {
 };
 
 dadavis.attribute.axis.tickY = function(config, cache) {
+    var lineH = 1;
     return {
         width: config.tickSize + "px",
-        height: 1 + "px",
+        height: lineH + "px",
         position: "absolute",
         left: config.margin.left - config.tickSize + "px",
         top: function(d, i) {
             return d.labelY + "px";
+        }
+    };
+};
+
+dadavis.attribute.axis.gridY = function(config, cache) {
+    var lineH = 1;
+    return {
+        width: cache.chartWidth + "px",
+        height: lineH + "px",
+        position: "absolute",
+        left: config.margin.left + "px",
+        top: function(d, i) {
+            return config.margin.top + d.labelY + "px";
         }
     };
 };
@@ -605,7 +713,11 @@ dadavis.attribute.axis.fringeY = function(config, cache) {
 dadavis.interaction = {};
 
 dadavis.interaction.hovering = function(config, cache) {
-    var hoveringContainer = cache.container.select(".hovering").style({
+    var hoveringContainer = cache.container.select(".hovering");
+    if (!!hoveringContainer.on("mousemove")) {
+        return this;
+    }
+    hoveringContainer.style({
         width: cache.chartWidth + "px",
         height: cache.chartHeight + "px",
         position: "absolute",
@@ -665,10 +777,11 @@ dadavis.interaction.tooltip = function(config, cache) {
             "class": "tooltip"
         }).style({
             position: "absolute",
-            "pointer-events": "none"
+            "pointer-events": "none",
+            "z-index": 2
         });
         tooltip.html(function(d, i) {
-            return d.value;
+            return config.tooltipFormatter(d);
         }).style({
             left: function(d, i) {
                 return d.x + "px";
@@ -683,7 +796,7 @@ dadavis.interaction.tooltip = function(config, cache) {
                 return y + "px";
             },
             "background-color": function(d, i) {
-                return config.colors[i];
+                return d.color;
             }
         });
         tooltip.exit().remove();
@@ -710,7 +823,7 @@ dadavis.interaction.hoverLine = function(config, cache) {
 dadavis.scale = {};
 
 dadavis.scale.x = function(config, cache) {
-    var keys = dadavis.utils.extractValues(cache.data, config.keyX);
+    var keys = dadavis.utils.extractValues(cache.visibleData, config.keyX);
     var allKeys = d3.merge(keys);
     var range = [ config.outerPadding, cache.chartWidth - config.outerPadding ];
     var scaleX = null;
@@ -731,7 +844,7 @@ dadavis.scale.x = function(config, cache) {
 };
 
 dadavis.scale.y = function(config, cache) {
-    var values = d3.merge(dadavis.utils.extractValues(cache.data, config.keyY));
+    var values = d3.merge(dadavis.utils.extractValues(cache.visibleData, config.keyY));
     return d3.scale.linear().range([ 0, cache.chartHeight ]).domain([ 0, d3.max(values) ]);
 };
 
@@ -818,8 +931,8 @@ dadavis.component = {};
 dadavis.component.chart = function(config, cache) {
     var chartContainer = cache.container.select(".chart").style({
         position: "absolute",
-        width: cache.chartWidth + "px",
-        height: cache.chartHeight + "px"
+        width: config.width + "px",
+        height: config.height + "px"
     });
     var panelContainer = chartContainer.select(".panel").style({
         position: "absolute",
@@ -833,20 +946,25 @@ dadavis.component.chart = function(config, cache) {
         width: cache.chartWidth + "px",
         height: cache.chartHeight + "px"
     });
+};
+
+dadavis.component.shapes = function(config, cache) {
     var shapeAttr = dadavis.attribute[config.type][config.subtype](config, cache);
+    var shapeContainer = cache.container.select(".shape");
+    shapeContainer.html("");
     var renderer = dadavis.renderer[config.renderer](shapeContainer.node());
     if (config.type === "line") {
         shapeAttr.forEach(function(d, i) {
             var color = null;
             if (config.subtype === "area") {
-                color = config.colors[i];
+                color = d.color;
             } else {
                 color = "none";
             }
             renderer.polygon({
-                points: d,
+                points: d.points,
                 fill: color,
-                stroke: config.colors[i]
+                stroke: d.color
             });
         });
     } else {
@@ -854,13 +972,38 @@ dadavis.component.chart = function(config, cache) {
             d.forEach(function(dB, iB) {
                 renderer.rect({
                     rect: dB,
-                    fill: config.colors[i],
-                    stroke: config.colors[i]
+                    fill: dB.color,
+                    stroke: dB.color
                 });
             });
         });
     }
     return this;
+};
+
+dadavis.component.title = function(config, cache) {
+    if (config.chartTitle) {
+        d3.select(".title").html("Chart Title").style({
+            width: "100%",
+            "text-align": "center"
+        });
+    }
+    if (config.axisXTitle) {
+        d3.select(".axis-title-x").html("X Axis Title").style({
+            top: function() {
+                return config.height - this.offsetHeight + "px";
+            },
+            position: "absolute",
+            width: "100%",
+            "text-align": "center"
+        });
+    }
+    if (config.axisYTitle) {
+        d3.select(".axis-title-y").html("Y Axis Title").style({
+            transform: "rotate(-90deg) translate(-" + config.height / 2 + "px)",
+            "transform-origin": "0 0"
+        });
+    }
 };
 
 dadavis.component.axisX = function(config, cache) {
@@ -875,6 +1018,24 @@ dadavis.component.axisX = function(config, cache) {
         left: config.margin.left + "px",
         "border-top": "1px solid black"
     });
+    if (config.showFringe) {
+        var fringeX = axisXContainer.selectAll("div.fringe-x").data(cache.layout[0]);
+        fringeX.enter().append("div").classed("fringe-x", true).style({
+            position: "absolute"
+        });
+        fringeX.style(dadavis.attribute.axis.fringeX(config, cache));
+        fringeX.exit().remove();
+    }
+    if (config.showXGrid) {
+        var gridX = cache.container.select(".grid-x").selectAll("div.grid-line-x").data(cache.axesLayout.x);
+        gridX.enter().append("div").classed("grid-line-x", true).style({
+            position: "absolute"
+        }).style({
+            "background-color": "#eee"
+        });
+        gridX.style(dadavis.attribute.axis.gridX(config, cache));
+        gridX.exit().remove();
+    }
     var labelsX = axisXContainer.selectAll("div.label").data(cache.axesLayout.x);
     labelsX.enter().append("div").classed("label", true).style({
         position: "absolute"
@@ -908,14 +1069,6 @@ dadavis.component.axisX = function(config, cache) {
     });
     ticksX.style(dadavis.attribute.axis.tickX(config, cache));
     ticksX.exit().remove();
-    if (config.showFringe) {
-        var fringeX = axisXContainer.selectAll("div.fringe-x").data(cache.layout[0]);
-        fringeX.enter().append("div").classed("fringe-x", true).style({
-            position: "absolute"
-        });
-        fringeX.style(dadavis.attribute.axis.fringeX(config, cache));
-        fringeX.exit().remove();
-    }
 };
 
 dadavis.component.axisY = function(config, cache) {
@@ -930,6 +1083,24 @@ dadavis.component.axisY = function(config, cache) {
         left: 0 + "px",
         "border-right": "1px solid black"
     });
+    if (config.showFringe) {
+        var fringeY = axisYContainer.selectAll("div.fringe-y").data(cache.layout[0]);
+        fringeY.enter().append("div").classed("fringe-y", true).style({
+            position: "absolute"
+        });
+        fringeY.style(dadavis.attribute.axis.fringeY(config, cache));
+        fringeY.exit().remove();
+    }
+    if (config.showYGrid) {
+        var gridX = cache.container.select(".grid-y").selectAll("div.grid-line-y").data(cache.axesLayout.y);
+        gridX.enter().append("div").classed("grid-line-y", true).style({
+            position: "absolute"
+        }).style({
+            "background-color": "#eee"
+        });
+        gridX.style(dadavis.attribute.axis.gridY(config, cache));
+        gridX.exit().remove();
+    }
     var labelsY = axisYContainer.selectAll("div.label").data(cache.axesLayout.y);
     labelsY.enter().append("div").classed("label", true);
     labelsY.html(function(d, i) {
@@ -946,14 +1117,57 @@ dadavis.component.axisY = function(config, cache) {
     });
     ticksY.style(dadavis.attribute.axis.tickY(config, cache));
     ticksY.exit().remove();
-    if (config.showFringe) {
-        var fringeY = axisYContainer.selectAll("div.fringe-y").data(cache.layout[0]);
-        fringeY.enter().append("div").classed("fringe-y", true).style({
-            position: "absolute"
-        });
-        fringeY.style(dadavis.attribute.axis.fringeY(config, cache));
-        fringeY.exit().remove();
+};
+
+dadavis.component.legend = function(config, cache) {
+    if (!config.showLegend) {
+        return this;
     }
+    var legend = cache.container.select(".legend").style({
+        position: "absolute"
+    });
+    var legendItems = legend.selectAll("p.legend-item").data(cache.legendLayout);
+    legendItems.enter().append("p").classed("legend-item", true).each(function(d, i) {
+        var that = this;
+        var a = d3.select(this).append("a").style({
+            cursor: "pointer"
+        }).on("click", function() {
+            var element = d3.select(that);
+            d3.select(that).classed("unchecked", !element.classed("unchecked"));
+            var toHide = [];
+            legendItems.each(function(d) {
+                if (this.classList.contains("unchecked")) {
+                    toHide.push(d.name);
+                }
+            });
+            cache.events.legendClick(toHide);
+            cache.internalEvents.legendClick(toHide);
+        });
+        a.append("span").attr({
+            "class": "legend-color"
+        }).style({
+            display: "inline-block",
+            width: 10 + "px",
+            height: 10 + "px",
+            "border-radius": 5 + "px",
+            "background-color": function(d, i) {
+                return d.color;
+            }
+        });
+        a.append("span").attr({
+            "class": "legend-name"
+        }).style({
+            display: "inline-block"
+        }).html(function() {
+            return d.name;
+        });
+    });
+    legendItems.exit().remove();
+    legend.style({
+        left: function() {
+            return config.width - this.offsetWidth + "px";
+        }
+    });
 };
 
 if (typeof define === "function" && define.amd) {

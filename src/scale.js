@@ -2,7 +2,7 @@ dadavis.scale = {};
 
 dadavis.scale.x = function(config, cache){
 
-    var keys = dadavis.utils.extractValues(cache.data, config.keyX);
+    var keys = dadavis.utils.extractValues(cache.visibleData, config.keyX);
     var allKeys = d3.merge(keys);
 
     var range = [config.outerPadding, cache.chartWidth - config.outerPadding];
@@ -29,7 +29,7 @@ dadavis.scale.x = function(config, cache){
 
 dadavis.scale.y = function(config, cache){
 
-    var values = d3.merge(dadavis.utils.extractValues(cache.data, config.keyY));
+    var values = d3.merge(dadavis.utils.extractValues(cache.visibleData, config.keyY));
 
     return d3.scale.linear().range([0, cache.chartHeight]).domain([0, d3.max(values)]);
 };

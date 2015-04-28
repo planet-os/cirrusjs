@@ -1,19 +1,24 @@
 dadavis.layout = {
     data: {},
-    axes: {}
+    axes: {},
+    fringes: {}
 };
 
 dadavis.layout.data = function(config, cache){
 
+    cache.visibleData = cache.data.filter(function(d){
+        return cache.dataLayersToHide.indexOf(d.name) === -1;
+    });
+
     var percentScaleY = cache.scaleY.copy();
     var stackedScaleY = cache.scaleY.copy();
 
-    var values = dadavis.utils.extractValues(cache.data, config.keyY);
+    var values = dadavis.utils.extractValues(cache.visibleData, config.keyY);
     var valuesTransposed = d3.transpose(values);
 
     var previousValue = null;
     var minW = Number.MAX_VALUE;
-    cache.data[0].values.forEach(function(d, i){
+    cache.visibleData[0].values.forEach(function(d, i){
 
         var value = d[config.keyX];
         if(config.scaleType === 'time'){
@@ -32,7 +37,7 @@ dadavis.layout.data = function(config, cache){
     });
     minW = Math.max(minW, 1);
 
-    return cache.data.map(function(d, i){
+    return cache.visibleData.map(function(d, i){
 
         var previous = null;
         return d.values.map(function(dB, iB){
@@ -68,9 +73,10 @@ dadavis.layout.data = function(config, cache){
                 gutterW: gutterW,
                 stackedPercentH: percentScaleY(value),
                 stackedH: stackedScaleY(value),
-                layerCount: cache.data.length,
+                layerCount: cache.visibleData.length,
                 layerIndex: i,
-                centerX: cache.scaleX(key) + minW / 2
+                centerX: cache.scaleX(key) + minW / 2,
+                color: d.color
             };
 
             datum.previous = previous || datum;
@@ -94,7 +100,7 @@ dadavis.layout.axes.x = function(config, cache){
         });
     }
     else{
-        return cache.data[0].values.map(function(d, i){
+        return cache.visibleData[0].values.map(function(d, i){
 
             var key = d[config.keyX];
             if(config.scaleType === 'time'){
@@ -117,7 +123,7 @@ dadavis.layout.axes.y = function(config, cache){
     var percentScaleY = cache.scaleY.copy();
     var stackedScaleY = cache.scaleY.copy();
 
-    var values = dadavis.utils.extractValues(cache.data, config.keyY);
+    var values = dadavis.utils.extractValues(cache.visibleData, config.keyY);
     var valuesTransposed = d3.transpose(values);
 
     var domainMax = d3.max(d3.merge(values));
@@ -141,4 +147,20 @@ dadavis.layout.axes.y = function(config, cache){
             labelY: scaleY(value)
         };
     });
+};
+
+dadavis.layout.legend = function(config, cache){
+
+    return cache.data.map(function(d, i){
+        return {name: d.name, color: d.color};
+    });
+};
+
+dadavis.layout.fringes.y = function(config, cache){
+
+    //TODO
+
+    //return cache.layout.map(function(d, i){
+    //
+    //});
 };

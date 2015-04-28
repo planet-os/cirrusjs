@@ -14,3 +14,7 @@
 .label {
     white-space: nowrap;
 }
+
+.legend-item.unchecked .legend-color {
+    background-color: #eee !important;
+}

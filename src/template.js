@@ -12,4 +12,5 @@ dadavis.template.main = '<div class="chart">' +
 '<div class="axis-x"></div>' +
 '<div class="axis-y"></div>' +
 '<div class="axis-title-x"></div>' +
+'<div class="legend"></div>' +
 '</div>';

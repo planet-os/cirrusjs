@@ -25,6 +25,7 @@ dadavis.utils.computeRandomTimeArray = function(count, dateNow){
 dadavis.utils.getRandomNumericData = function(shapeCount, layerCount){
 
     var x = d3.range(shapeCount);
+    var colors =  dadavis.utils.defaultColors;
 
     return d3.range(layerCount).map(function(d, i){
         var y = dadavis.utils.computeRandomNumericArray(shapeCount, 10, 100);
@@ -33,15 +34,19 @@ dadavis.utils.getRandomNumericData = function(shapeCount, layerCount){
         });
         return {
             name: 'name' + i,
-            values: values
+            values: values,
+            color: colors[i % colors.length]
         };
     })
 };
+
+dadavis.utils.defaultColors = ['skyblue', 'orange', 'lime', 'orangered', 'violet', 'yellow', 'brown', 'pink'];
 
 dadavis.utils.getRandomTimeData = function(shapeCount, layerCount){
     var dateNow = new Date().getTime();
 
     var x = dadavis.utils.computeRandomTimeArray(shapeCount, dateNow);
+    var colors =  dadavis.utils.defaultColors;
 
     return d3.range(layerCount).map(function(d, i){
         var y = dadavis.utils.computeRandomNumericArray(shapeCount, 10, 100);
@@ -50,7 +55,8 @@ dadavis.utils.getRandomTimeData = function(shapeCount, layerCount){
         });
         return {
             name: 'name' + i,
-            values: values
+            values: values,
+            color: colors[i % colors.length]
         };
     });
 };
@@ -119,4 +125,16 @@ dadavis.utils.extractValues = function(data, key){
             return dB[key];
         });
     });
+};
+
+dadavis.utils.once = function once(fn, context) {
+    var result;
+
+    return function() {
+        if(fn) {
+            result = fn.apply(context || this, arguments);
+            fn = null;
+        }
+        return result;
+    };
 };
