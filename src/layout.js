@@ -17,7 +17,7 @@ dadavis.layout.data = function(config, cache){
     var valuesTransposed = d3.transpose(values);
 
     var previousValue = null;
-    var minW = Number.MAX_VALUE;
+    var minW = cache.chartWidth;
     cache.visibleData[0].values.forEach(function(d, i){
 
         var value = d[config.keyX];

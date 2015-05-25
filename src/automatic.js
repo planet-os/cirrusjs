@@ -19,11 +19,6 @@ dadavis.automatic.config = function(config, cache){
         }
     }
 
-    if(config.outerPadding === 'auto'){
-        var keys = dadavis.utils.extractValues(cache.data, config.keyX);
-        config.outerPadding = cache.chartWidth / keys[0].length / 4;
-    }
-
     this.setConfig({
         width: cache.container.node().offsetWidth,
         height: cache.container.node().offsetHeight
@@ -31,6 +26,13 @@ dadavis.automatic.config = function(config, cache){
 
     cache.chartWidth = config.width - config.margin.left - config.margin.right;
     cache.chartHeight = config.height - config.margin.top - config.margin.bottom;
+
+    if(config.outerPadding === 'auto'){
+        var keys = dadavis.utils.extractValues(cache.data, config.keyX);
+        this.setConfig({
+            outerPadding: cache.chartWidth / (keys[0].length) / 2
+        });
+    }
 
     if(config.type === 'line'){
         cache.noPadding = true;

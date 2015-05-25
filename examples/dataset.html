@@ -96,6 +96,7 @@ var data3 = [
 
 var renderer = 'svg';
 var scaleType = 'linear';
+var outerPadding = 'auto';
 
 var labelFormatter = function(d, i){
     return d3.time.format('%e %b')(new Date(d));
@@ -197,7 +198,7 @@ var config = {
     subtype: 'simple',
     renderer: renderer,
     scaleType: 'ordinal',
-    outerPadding: 40
+    outerPadding: outerPadding
 };
 var ds = dadavis.init(config).render(data3);
 
@@ -207,7 +208,7 @@ var config = {
     subtype: 'stacked',
     renderer: renderer,
     scaleType: 'ordinal',
-    outerPadding: 40
+    outerPadding: outerPadding
 };
 var ds = dadavis.init(config).render(data3);
 
