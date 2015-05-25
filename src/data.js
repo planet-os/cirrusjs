@@ -20,15 +20,9 @@ dadavis.data.validate = function(config, cache, _data){
         dataIsValid = true;
     }
 
-    cache.data.forEach(function(d, i){
-        if(!d.color){
-            d.color = dadavis.utils.defaultColors[i];
-        }
-    });
-
     cache.visibleData = cache.data.filter(function(d){
         return cache.dataLayersToHide.indexOf(d.name) === -1;
     });
 
     return dataIsValid;
-}
+};

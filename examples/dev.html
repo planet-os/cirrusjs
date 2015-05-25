@@ -36,7 +36,7 @@
 <script>
 
     var data = dadavis.utils.getRandomTimeData(60, 5);
-
+    
     var config = {
         containerSelector: '.container',
         margin: {top: 40, right: 60, bottom: 80, left: 80},
@@ -58,7 +58,8 @@
         },
         tooltipFormatter: function(d){
             return d.parentData.name + ' : ' + d.value;
-        }
+        },
+        colorList: ['pink', 'orange', 'brown']
     };
 
     var ds = dadavis.init(config).render(data);

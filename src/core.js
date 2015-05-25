@@ -33,7 +33,8 @@ dadavis.init = function(_config){
         autoTypeThreshold: 30,
         chartTitle: null,
         axisXTitle: null,
-        axisYTitle: null
+        axisYTitle: null,
+        colorList: dadavis.utils.defaultColors
     };
 
     var cache = {

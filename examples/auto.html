@@ -35,17 +35,17 @@
 
 <script>
 
-    var data = dadavis.utils.getRandomTimeData(60, 5);
+    var data = dadavis.utils.getRandomTimeData(40, 5);
 
     var config = {
         containerSelector: '.container',
         margin: {top: 40, right: 60, bottom: 80, left: 80},
         type: 'auto',
         subtype: 'stacked',
+        autoTypeThreshold: 30,
         axisXTickSkip: 'auto',
         gutterPercent: 50,
         scaleType: 'time',
-        showFringe: true,
         chartTitle: 'Chart Title',
         axisXTitle: 'X Axis Title',
         axisYTitle: 'Y Axis Title',

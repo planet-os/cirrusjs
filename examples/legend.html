@@ -35,14 +35,14 @@
 
 <script>
 
-    var data = dadavis.utils.getRandomTimeData(60, 5);
+    var data = dadavis.utils.getRandomTimeData(150, 5);
 
     var config = {
         containerSelector: '.container',
         margin: {top: 40, right: 60, bottom: 80, left: 80},
         type: 'line',
         subtype: 'area',
-        axisXTickSkip: 5,
+        axisXTickSkip: 'auto',
         minorTickSize: 2,
         gutterPercent: 50,
         scaleType: 'time',

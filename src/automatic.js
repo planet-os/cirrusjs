@@ -35,5 +35,12 @@ dadavis.automatic.config = function(config, cache){
     if(config.type === 'line'){
         cache.noPadding = true;
     }
+
+    cache.data.forEach(function(d, i){
+        if(!d.color){
+            d.color = config.colorList[i % config.colorList.length];
+        }
+    });
+
     return this;
 };
