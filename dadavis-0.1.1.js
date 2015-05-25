@@ -43,7 +43,8 @@ dadavis.init = function(_config) {
         autoTypeThreshold: 30,
         chartTitle: null,
         axisXTitle: null,
-        axisYTitle: null
+        axisYTitle: null,
+        colorList: dadavis.utils.defaultColors
     };
     var cache = {
         chartWidth: 500,
@@ -152,7 +153,6 @@ dadavis.utils.computeRandomTimeArray = function(count, dateNow) {
 
 dadavis.utils.getRandomNumericData = function(shapeCount, layerCount) {
     var x = d3.range(shapeCount);
-    var colors = dadavis.utils.defaultColors;
     return d3.range(layerCount).map(function(d, i) {
         var y = dadavis.utils.computeRandomNumericArray(shapeCount, 10, 100);
         var values = d3.zip(x, y).map(function(d, i) {
@@ -163,8 +163,7 @@ dadavis.utils.getRandomNumericData = function(shapeCount, layerCount) {
         });
         return {
             name: "name" + i,
-            values: values,
-            color: colors[i % colors.length]
+            values: values
         };
     });
 };
@@ -174,7 +173,6 @@ dadavis.utils.defaultColors = [ "skyblue", "orange", "lime", "orangered", "viole
 dadavis.utils.getRandomTimeData = function(shapeCount, layerCount) {
     var dateNow = new Date().getTime();
     var x = dadavis.utils.computeRandomTimeArray(shapeCount, dateNow);
-    var colors = dadavis.utils.defaultColors;
     return d3.range(layerCount).map(function(d, i) {
         var y = dadavis.utils.computeRandomNumericArray(shapeCount, 10, 100);
         var values = d3.zip(x, y).map(function(d, i) {
@@ -185,8 +183,7 @@ dadavis.utils.getRandomTimeData = function(shapeCount, layerCount) {
         });
         return {
             name: "name" + i,
-            values: values,
-            color: colors[i % colors.length]
+            values: values
         };
     });
 };
@@ -280,11 +277,6 @@ dadavis.data.validate = function(config, cache, _data) {
         cache.data = cache.previousData;
         dataIsValid = true;
     }
-    cache.data.forEach(function(d, i) {
-        if (!d.color) {
-            d.color = dadavis.utils.defaultColors[i];
-        }
-    });
     cache.visibleData = cache.data.filter(function(d) {
         return cache.dataLayersToHide.indexOf(d.name) === -1;
     });
@@ -309,19 +301,26 @@ dadavis.automatic.config = function(config, cache) {
             });
         }
     }
-    if (config.outerPadding === "auto") {
-        var keys = dadavis.utils.extractValues(cache.data, config.keyX);
-        config.outerPadding = cache.chartWidth / keys[0].length / 4;
-    }
     this.setConfig({
         width: cache.container.node().offsetWidth,
         height: cache.container.node().offsetHeight
     });
     cache.chartWidth = config.width - config.margin.left - config.margin.right;
     cache.chartHeight = config.height - config.margin.top - config.margin.bottom;
+    if (config.outerPadding === "auto") {
+        var keys = dadavis.utils.extractValues(cache.data, config.keyX);
+        this.setConfig({
+            outerPadding: cache.chartWidth / keys[0].length / 2
+        });
+    }
     if (config.type === "line") {
         cache.noPadding = true;
     }
+    cache.data.forEach(function(d, i) {
+        if (!d.color) {
+            d.color = config.colorList[i % config.colorList.length];
+        }
+    });
     return this;
 };
 
@@ -344,7 +343,7 @@ dadavis.layout.data = function(config, cache) {
     var values = dadavis.utils.extractValues(cache.visibleData, config.keyY);
     var valuesTransposed = d3.transpose(values);
     var previousValue = null;
-    var minW = Number.MAX_VALUE;
+    var minW = cache.chartWidth;
     cache.visibleData[0].values.forEach(function(d, i) {
         var value = d[config.keyX];
         if (config.scaleType === "time") {
@@ -1043,15 +1042,18 @@ dadavis.component.axisX = function(config, cache) {
     labelsX.html(function(d, i) {
         return config.labelFormatterX(d.key, i);
     }).style(dadavis.attribute.axis.labelX(config, cache));
+    var skipped = [];
     if (config.axisXTickSkip === "auto") {
         var previous = null;
-        labelsX[0].forEach(function(d) {
+        labelsX[0].forEach(function(d, i) {
             var hide = false;
             if (previous) {
                 hide = parseFloat(d.style.left) - parseFloat(previous.style.left) < d.offsetWidth;
             }
             if (!hide) {
                 previous = d;
+            } else {
+                skipped.push(i);
             }
             d3.select(d).style({
                 opacity: +!hide
@@ -1067,7 +1069,15 @@ dadavis.component.axisX = function(config, cache) {
     }).style({
         "background-color": "black"
     });
-    ticksX.style(dadavis.attribute.axis.tickX(config, cache));
+    ticksX.style(dadavis.attribute.axis.tickX(config, cache)).style({
+        height: function(d, i) {
+            if (config.axisXTickSkip === "auto") {
+                var toSkip = skipped.indexOf(i) !== -1;
+                return (toSkip ? config.minorTickSize : config.tickSize) + "px";
+            }
+            return (i % config.axisXTickSkip ? config.minorTickSize : config.tickSize) + "px";
+        }
+    });
     ticksX.exit().remove();
 };
 
