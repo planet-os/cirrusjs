@@ -1,11 +1,11 @@
 dadavis.scale = {};
 
-dadavis.scale.x = function(config, cache){
+dadavis.scale.x = function(config, _config){
 
-    var keys = dadavis.utils.extractValues(cache.visibleData, config.keyX);
+    var keys = dadavis.utils.extractValues(_config.visibleData, config.keyX);
     var allKeys = d3.merge(keys);
 
-    var range = [config.outerPadding, cache.chartWidth - config.outerPadding];
+    var range = [config.outerPadding, _config.chartWidth - config.outerPadding];
     var scaleX = null;
     if(config.scaleType === 'time'){
         scaleX = d3.time.scale().range(range);
@@ -27,9 +27,9 @@ dadavis.scale.x = function(config, cache){
     return scaleX;
 };
 
-dadavis.scale.y = function(config, cache){
+dadavis.scale.y = function(config, _config){
 
-    var values = d3.merge(dadavis.utils.extractValues(cache.visibleData, config.keyY));
+    var values = d3.merge(dadavis.utils.extractValues(_config.visibleData, config.keyY));
 
-    return d3.scale.linear().range([0, cache.chartHeight]).domain([0, d3.max(values)]);
+    return d3.scale.linear().range([0, _config.chartHeight]).domain([0, d3.max(values)]);
 };

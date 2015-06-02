@@ -73,11 +73,11 @@ dadavis.utils.throttle = function(callback, limit){
     };
 };
 
-dadavis.utils.convertToImage = function(config, cache, callback){
+dadavis.utils.convertToImage = function(config, _config, callback){
 
     var clickEvent = new MouseEvent("click", {"view": window, "bubbles": true, "cancelable": false});
 
-    var chartNode = cache.container.node();
+    var chartNode = _config.container.node();
     var xhtml = new XMLSerializer().serializeToString(chartNode);
 
     var size = {width: chartNode.offsetWidth, height: chartNode.offsetHeight, rootFontSize: 14};

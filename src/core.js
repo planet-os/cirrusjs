@@ -1,11 +1,11 @@
 var dadavis = {version: '0.1.1'};
 
-dadavis.init = function(_config){
+dadavis.init = function(initialConfig){
 
     var config = {
-        containerSelector: '.container',
-        width: 500,
-        height: 500,
+        container: '.container',
+        width: 'auto',
+        height: 'auto',
         margin: {top: 20, right: 20, bottom: 50, left: 50},
         type: 'bar',
         subtype: 'stacked',
@@ -37,12 +37,12 @@ dadavis.init = function(_config){
         colorList: dadavis.utils.defaultColors
     };
 
-    var cache = {
+    var _config = {
         chartWidth: 500,
         chartHeight: 500,
         data: null,
         visibleData: null,
-        layout: null,
+        shapeLayout: null,
         scaleX: null,
         scaleY: null,
         axesLayout: {},
@@ -53,27 +53,27 @@ dadavis.init = function(_config){
         noPadding: false,
         dataLayersToHide: [],
         events: d3.dispatch('hover', 'hoverOut', 'legendClick'),
-        internalEvents: d3.dispatch('setHover', 'hideHover', 'resize', 'legendClick'),
+        internalEvents: d3.dispatch('setHover', 'hideHover', 'resize', 'legendClick')
     };
 
     var exports = {};
 
-    exports.initialize = dadavis.utils.once(function(config, cache){
-        dadavis.utils.override(_config, config);
+    exports.initialize = dadavis.utils.once(function(config, _config){
+        this.setConfig(initialConfig);
 
-        cache.container = d3.select(config.containerSelector);
-        cache.container.html(dadavis.template.main);
+        _config.container = d3.select(config.container);
+        _config.container.html(dadavis.template.main);
 
         d3.select(window).on('resize.namespace' + ~~(Math.random()*1000), dadavis.utils.throttle(function(){
-            cache.internalEvents.resize();
+            _config.internalEvents.resize();
         }, 200));
 
         var that = this;
-        cache.internalEvents.on('resize', function(){
+        _config.internalEvents.on('resize', function(){
             that.resize();
         });
-        cache.internalEvents.on('legendClick', function(toHide){
-            cache.dataLayersToHide = toHide;
+        _config.internalEvents.on('legendClick', function(toHide){
+            _config.dataLayersToHide = toHide;
             that.render();
         });
     });
@@ -83,59 +83,67 @@ dadavis.init = function(_config){
         return this;
     };
 
+    exports.getConfig = function(){
+        return config;
+    };
+
+    exports._getConfig = function(){
+        return _config;
+    };
+
     exports.resize = function(){
         this.render();
         return this;
     };
 
     exports.downloadAsPNG = function(callback){
-        dadavis.utils.convertToImage(config, cache, callback);
+        dadavis.utils.convertToImage(config, _config, callback);
         return this;
     };
 
     exports.setHovering = function(hoverData){
-        cache.internalEvents.setHover(hoverData);
+        _config.internalEvents.setHover(hoverData);
         return this;
     };
 
     exports.hideHovering = function(){
-        cache.internalEvents.hideHover();
+        _config.internalEvents.hideHover();
         return this;
     };
 
     exports.render = function(data){
 
-        if(!dadavis.data.validate(config, cache, data)){
+        if(!dadavis.data.validate(config, _config, data)){
             console.error('Invalid data', data);
             return this;
         }
 
-        this.initialize.call(this, config, cache);
-        dadavis.automatic.config.call(this, config, cache);
+        this.initialize.call(this, config, _config);
+        dadavis.automatic.config.call(this, config, _config);
 
-        cache.scaleX = dadavis.scale.x(config, cache);
-        cache.scaleY = dadavis.scale.y(config, cache);
+        _config.scaleX = dadavis.scale.x(config, _config);
+        _config.scaleY = dadavis.scale.y(config, _config);
 
-        cache.layout = dadavis.layout.data(config, cache);
-        cache.axesLayout.x = dadavis.layout.axes.x(config, cache);
-        cache.axesLayout.y = dadavis.layout.axes.y(config, cache);
-        cache.legendLayout = dadavis.layout.legend(config, cache);
+        _config.shapeLayout = dadavis.layout.shape(config, _config);
+        _config.axesLayout.x = dadavis.layout.axes.x(config, _config);
+        _config.axesLayout.y = dadavis.layout.axes.y(config, _config);
+        _config.legendLayout = dadavis.layout.legend(config, _config);
 
-        //cache.fringeLayout.y = dadavis.layout.fringes.y(config, cache);
-        //console.log(cache.fringeLayout.y);
+        //_config.fringeLayout.y = dadavis.layout.fringes.y(config, _config);
+        //console.log(_config.fringeLayout.y);
 
-        dadavis.component.chart(config, cache);
-        dadavis.component.shapes(config, cache);
-        dadavis.component.axisX(config, cache);
-        dadavis.component.axisY(config, cache);
-        dadavis.component.title(config, cache);
-        dadavis.component.legend(config, cache);
-        dadavis.interaction.hovering(config, cache);
+        dadavis.component.chart(config, _config);
+        dadavis.component.shapes(config, _config);
+        dadavis.component.axisX(config, _config);
+        dadavis.component.axisY(config, _config);
+        dadavis.component.title(config, _config);
+        dadavis.component.legend(config, _config);
+        dadavis.interaction.hovering(config, _config);
 
         return this;
     };
 
-    d3.rebind(exports, cache.events, "on");
+    d3.rebind(exports, _config.events, "on");
 
     return exports;
 };

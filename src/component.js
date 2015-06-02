@@ -1,7 +1,7 @@
 dadavis.component = {};
 
-dadavis.component.chart = function(config, cache){
-    var chartContainer = cache.container.select('.chart').style({
+dadavis.component.chart = function(config, _config){
+    var chartContainer = _config.container.select('.chart').style({
         position: 'absolute',
         width: config.width + 'px',
         height: config.height + 'px'
@@ -11,23 +11,23 @@ dadavis.component.chart = function(config, cache){
         position: 'absolute',
         left: config.margin.left + 'px',
         top: config.margin.top + 'px',
-        width: cache.chartWidth + 'px',
-        height: cache.chartHeight + 'px'
+        width: _config.chartWidth + 'px',
+        height: _config.chartHeight + 'px'
     });
 
     var shapeContainer = chartContainer.select('.shape').style({
         position: 'absolute',
-        width: cache.chartWidth + 'px',
-        height: cache.chartHeight + 'px'
+        width: _config.chartWidth + 'px',
+        height: _config.chartHeight + 'px'
     });
 
 };
 
-dadavis.component.shapes = function(config, cache){
+dadavis.component.shapes = function(config, _config){
 
-    var shapeAttr = dadavis.attribute[config.type][config.subtype](config, cache);
+    var shapeAttr = dadavis.attribute[config.type][config.subtype](config, _config);
 
-    var shapeContainer = cache.container.select('.shape');
+    var shapeContainer = _config.container.select('.shape');
     shapeContainer.html('');
     var renderer = dadavis.renderer[config.renderer](shapeContainer.node());
 
@@ -57,7 +57,7 @@ dadavis.component.shapes = function(config, cache){
     return this;
 };
 
-dadavis.component.title = function(config, cache){
+dadavis.component.title = function(config, _config){
 
     if(config.chartTitle){
         d3.select('.title')
@@ -91,50 +91,50 @@ dadavis.component.title = function(config, cache){
     }
 };
 
-dadavis.component.axisX = function(config, cache){
+dadavis.component.axisX = function(config, _config){
 
     if(!config.showAxes){
         return;
     }
 
-    var axisXContainer = cache.container.select('.axis-x')
+    var axisXContainer = _config.container.select('.axis-x')
         .style({
-            width: cache.chartWidth + 'px',
+            width: _config.chartWidth + 'px',
             height: config.margin.bottom + 'px',
             position: 'absolute',
-            top: cache.chartHeight + config.margin.top + 'px',
+            top: _config.chartHeight + config.margin.top + 'px',
             left: config.margin.left + 'px',
             'border-top': '1px solid black'
         });
 
     if(config.showFringe){
         var fringeX = axisXContainer.selectAll('div.fringe-x')
-            .data(cache.layout[0]);
+            .data(_config.shapeLayout[0]);
 
         fringeX.enter().append('div').classed('fringe-x', true)
             .style({position: 'absolute'});
 
-        fringeX.style(dadavis.attribute.axis.fringeX(config, cache));
+        fringeX.style(dadavis.attribute.axis.fringeX(config, _config));
 
         fringeX.exit().remove();
     }
 
     if(config.showXGrid){
-        var gridX = cache.container.select('.grid-x')
+        var gridX = _config.container.select('.grid-x')
             .selectAll('div.grid-line-x')
-            .data(cache.axesLayout.x);
+            .data(_config.axesLayout.x);
 
         gridX.enter().append('div').classed('grid-line-x', true)
             .style({position: 'absolute'})
             .style({'background-color': '#eee'});
 
-        gridX.style(dadavis.attribute.axis.gridX(config, cache));
+        gridX.style(dadavis.attribute.axis.gridX(config, _config));
 
         gridX.exit().remove();
     }
 
     var labelsX = axisXContainer.selectAll('div.label')
-        .data(cache.axesLayout.x);
+        .data(_config.axesLayout.x);
 
     labelsX.enter().append('div').classed('label', true)
         .style({
@@ -145,7 +145,7 @@ dadavis.component.axisX = function(config, cache){
         .html(function(d, i){
             return config.labelFormatterX(d.key, i);
         })
-        .style(dadavis.attribute.axis.labelX(config, cache));
+        .style(dadavis.attribute.axis.labelX(config, _config));
 
     var skipped = [];
     if(config.axisXTickSkip === 'auto'){
@@ -166,18 +166,18 @@ dadavis.component.axisX = function(config, cache){
         });
     }
 
-    labelsX.style(dadavis.attribute.axis.labelX(config, cache));
+    labelsX.style(dadavis.attribute.axis.labelX(config, _config));
 
     labelsX.exit().remove();
 
     var ticksX = axisXContainer.selectAll('div.tick')
-        .data(cache.axesLayout.x);
+        .data(_config.axesLayout.x);
 
     ticksX.enter().append('div').classed('tick', true)
         .style({position: 'absolute'})
         .style({'background-color': 'black'});
 
-    ticksX.style(dadavis.attribute.axis.tickX(config, cache))
+    ticksX.style(dadavis.attribute.axis.tickX(config, _config))
         .style({
             height: function(d, i){
                 if(config.axisXTickSkip === 'auto'){
@@ -191,16 +191,16 @@ dadavis.component.axisX = function(config, cache){
     ticksX.exit().remove();
 };
 
-dadavis.component.axisY = function(config, cache){
+dadavis.component.axisY = function(config, _config){
 
     if(!config.showAxes){
         return;
     }
 
-    var axisYContainer = cache.container.select('.axis-y')
+    var axisYContainer = _config.container.select('.axis-y')
         .style({
             width: config.margin.left + 'px',
-            height: cache.chartHeight + 'px',
+            height: _config.chartHeight + 'px',
             position: 'absolute',
             top: config.margin.top + 'px',
             left: 0 + 'px',
@@ -209,32 +209,32 @@ dadavis.component.axisY = function(config, cache){
 
     if(config.showFringe){
         var fringeY = axisYContainer.selectAll('div.fringe-y')
-            .data(cache.layout[0]); // TODO only works for single layer
+            .data(_config.shapeLayout[0]); // TODO only works for single layer
 
         fringeY.enter().append('div').classed('fringe-y', true)
             .style({position: 'absolute'});
 
-        fringeY.style(dadavis.attribute.axis.fringeY(config, cache));
+        fringeY.style(dadavis.attribute.axis.fringeY(config, _config));
 
         fringeY.exit().remove();
     }
 
     if(config.showYGrid){
-        var gridX = cache.container.select('.grid-y')
+        var gridX = _config.container.select('.grid-y')
             .selectAll('div.grid-line-y')
-            .data(cache.axesLayout.y);
+            .data(_config.axesLayout.y);
 
         gridX.enter().append('div').classed('grid-line-y', true)
             .style({position: 'absolute'})
             .style({'background-color': '#eee'});
 
-        gridX.style(dadavis.attribute.axis.gridY(config, cache));
+        gridX.style(dadavis.attribute.axis.gridY(config, _config));
 
         gridX.exit().remove();
     }
 
     var labelsY = axisYContainer.selectAll('div.label')
-        .data(cache.axesLayout.y);
+        .data(_config.axesLayout.y);
 
     labelsY.enter().append('div').classed('label', true);
 
@@ -247,34 +247,34 @@ dadavis.component.axisY = function(config, cache){
                 return d.stackedLabel;
             }
         })
-        .style(dadavis.attribute.axis.labelY(config, cache));
+        .style(dadavis.attribute.axis.labelY(config, _config));
 
     labelsY.exit().remove();
 
     var ticksY = axisYContainer.selectAll('div.tick')
-        .data(cache.axesLayout.y);
+        .data(_config.axesLayout.y);
 
     ticksY.enter().append('div').classed('tick', true)
         .style({'background-color': 'black'});
 
-    ticksY.style(dadavis.attribute.axis.tickY(config, cache));
+    ticksY.style(dadavis.attribute.axis.tickY(config, _config));
 
     ticksY.exit().remove();
 };
 
-dadavis.component.legend = function(config, cache){
+dadavis.component.legend = function(config, _config){
 
     if(!config.showLegend){
         return this;
     }
 
-    var legend = cache.container.select('.legend')
+    var legend = _config.container.select('.legend')
         .style({
             position: 'absolute'
         });
 
     var legendItems = legend.selectAll('p.legend-item')
-        .data(cache.legendLayout);
+        .data(_config.legendLayout);
 
     legendItems.enter().append('p').classed('legend-item', true)
         .each(function(d, i){
@@ -294,8 +294,8 @@ dadavis.component.legend = function(config, cache){
                         }
                     });
 
-                    cache.events.legendClick(toHide);
-                    cache.internalEvents.legendClick(toHide);
+                    _config.events.legendClick(toHide);
+                    _config.internalEvents.legendClick(toHide);
                 });
 
             a.append('span')

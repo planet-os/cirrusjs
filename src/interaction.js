@@ -1,32 +1,32 @@
 dadavis.interaction = {};
 
-dadavis.interaction.hovering = function(config, cache){
+dadavis.interaction.hovering = function(config, _config){
 
-    var hoveringContainer = cache.container.select('.hovering')
+    var hoveringContainer = _config.container.select('.hovering')
 
     if(!!hoveringContainer.on('mousemove')){
         return this;
     }
 
     hoveringContainer.style({
-            width: cache.chartWidth + 'px',
-            height: cache.chartHeight + 'px',
+            width: _config.chartWidth + 'px',
+            height: _config.chartHeight + 'px',
             position: 'absolute',
             opacity: 0
         })
         .on('mousemove', function(){
             var mouse = d3.mouse(this);
-            var x = cache.layout[0].map(function(d, i){
+            var x = _config.shapeLayout[0].map(function(d, i){
                 return d.x;
             });
 
-            var mouseOffset = cache.layout[0][0].w / 2;
+            var mouseOffset = _config.shapeLayout[0][0].w / 2;
             var idxUnderMouse = d3.bisect(x, mouse[0] - mouseOffset);
             idxUnderMouse = Math.min(idxUnderMouse, x.length - 1);
 
             setHovering(idxUnderMouse);
 
-            cache.events.hover({
+            _config.events.hover({
                 mouse: mouse,
                 x: x,
                 idx: idxUnderMouse
@@ -37,24 +37,24 @@ dadavis.interaction.hovering = function(config, cache){
         })
         .on('mouseout', function(){
             hoveringContainer.style({opacity: 0});
-            cache.events.hoverOut();
+            _config.events.hoverOut();
         });
 
-    var hoverLine = dadavis.interaction.hoverLine(config, cache);
-    var tooltip = dadavis.interaction.tooltip(config, cache);
+    var hoverLine = dadavis.interaction.hoverLine(config, _config);
+    var tooltip = dadavis.interaction.tooltip(config, _config);
 
-    cache.internalEvents.on('setHover', function(hoverData){
+    _config.internalEvents.on('setHover', function(hoverData){
         setHovering(hoverData.idx);
     });
 
-    cache.internalEvents.on('hideHover', function(){
+    _config.internalEvents.on('hideHover', function(){
         hoveringContainer.style({opacity: 0});
     });
 
     var setHovering = function(idxUnderMouse){
-        var dataUnderMouse = cache.layout[0][idxUnderMouse];
+        var dataUnderMouse = _config.shapeLayout[0][idxUnderMouse];
 
-        var tooltipsData = cache.layout.map(function(d, i){
+        var tooltipsData = _config.shapeLayout.map(function(d, i){
             return d[idxUnderMouse];
         });
 
@@ -64,10 +64,10 @@ dadavis.interaction.hovering = function(config, cache){
     };
 };
 
-dadavis.interaction.tooltip = function(config, cache){
+dadavis.interaction.tooltip = function(config, _config){
 
     return function(tooltipsData){
-        var hoveringContainer = cache.container.select('.hovering');
+        var hoveringContainer = _config.container.select('.hovering');
 
         var tooltip = hoveringContainer.selectAll('.tooltip')
             .data(tooltipsData);
@@ -104,15 +104,15 @@ dadavis.interaction.tooltip = function(config, cache){
     }
 };
 
-dadavis.interaction.hoverLine = function(config, cache){
+dadavis.interaction.hoverLine = function(config, _config){
 
-    var hoverLine = cache.container.select('.hovering')
+    var hoverLine = _config.container.select('.hovering')
         .append('div')
         .attr({'class': 'hover-line'})
         .style({
             position: 'absolute',
             width: '1px',
-            height: cache.chartHeight + 'px',
+            height: _config.chartHeight + 'px',
             left: config.margin.left + 'px',
             'pointer-events': 'none'
         });

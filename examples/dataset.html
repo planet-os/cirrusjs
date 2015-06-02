@@ -3,7 +3,7 @@
 <head>
     <meta http-equiv="content-type" content="text/html; charset=UTF-8">
     <title></title>
-    <script type='text/javascript' src="../d3.js"></script>
+    <script type='text/javascript' src="../lib/d3.js"></script>
 
     <!--<script type='text/javascript' src="../dadavis-0.1.0.js"></script>-->
 
@@ -103,7 +103,7 @@ var labelFormatter = function(d, i){
 };
 
 var config = {
-    containerSelector: '#chart1',
+    container: '#chart1',
     type: 'line',
     subtype: 'area',
     renderer: renderer,
@@ -113,7 +113,7 @@ var config = {
 var ds = dadavis.init(config).render(data1);
 
 var config = {
-    containerSelector: '#chart2',
+    container: '#chart2',
     type: 'line',
     subtype: 'stacked',
     renderer: renderer,
@@ -123,7 +123,7 @@ var config = {
 var ds = dadavis.init(config).render(data1);
 
 var config = {
-    containerSelector: '#chart3',
+    container: '#chart3',
     type: 'line',
     subtype: 'simple',
     renderer: renderer,
@@ -133,7 +133,7 @@ var config = {
 var ds = dadavis.init(config).render(data1);
 
 var config = {
-    containerSelector: '#chart4',
+    container: '#chart4',
     type: 'bar',
     subtype: 'simple',
     renderer: renderer,
@@ -144,7 +144,7 @@ var config = {
 var ds = dadavis.init(config).render(data1);
 
 var config = {
-    containerSelector: '#chart5',
+    container: '#chart5',
     type: 'bar',
     subtype: 'stacked',
     renderer: renderer,
@@ -155,7 +155,7 @@ var config = {
 var ds = dadavis.init(config).render(data1);
 
 var config = {
-    containerSelector: '#chart6',
+    container: '#chart6',
     type: 'bar',
     subtype: 'percent',
     renderer: renderer,
@@ -166,7 +166,7 @@ var config = {
 var ds = dadavis.init(config).render(data1);
 
 var config = {
-    containerSelector: '#chart7',
+    container: '#chart7',
     type: 'line',
     subtype: 'area',
     renderer: renderer,
@@ -175,7 +175,7 @@ var config = {
 var ds = dadavis.init(config).render(data3);
 
 var config = {
-    containerSelector: '#chart8',
+    container: '#chart8',
     type: 'line',
     subtype: 'stacked',
     renderer: renderer,
@@ -184,7 +184,7 @@ var config = {
 var ds = dadavis.init(config).render(data3);
 
 var config = {
-    containerSelector: '#chart9',
+    container: '#chart9',
     type: 'line',
     subtype: 'simple',
     renderer: renderer,
@@ -193,7 +193,7 @@ var config = {
 var ds = dadavis.init(config).render(data3);
 
 var config = {
-    containerSelector: '#chart10',
+    container: '#chart10',
     type: 'bar',
     subtype: 'simple',
     renderer: renderer,
@@ -203,7 +203,7 @@ var config = {
 var ds = dadavis.init(config).render(data3);
 
 var config = {
-    containerSelector: '#chart11',
+    container: '#chart11',
     type: 'bar',
     subtype: 'stacked',
     renderer: renderer,
@@ -213,7 +213,7 @@ var config = {
 var ds = dadavis.init(config).render(data3);
 
 var config = {
-    containerSelector: '#chart12',
+    container: '#chart12',
     type: 'bar',
     subtype: 'percent',
     renderer: renderer,
@@ -223,7 +223,7 @@ var config = {
 var ds = dadavis.init(config).render(data3);
 
 var config = {
-    containerSelector: '#chart13',
+    container: '#chart13',
     type: 'line',
     subtype: 'area',
     renderer: renderer,
@@ -232,7 +232,7 @@ var config = {
 var ds = dadavis.init(config).render(data2);
 
 var config = {
-    containerSelector: '#chart14',
+    container: '#chart14',
     type: 'line',
     subtype: 'stacked',
     renderer: renderer,
@@ -241,7 +241,7 @@ var config = {
 var ds = dadavis.init(config).render(data2);
 
 var config = {
-    containerSelector: '#chart15',
+    container: '#chart15',
     type: 'line',
     subtype: 'simple',
     renderer: renderer,
@@ -250,7 +250,7 @@ var config = {
 var ds = dadavis.init(config).render(data2);
 
 var config = {
-    containerSelector: '#chart16',
+    container: '#chart16',
     type: 'bar',
     subtype: 'simple',
     renderer: renderer,
@@ -260,7 +260,7 @@ var config = {
 var ds = dadavis.init(config).render(data2);
 
 var config = {
-    containerSelector: '#chart17',
+    container: '#chart17',
     type: 'bar',
     subtype: 'stacked',
     renderer: renderer,
@@ -270,7 +270,7 @@ var config = {
 var ds = dadavis.init(config).render(data2);
 
 var config = {
-    containerSelector: '#chart18',
+    container: '#chart18',
     type: 'bar',
     subtype: 'percent',
     renderer: renderer,

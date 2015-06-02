@@ -1,9 +1,9 @@
 dadavis.automatic = {};
 
-dadavis.automatic.config = function(config, cache){
+dadavis.automatic.config = function(config, _config){
 
     if(config.type === 'auto'){
-        var dataLength = cache.data[0].values.length;
+        var dataLength = _config.data[0].values.length;
         if(dataLength < config.autoTypeThreshold){
             this.setConfig({
                 type: 'bar',
@@ -19,26 +19,33 @@ dadavis.automatic.config = function(config, cache){
         }
     }
 
-    this.setConfig({
-        width: cache.container.node().offsetWidth,
-        height: cache.container.node().offsetHeight
-    });
+    if(config.width === 'auto' || !config.width){
+        this.setConfig({
+            width: _config.container.node().offsetWidth
+        });
+    }
 
-    cache.chartWidth = config.width - config.margin.left - config.margin.right;
-    cache.chartHeight = config.height - config.margin.top - config.margin.bottom;
+    if(config.height === 'auto' || !config.height){
+        this.setConfig({
+            height: _config.container.node().offsetHeight
+        });
+    }
+
+    _config.chartWidth = config.width - config.margin.left - config.margin.right;
+    _config.chartHeight = config.height - config.margin.top - config.margin.bottom;
 
     if(config.outerPadding === 'auto'){
-        var keys = dadavis.utils.extractValues(cache.data, config.keyX);
+        var keys = dadavis.utils.extractValues(_config.data, config.keyX);
         this.setConfig({
-            outerPadding: cache.chartWidth / (keys[0].length) / 2
+            outerPadding: _config.chartWidth / (keys[0].length) / 2
         });
     }
 
     if(config.type === 'line'){
-        cache.noPadding = true;
+        _config.noPadding = true;
     }
 
-    cache.data.forEach(function(d, i){
+    _config.data.forEach(function(d, i){
         if(!d.color){
             d.color = config.colorList[i % config.colorList.length];
         }

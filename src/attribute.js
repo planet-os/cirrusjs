@@ -5,8 +5,8 @@ dadavis.attribute = {
     axis: {}
 };
 
-dadavis.attribute.bar.simple = function(config, cache){
-    return cache.layout.map(function(d, i){
+dadavis.attribute.bar.simple = function(config, _config){
+    return _config.shapeLayout.map(function(d, i){
         return d.map(function(dB, iB){
             return {
                 x: dB.x - dB.w / 2 + dB.gutterW / 2,
@@ -19,8 +19,8 @@ dadavis.attribute.bar.simple = function(config, cache){
     });
 };
 
-dadavis.attribute.bar.percent = function(config, cache){
-    return cache.layout.map(function(d, i){
+dadavis.attribute.bar.percent = function(config, _config){
+    return _config.shapeLayout.map(function(d, i){
         return d.map(function(dB, iB){
             return {
                 x: dB.x - dB.w / 2 + dB.gutterW / 2,
@@ -33,8 +33,8 @@ dadavis.attribute.bar.percent = function(config, cache){
     });
 };
 
-dadavis.attribute.bar.stacked = function(config, cache){
-    return cache.layout.map(function(d, i){
+dadavis.attribute.bar.stacked = function(config, _config){
+    return _config.shapeLayout.map(function(d, i){
         return d.map(function(dB, iB){
             return {
                 x: dB.x - dB.w / 2 + dB.gutterW / 2,
@@ -47,10 +47,10 @@ dadavis.attribute.bar.stacked = function(config, cache){
     });
 };
 
-dadavis.attribute.point.stacked = function(config, cache){
+dadavis.attribute.point.stacked = function(config, _config){
     return {
         cx: function(d, i){
-            if(cache.noPadding){
+            if(_config.noPadding){
                 return d.x;
             }
             else{
@@ -64,8 +64,8 @@ dadavis.attribute.point.stacked = function(config, cache){
     };
 };
 
-dadavis.attribute.line.simple = function(config, cache){
-    return cache.layout.map(function(d, i){
+dadavis.attribute.line.simple = function(config, _config){
+    return _config.shapeLayout.map(function(d, i){
 
         return {
             points: d.map(function(dB, iB){
@@ -76,8 +76,8 @@ dadavis.attribute.line.simple = function(config, cache){
     });
 };
 
-dadavis.attribute.line.stacked = function(config, cache){
-    return cache.layout.map(function(d, i){
+dadavis.attribute.line.stacked = function(config, _config){
+    return _config.shapeLayout.map(function(d, i){
         return {
             points: d.map(function(dB, iB){
                     return [dB.x, dB.stackedY];
@@ -87,8 +87,8 @@ dadavis.attribute.line.stacked = function(config, cache){
     });
 };
 
-dadavis.attribute.line.area = function(config, cache){
-    return cache.layout.map(function(d, i){
+dadavis.attribute.line.area = function(config, _config){
+    return _config.shapeLayout.map(function(d, i){
         var line = d.map(function(dB, iB){
             return [dB.x, dB.stackedY];
         });
@@ -96,11 +96,11 @@ dadavis.attribute.line.area = function(config, cache){
         var previousLine = null;
         if(i === 0){
             previousLine = d.map(function(dB, iB){
-                return [dB.x, cache.chartHeight];
+                return [dB.x, _config.chartHeight];
             }).reverse();
         }
         else{
-            previousLine = cache.layout[i - 1].map(function(dB, iB){
+            previousLine = _config.shapeLayout[i - 1].map(function(dB, iB){
                 return [dB.x, dB.stackedY];
             }).reverse();
         }
@@ -114,7 +114,7 @@ dadavis.attribute.line.area = function(config, cache){
     });
 };
 
-dadavis.attribute.axis.labelX = function(config, cache){
+dadavis.attribute.axis.labelX = function(config, _config){
     var labelAttr = {};
     if(config.axisXAngle < 0){
         labelAttr = {
@@ -149,7 +149,7 @@ dadavis.attribute.axis.labelX = function(config, cache){
     return labelAttr;
 };
 
-dadavis.attribute.axis.tickX = function(config, cache){
+dadavis.attribute.axis.tickX = function(config, _config){
     var tickW = 1;
     return {
         left: function(d, i){
@@ -162,7 +162,7 @@ dadavis.attribute.axis.tickX = function(config, cache){
     };
 };
 
-dadavis.attribute.axis.gridX = function(config, cache){
+dadavis.attribute.axis.gridX = function(config, _config){
     var lineW = 1;
     return {
         top: config.margin.top + 'px',
@@ -171,12 +171,12 @@ dadavis.attribute.axis.gridX = function(config, cache){
         },
         width: lineW + 'px',
         height: function(d, i){
-            return ((i % config.axisXTickSkip) ? 0 : cache.chartHeight) + 'px';
+            return ((i % config.axisXTickSkip) ? 0 : _config.chartHeight) + 'px';
         }
     };
 };
 
-dadavis.attribute.axis.fringeX = function(config, cache){
+dadavis.attribute.axis.fringeX = function(config, _config){
     var fringeColorScale = d3.scale.linear().domain([0, 1]).range(['yellow', 'limegreen']);
     return {
         left: function(d, i){
@@ -194,7 +194,7 @@ dadavis.attribute.axis.fringeX = function(config, cache){
     };
 };
 
-dadavis.attribute.axis.labelY = function(config, cache){
+dadavis.attribute.axis.labelY = function(config, _config){
     return {
         position: 'absolute',
         left: function(d, i){
@@ -208,7 +208,7 @@ dadavis.attribute.axis.labelY = function(config, cache){
     };
 };
 
-dadavis.attribute.axis.tickY = function(config, cache){
+dadavis.attribute.axis.tickY = function(config, _config){
     var lineH = 1;
     return {
         width: config.tickSize + 'px',
@@ -221,10 +221,10 @@ dadavis.attribute.axis.tickY = function(config, cache){
     };
 };
 
-dadavis.attribute.axis.gridY = function(config, cache){
+dadavis.attribute.axis.gridY = function(config, _config){
     var lineH = 1;
     return {
-        width: cache.chartWidth + 'px',
+        width: _config.chartWidth + 'px',
         height: lineH + 'px',
         position: 'absolute',
         left: config.margin.left + 'px',
@@ -234,7 +234,7 @@ dadavis.attribute.axis.gridY = function(config, cache){
     };
 };
 
-dadavis.attribute.axis.fringeY = function(config, cache){
+dadavis.attribute.axis.fringeY = function(config, _config){
     var fringeColorScale = d3.scale.linear().domain([0, 1]).range(['yellow', 'limegreen']);
     var h = 3;
     return {

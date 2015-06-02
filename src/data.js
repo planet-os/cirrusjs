@@ -1,6 +1,6 @@
 dadavis.data = {};
 
-dadavis.data.validate = function(config, cache, _data){
+dadavis.data.validate = function(config, _config, _data){
     var dataIsValid = false;
     if(_data && typeof _data === 'object'){
         var isNotNull = false;
@@ -9,19 +9,19 @@ dadavis.data.validate = function(config, cache, _data){
         });
 
         if(isNotNull){
-            cache.previousData = _data;
-            cache.data = _data;
+            _config.previousData = _data;
+            _config.data = _data;
             dataIsValid = true;
         }
     }
 
-    if(cache.previousData){
-        cache.data = cache.previousData;
+    if(_config.previousData){
+        _config.data = _config.previousData;
         dataIsValid = true;
     }
 
-    cache.visibleData = cache.data.filter(function(d){
-        return cache.dataLayersToHide.indexOf(d.name) === -1;
+    _config.visibleData = _config.data.filter(function(d){
+        return _config.dataLayersToHide.indexOf(d.name) === -1;
     });
 
     return dataIsValid;

@@ -3,9 +3,7 @@
 <head>
     <meta http-equiv="content-type" content="text/html; charset=UTF-8">
     <title></title>
-    <script type='text/javascript' src="../d3.js"></script>
-
-    <!--<script type='text/javascript' src="../dadavis-0.1.1.js"></script>-->
+    <script type='text/javascript' src="../lib/d3.js"></script>
 
     <script type='text/javascript' src="../src/core.js"></script>
     <script type='text/javascript' src="../src/utils.js"></script>
@@ -47,7 +45,7 @@ var labelFormatter = function(d, i){
 };
 
 var config = {
-    containerSelector: '#chart1',
+    container: '#chart1',
     type: 'line',
     subtype: 'area',
     renderer: renderer,
@@ -57,7 +55,7 @@ var data = dadavis.utils.getRandomTimeData(100, 5);
 var ds = dadavis.init(config).render(data);
 
 var config = {
-    containerSelector: '#chart2',
+    container: '#chart2',
     type: 'line',
     subtype: 'stacked',
     renderer: renderer,
@@ -67,7 +65,7 @@ var data = dadavis.utils.getRandomTimeData(100, 5);
 var ds = dadavis.init(config).render(data);
 
 var config = {
-    containerSelector: '#chart3',
+    container: '#chart3',
     type: 'line',
     subtype: 'simple',
     renderer: renderer,
@@ -77,7 +75,7 @@ var data = dadavis.utils.getRandomTimeData(100, 5);
 var ds = dadavis.init(config).render(data);
 
 var config = {
-    containerSelector: '#chart4',
+    container: '#chart4',
     type: 'bar',
     subtype: 'simple',
     renderer: renderer,
@@ -87,7 +85,7 @@ var data = dadavis.utils.getRandomTimeData(100, 5);
 var ds = dadavis.init(config).render(data);
 
 var config = {
-    containerSelector: '#chart5',
+    container: '#chart5',
     type: 'bar',
     subtype: 'stacked',
     renderer: renderer,
@@ -97,7 +95,7 @@ var data = dadavis.utils.getRandomTimeData(100, 5);
 var ds = dadavis.init(config).render(data);
 
 var config = {
-    containerSelector: '#chart6',
+    container: '#chart6',
     type: 'bar',
     subtype: 'percent',
     renderer: renderer,

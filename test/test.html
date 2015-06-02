@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Mocha</title>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="lib/mocha.css" />
+    <style>
+        #fixture-container {
+            height: 300px;
+        }
+        .chart-container {
+            width: 400px;
+            height: 300px;
+        }
+    </style>
+</head>
+<body>
+<div id="mocha"></div>
+<div id="fixture-container"></div>
+<script src="lib/chai.js"></script>
+<script src="lib/mocha.js"></script>
+<script>mocha.setup('bdd')</script>
+<script src="../lib/d3.js"></script>
+<script type='text/javascript' src="../src/core.js"></script>
+<script type='text/javascript' src="../src/utils.js"></script>
+<script type='text/javascript' src="../src/data.js"></script>
+<script type='text/javascript' src="../src/automatic.js"></script>
+<script type='text/javascript' src="../src/layout.js"></script>
+<script type='text/javascript' src="../src/attribute.js"></script>
+<script type='text/javascript' src="../src/template.js"></script>
+<script type='text/javascript' src="../src/interaction.js"></script>
+<script type='text/javascript' src="../src/renderer.js"></script>
+<script type='text/javascript' src="../src/scale.js"></script>
+<script type='text/javascript' src="../src/component.js"></script>
+<script src="chart-test.js"></script>
+<script src="shape-test.js"></script>
+<script src="layout-test.js"></script>
+<script src="attribute-test.js"></script>
+<script src="utils-test.js"></script>
+<script>
+    mocha.run();
+</script>
+</body>
+</html>

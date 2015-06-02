@@ -3,9 +3,7 @@
 <head>
     <meta http-equiv="content-type" content="text/html; charset=UTF-8">
     <title></title>
-    <script type='text/javascript' src="../d3.js"></script>
-
-    <!--<script type='text/javascript' src="../dadavis-0.1.1.js"></script>-->
+    <script type='text/javascript' src="../lib/d3.js"></script>
 
     <script type='text/javascript' src="../src/core.js"></script>
     <script type='text/javascript' src="../src/utils.js"></script>
@@ -38,7 +36,7 @@
     var data = dadavis.utils.getRandomTimeData(150, 5);
 
     var config = {
-        containerSelector: '.container',
+        container: '.container',
         margin: {top: 40, right: 60, bottom: 80, left: 80},
         type: 'line',
         subtype: 'area',
