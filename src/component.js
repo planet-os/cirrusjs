@@ -60,8 +60,8 @@ dadavis.component.shapes = function(config, _config){
 dadavis.component.title = function(config, _config){
 
     if(config.chartTitle){
-        d3.select('.title')
-            .html('Chart Title')
+        _config.container.select('.title')
+            .html(config.chartTitle)
             .style({
                 width: '100%',
                 'text-align': 'center'
@@ -69,8 +69,8 @@ dadavis.component.title = function(config, _config){
     }
 
     if(config.axisXTitle){
-        d3.select('.axis-title-x')
-            .html('X Axis Title')
+        _config.container.select('.axis-title-x')
+            .html(config.axisXTitle)
             .style({
                 top: function(){
                     return config.height - this.offsetHeight + 'px';
@@ -82,8 +82,8 @@ dadavis.component.title = function(config, _config){
     }
 
     if(config.axisYTitle){
-        d3.select('.axis-title-y')
-            .html('Y Axis Title')
+        _config.container.select('.axis-title-y')
+            .html(config.axisYTitle)
             .style({
                 transform: 'rotate(-90deg) translate(-' + config.height / 2 + 'px)',
                 'transform-origin': '0 0'
@@ -119,20 +119,6 @@ dadavis.component.axisX = function(config, _config){
         fringeX.exit().remove();
     }
 
-    if(config.showXGrid){
-        var gridX = _config.container.select('.grid-x')
-            .selectAll('div.grid-line-x')
-            .data(_config.axesLayout.x);
-
-        gridX.enter().append('div').classed('grid-line-x', true)
-            .style({position: 'absolute'})
-            .style({'background-color': '#eee'});
-
-        gridX.style(dadavis.attribute.axis.gridX(config, _config));
-
-        gridX.exit().remove();
-    }
-
     var labelsX = axisXContainer.selectAll('div.label')
         .data(_config.axesLayout.x);
 
@@ -146,6 +132,10 @@ dadavis.component.axisX = function(config, _config){
             return config.labelFormatterX(d.key, i);
         })
         .style(dadavis.attribute.axis.labelX(config, _config));
+
+    labelsX.style(dadavis.attribute.axis.labelX(config, _config));
+
+    labelsX.exit().remove();
 
     var skipped = [];
     if(config.axisXTickSkip === 'auto'){
@@ -166,9 +156,28 @@ dadavis.component.axisX = function(config, _config){
         });
     }
 
-    labelsX.style(dadavis.attribute.axis.labelX(config, _config));
+    if(config.showXGrid){
+        var gridX = _config.container.select('.grid-x')
+            .selectAll('div.grid-line-x')
+            .data(_config.axesLayout.x);
 
-    labelsX.exit().remove();
+        gridX.enter().append('div').classed('grid-line-x', true)
+            .style({position: 'absolute'})
+            .style({'background-color': '#eee'});
+
+        gridX.style(dadavis.attribute.axis.gridX(config, _config));
+
+        if(config.axisXTickSkip === 'auto'){
+            gridX.style({
+                height: function(d, i){
+                    var toSkip = skipped.indexOf(i) !== -1;
+                    return (toSkip ? 0 : d.height) + 'px';
+                }
+            });
+        }
+
+        gridX.exit().remove();
+    }
 
     var ticksX = axisXContainer.selectAll('div.tick')
         .data(_config.axesLayout.x);
@@ -177,16 +186,16 @@ dadavis.component.axisX = function(config, _config){
         .style({position: 'absolute'})
         .style({'background-color': 'black'});
 
-    ticksX.style(dadavis.attribute.axis.tickX(config, _config))
-        .style({
+    ticksX.style(dadavis.attribute.axis.tickX(config, _config));
+
+    if(config.axisXTickSkip === 'auto'){
+        ticksX.style({
             height: function(d, i){
-                if(config.axisXTickSkip === 'auto'){
-                    var toSkip = skipped.indexOf(i) !== -1;
-                    return (toSkip ? config.minorTickSize : config.tickSize) + 'px';
-                }
-                return ((i % config.axisXTickSkip) ? config.minorTickSize : config.tickSize) + 'px';
+                var toSkip = skipped.indexOf(i) !== -1;
+                return (toSkip ? config.minorTickSize : config.tickSize) + 'px';
             }
         });
+    }
 
     ticksX.exit().remove();
 };
