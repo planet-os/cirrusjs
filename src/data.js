@@ -2,16 +2,15 @@ dadavis.data = {};
 
 dadavis.data.validate = function(config, _config, _data){
 
-    var data = JSON.parse(JSON.stringify(_data));
-
     var dataIsValid = false;
-    if(data && typeof data === 'object'){
+    if(_data && typeof _data === 'object'){
         var isNotNull = false;
-        data.forEach(function(d){
+        _data.forEach(function(d){
             isNotNull = isNotNull || !!d.values.length;
         });
 
         if(isNotNull){
+            var data = JSON.parse(JSON.stringify(_data));
             _config.previousData = data;
             _config.data = data;
             dataIsValid = true;

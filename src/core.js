@@ -18,7 +18,6 @@ dadavis.init = function(initialConfig){
         tickYCount: 5,
         axisXTickSkip: 'auto',
         continuousXAxis: false,
-        dotSize: 2,
         gutterPercent: 10,
         renderer: 'svg',
         scaleType: 'time',

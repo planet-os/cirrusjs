@@ -5,6 +5,8 @@
     <title></title>
     <script type='text/javascript' src="../lib/d3.js"></script>
 
+    <!--<script type='text/javascript' src="../dadavis-0.1.1.js"></script>-->
+
     <script type='text/javascript' src="../src/core.js"></script>
     <script type='text/javascript' src="../src/utils.js"></script>
     <script type='text/javascript' src="../src/data.js"></script>
@@ -19,90 +21,67 @@
 
     <link href="style.css" rel="stylesheet" />
     <style>
-        .container {
+        .container, .image, .container2 {
             width: 400px;
             height: 200px;
-            margin-top: 10px;
+            margin-bottom: 20px;
             border: 1px solid #eee;
+            white-space: nowrap;
         }
     </style>
 </head>
 <body>
 
-<div class="container" id="chart1"></div>
-<div class="container" id="chart2"></div>
-<div class="container" id="chart3"></div>
-<div class="container" id="chart4"></div>
-<div class="container" id="chart5"></div>
-<div class="container" id="chart6"></div>
+<button class="download">Download</button><br>
+SVG chart
+<div class="container"></div>
+Converted PNG Image
+<div class="image"></div>
+Canvas chart
+<div class="container2"></div>
 
 <script>
-    
-var renderer = 'svg'; // svg, canvas
 
-var labelFormatter = function(d, i){
-    return d3.time.format('%e %b')(new Date(d));
-};
+    var data = dadavis.utils.getRandomTimeData(50, 5);
 
-var config = {
-    container: '#chart1',
-    type: 'line',
-    subtype: 'area',
-    renderer: renderer,
-    labelFormatterX: labelFormatter
-};
-var data = dadavis.utils.getRandomTimeData(100, 5);
-var ds = dadavis.init(config).render(data);
+    var config = {
+        container: '.container',
+        type: 'line',
+        subtype: 'area',
+        scaleType: 'time',
+        renderer: 'svg',
+        axisXTickSkip: 9,
+        labelFormatterX: function(d, i){
+            return d3.time.format('%e %b')(new Date(d));
+        }
+    };
 
-var config = {
-    container: '#chart2',
-    type: 'line',
-    subtype: 'stacked',
-    renderer: renderer,
-    labelFormatterX: labelFormatter
-};
-var data = dadavis.utils.getRandomTimeData(100, 5);
-var ds = dadavis.init(config).render(data);
+    var ds = dadavis.init(config).render(data);
 
-var config = {
-    container: '#chart3',
-    type: 'line',
-    subtype: 'simple',
-    renderer: renderer,
-    labelFormatterX: labelFormatter
-};
-var data = dadavis.utils.getRandomTimeData(100, 5);
-var ds = dadavis.init(config).render(data);
+    d3.select('.download').on('click', function(){
+        ds.downloadAsPNG();
+    });
 
-var config = {
-    container: '#chart4',
-    type: 'bar',
-    subtype: 'simple',
-    renderer: renderer,
-    labelFormatterX: labelFormatter
-};
-var data = dadavis.utils.getRandomTimeData(100, 5);
-var ds = dadavis.init(config).render(data);
+    ds.downloadAsPNG(function(imgBase64){
+        d3.select('.image').append('img')
+            .attr({
+                src: imgBase64
+            });
+    });
 
-var config = {
-    container: '#chart5',
-    type: 'bar',
-    subtype: 'stacked',
-    renderer: renderer,
-    labelFormatterX: labelFormatter
-};
-var data = dadavis.utils.getRandomTimeData(100, 5);
-var ds = dadavis.init(config).render(data);
+    var config = {
+        container: '.container2',
+        type: 'line',
+        subtype: 'area',
+        scaleType: 'time',
+        renderer: 'canvas',
+        axisXTickSkip: 8,
+        labelFormatterX: function(d, i){
+            return d3.time.format('%e %b')(new Date(d));
+        }
+    };
 
-var config = {
-    container: '#chart6',
-    type: 'bar',
-    subtype: 'percent',
-    renderer: renderer,
-    labelFormatterX: labelFormatter
-};
-var data = dadavis.utils.getRandomTimeData(100, 5);
-var ds = dadavis.init(config).render(data);
+    var ds = dadavis.init(config).render(data);
 
 </script>
 </body>
