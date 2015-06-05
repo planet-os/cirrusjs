@@ -1,59 +1,139 @@
 <!DOCTYPE html>
 <html>
-<head>
-    <meta http-equiv="content-type" content="text/html; charset=UTF-8">
+<head lang="en">
+    <meta charset="UTF-8">
     <title></title>
-    <script type='text/javascript' src="d3.js"></script>
-    <script type='text/javascript' src="dadavis-0.1.0.js"></script>
-    <!--
-    <script type='text/javascript' src="src/core.js"></script>
-    <script type='text/javascript' src="src/utils.js"></script>
-    <script type='text/javascript' src="src/layout.js"></script>
-    <script type='text/javascript' src="src/attribute.js"></script>
-    <script type='text/javascript' src="src/template.js"></script>
-    <script type='text/javascript' src="src/render.js"></script>
-    -->
-    <link href="style.css" rel="stylesheet" />
     <style>
         .container {
-            width: 600px;
-            height: 400px;
+            width: 800px;
+            margin: 0 auto;
+            border: 1px solid silver;
+            padding: 20px;
+        }
+
+        a:visited, a {
+            color: black;
+        }
+
+        li {
+            font-size: 0.8em;
+        }
+
+        h2 {
+            font-size: 1.5em;
+            margin-bottom: 0;
+            font-weight: normal;
+        }
+
+        h3 {
+            font-size: 1em;
+            margin-bottom: 0;
+            font-weight: normal;
+        }
+
+        p {
+            -webkit-margin-before: 0.5em;
+            -webkit-margin-after: 0.5em;
+        }
+
+        .cloud-icon {
+            color: skyblue;
         }
     </style>
 </head>
 <body>
 
-<div class="container"></div>
+<div class="container">
 
-<script>
+<h2>Cirrus.js <span class="cloud-icon">☁</span></h2>
 
-var data = dadavis.utils.getRandomData(20, 5);
+<p>Cumuls.js is a charts library based on a datavis pipeline going from data space to graphics space.
+    You can learn more about the conceptual background <a href="">here</a>.
+</p>
 
+<p>From the implementation standpoint, it tries to keep a fair decoupling between all steps in the pipeline.
+    Data, scale, layout, attribute, component, renderer, interaction.
+    It starts with the basic charts: simple/stacked/percent bar charts and simple/multiple/stacked/area charts.
+    But the goal is to validate if this datavis pipeline architecture makes it easy to expand indefinitely.
+</p>
+
+    <iframe src="http://run.plnkr.co/plunks/3QVrDlABkmtNzUCvyjwL/" width="900" height="650" frameborder="0"></iframe>
+
+<h2>Documentation</h2>
+    The data format is an array of objects:
+<pre>
 var data = [
-  {name: 'name1', values: [7, 2, 3, 4]},
-  {name: 'name2', values:[5, 6, 2, 8]},
-  {name: 'name3', values:[5, 6, 2, 1]}
+    {name: 'Sensor1', values: [
+        {x: 'Fri May 01 2015 13:00:00 GMT-0400 (EDT)', y: 1},
+        {x: 'Sat May 02 2015 13:00:00 GMT-0400 (EDT)', y: 2},
+        {x: 'Mon May 04 2015 13:00:00 GMT-0400 (EDT)', y: 3},
+        {x: 'Tue May 05 2015 13:00:00 GMT-0400 (EDT)', y: 8}
+    ]},
+    {name: 'Sensor2', values: [
+        {x: 'Fri May 01 2015 13:00:00 GMT-0400 (EDT)', y: 1},
+        {x: 'Sat May 02 2015 13:00:00 GMT-0400 (EDT)', y: 2},
+        {x: 'Mon May 04 2015 13:00:00 GMT-0400 (EDT)', y: 3},
+        {x: 'Tue May 05 2015 13:00:00 GMT-0400 (EDT)', y: 8}
+    ]}
 ];
+</pre>
 
+<p>The charts function takes a config object. The only required one is the container, which can be a CSS selector or a node</p>
+
+<pre>
+dadavis.init({container: '.container'}).render(data);
+</pre>
+
+<p>The list of configuration attributes exposed is available in core.js and are pretty self-explanatory:</p>
+
+<pre>
 var config = {
-    containerSelector: '.container',
-    type: 'bar',
-    subtype: 'grouped'
-}
+      container: '.container',
+      width: 'auto',
+      height: 'auto',
+      margin: {top: 50, right: 60, bottom: 70, left: 60},
+      type: 'bar',
+      subtype: 'stacked',
+      labelFormatterX: function(d){
+          return d3.time.format('%e %b')(new Date(d));
+      },
+      tooltipFormatter: function(d){
+          return d.parentData.name + ' : ' + d.value;
+      },
+      axisXAngle: 0,
+      tickSize: 10,
+      minorTickSize: 5,
+      fringeSize: 3,
+      tickYCount: 5,
+      axisXTickSkip: 4,
+      gutterPercent: 10,
+      renderer: 'svg',
+      scaleType: 'time',
+      keyX: 'x',
+      keyY: 'y',
+      outerPadding: 'auto',
+      showFringe: true,
+      showAxes: true,
+      showXGrid: true,
+      showYGrid: true,
+      showLegend: true,
+      autoTypeThreshold: 30,
+      chartTitle: 'Chart title',
+      axisXTitle: 'Axis X title',
+      axisYTitle: 'Axis Y title',
+      colorList: ['skyblue', 'orange', 'lime', 'orangered', 'violet']
+};
+</pre>
 
-var ds = dadavis.init(config).render(data);
+<p>If you are not sure what a config attribute is doing, just try it <a href="http://plnkr.co/edit/zybRSvKPkG7MlV1WGctf?p=preview">here</a>.</p>
 
-var chartIndex = 0;
-setInterval(function(){
-    data = dadavis.utils.getRandomData(30, 5);
-    var chartSubtypes = ['simple', 'grouped', 'stacked', 'percent'];
-    var chartSubtype = chartSubtypes[chartIndex++ % chartSubtypes.length];
+<p>You can find some demos in the examples folder as well as a minimal test suite. Enjoy! <span class="cloud-icon">☁</span></p>
 
-    ds.setConfig({subtype: chartSubtype})
-        .render(data);
+Chris Viau<br>
+@d3visualization<br>
+Planet OS data visualization engineer<br>
 
-}, 1000);
+</div>
 
-</script>
 </body>
 </html>
