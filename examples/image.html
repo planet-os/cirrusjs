@@ -5,8 +5,6 @@
     <title></title>
     <script type='text/javascript' src="../lib/d3.js"></script>
 
-    <!--<script type='text/javascript' src="../dadavis-0.1.1.js"></script>-->
-
     <script type='text/javascript' src="../src/core.js"></script>
     <script type='text/javascript' src="../src/utils.js"></script>
     <script type='text/javascript' src="../src/data.js"></script>
@@ -39,7 +37,7 @@ Image
 
 <script>
 
-var data = dadavis.utils.getRandomTimeData(50, 5);
+var data = cirrus.utils.getRandomTimeData(50, 5);
 
 var config = {
     container: '.container',
@@ -55,13 +53,13 @@ var config = {
     }
 };
 
-var ds = dadavis.init(config).render(data);
+var chart = cirrus.init(config).render(data);
 
 d3.select('.download').on('click', function(){
-    ds.downloadAsPNG();
+    chart.downloadAsPNG();
 });
 
-ds.downloadAsPNG(function(imgBase64){
+chart.downloadAsPNG(function(imgBase64){
     d3.select('.image').append('img')
         .attr({
             src: imgBase64

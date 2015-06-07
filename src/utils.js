@@ -1,6 +1,6 @@
-dadavis.utils = {};
+cirrus.utils = {};
 
-dadavis.utils.override = function(_objA, _objB){
+cirrus.utils.override = function(_objA, _objB){
     for(var x in _objA){
         if(x in _objB){
             _objB[x] = _objA[x];
@@ -8,13 +8,13 @@ dadavis.utils.override = function(_objA, _objB){
     }
 };
 
-dadavis.utils.computeRandomNumericArray = function(count, min, max){
+cirrus.utils.computeRandomNumericArray = function(count, min, max){
     return d3.range(count || 0).map(function(d, i){
         return ~~(Math.random() * (max - min) + min);
     });
 };
 
-dadavis.utils.computeRandomTimeArray = function(count, dateNow){
+cirrus.utils.computeRandomTimeArray = function(count, dateNow){
     var dayInMillis = 1000 * 60 * 60 * 24;
     var dateNow = new Date().getTime() - count * dayInMillis;
     return d3.range(count || 0).map(function(d, i){
@@ -22,12 +22,12 @@ dadavis.utils.computeRandomTimeArray = function(count, dateNow){
     });
 };
 
-dadavis.utils.getRandomNumericData = function(shapeCount, layerCount){
+cirrus.utils.getRandomNumericData = function(shapeCount, layerCount){
 
     var x = d3.range(shapeCount);
 
     return d3.range(layerCount).map(function(d, i){
-        var y = dadavis.utils.computeRandomNumericArray(shapeCount, 10, 100);
+        var y = cirrus.utils.computeRandomNumericArray(shapeCount, 10, 100);
         var values = d3.zip(x, y).map(function(d, i){
             return {x: d[0], y: d[1]};
         });
@@ -38,15 +38,15 @@ dadavis.utils.getRandomNumericData = function(shapeCount, layerCount){
     })
 };
 
-dadavis.utils.defaultColors = ['skyblue', 'orange', 'lime', 'orangered', 'violet', 'yellow', 'brown', 'pink'];
+cirrus.utils.defaultColors = ['skyblue', 'orange', 'lime', 'orangered', 'violet', 'yellow', 'brown', 'pink'];
 
-dadavis.utils.getRandomTimeData = function(shapeCount, layerCount){
+cirrus.utils.getRandomTimeData = function(shapeCount, layerCount){
     var dateNow = new Date().getTime();
 
-    var x = dadavis.utils.computeRandomTimeArray(shapeCount, dateNow);
+    var x = cirrus.utils.computeRandomTimeArray(shapeCount, dateNow);
 
     return d3.range(layerCount).map(function(d, i){
-        var y = dadavis.utils.computeRandomNumericArray(shapeCount, 10, 100);
+        var y = cirrus.utils.computeRandomNumericArray(shapeCount, 10, 100);
         var values = d3.zip(x, y).map(function(d, i){
             return {x: d[0], y: d[1]};
         });
@@ -57,7 +57,7 @@ dadavis.utils.getRandomTimeData = function(shapeCount, layerCount){
     });
 };
 
-dadavis.utils.throttle = function(callback, limit){
+cirrus.utils.throttle = function(callback, limit){
     var wait = false;
     var timer = null;
     return function(){
@@ -73,7 +73,7 @@ dadavis.utils.throttle = function(callback, limit){
     };
 };
 
-dadavis.utils.convertToImage = function(config, _config, callback){
+cirrus.utils.convertToImage = function(config, _config, callback){
 
     var clickEvent = new MouseEvent("click", {"view": window, "bubbles": true, "cancelable": false});
 
@@ -115,7 +115,7 @@ dadavis.utils.convertToImage = function(config, _config, callback){
     img.src = "data:image/svg+xml;base64," + btoa(XMLString);
 };
 
-dadavis.utils.extractValues = function(data, key){
+cirrus.utils.extractValues = function(data, key){
     return data.map(function(d){
         return d.values.map(function(dB){
             return dB[key];
@@ -123,7 +123,7 @@ dadavis.utils.extractValues = function(data, key){
     });
 };
 
-dadavis.utils.once = function once(fn, context) {
+cirrus.utils.once = function once(fn, context) {
     var result;
 
     return function() {

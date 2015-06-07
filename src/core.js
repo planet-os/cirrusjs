@@ -1,6 +1,6 @@
-var dadavis = {version: '0.1.1'};
+var cirrus = {version: '0.1.1'};
 
-dadavis.init = function(initialConfig){
+cirrus.init = function(initialConfig){
 
     var config = {
         container: '.container',
@@ -33,7 +33,7 @@ dadavis.init = function(initialConfig){
         chartTitle: null,
         axisXTitle: null,
         axisYTitle: null,
-        colorList: dadavis.utils.defaultColors
+        colorList: cirrus.utils.defaultColors
     };
 
     var _config = {
@@ -57,13 +57,13 @@ dadavis.init = function(initialConfig){
 
     var exports = {};
 
-    exports.initialize = dadavis.utils.once(function(config, _config){
+    exports.initialize = cirrus.utils.once(function(config, _config){
         this.setConfig(initialConfig);
 
         _config.container = d3.select(config.container);
-        _config.container.html(dadavis.template.main);
+        _config.container.html(cirrus.template.main);
 
-        d3.select(window).on('resize.namespace' + ~~(Math.random()*1000), dadavis.utils.throttle(function(){
+        d3.select(window).on('resize.namespace' + ~~(Math.random()*1000), cirrus.utils.throttle(function(){
             _config.internalEvents.resize();
         }, 200));
 
@@ -78,7 +78,7 @@ dadavis.init = function(initialConfig){
     });
 
     exports.setConfig = function(newConfig){
-        dadavis.utils.override(newConfig, config);
+        cirrus.utils.override(newConfig, config);
         return this;
     };
 
@@ -96,7 +96,7 @@ dadavis.init = function(initialConfig){
     };
 
     exports.downloadAsPNG = function(callback){
-        dadavis.utils.convertToImage(config, _config, callback);
+        cirrus.utils.convertToImage(config, _config, callback);
         return this;
     };
 
@@ -112,32 +112,32 @@ dadavis.init = function(initialConfig){
 
     exports.render = function(data){
 
-        if(!dadavis.data.validate(config, _config, data)){
+        if(!cirrus.data.validate(config, _config, data)){
             console.error('Invalid data', data);
             return this;
         }
 
         this.initialize.call(this, config, _config);
-        dadavis.automatic.config.call(this, config, _config);
+        cirrus.automatic.config.call(this, config, _config);
 
-        _config.scaleX = dadavis.scale.x(config, _config);
-        _config.scaleY = dadavis.scale.y(config, _config);
+        _config.scaleX = cirrus.scale.x(config, _config);
+        _config.scaleY = cirrus.scale.y(config, _config);
 
-        _config.shapeLayout = dadavis.layout.shape(config, _config);
-        _config.axesLayout.x = dadavis.layout.axes.x(config, _config);
-        _config.axesLayout.y = dadavis.layout.axes.y(config, _config);
-        _config.legendLayout = dadavis.layout.legend(config, _config);
+        _config.shapeLayout = cirrus.layout.shape(config, _config);
+        _config.axesLayout.x = cirrus.layout.axes.x(config, _config);
+        _config.axesLayout.y = cirrus.layout.axes.y(config, _config);
+        _config.legendLayout = cirrus.layout.legend(config, _config);
 
-        //_config.fringeLayout.y = dadavis.layout.fringes.y(config, _config);
+        //_config.fringeLayout.y = cirrus.layout.fringes.y(config, _config);
         //console.log(_config.fringeLayout.y);
 
-        dadavis.component.chart(config, _config);
-        dadavis.component.shapes(config, _config);
-        dadavis.component.axisX(config, _config);
-        dadavis.component.axisY(config, _config);
-        dadavis.component.title(config, _config);
-        dadavis.component.legend(config, _config);
-        dadavis.interaction.hovering(config, _config);
+        cirrus.component.chart(config, _config);
+        cirrus.component.shapes(config, _config);
+        cirrus.component.axisX(config, _config);
+        cirrus.component.axisY(config, _config);
+        cirrus.component.title(config, _config);
+        cirrus.component.legend(config, _config);
+        cirrus.interaction.hovering(config, _config);
 
         return this;
     };

@@ -111,7 +111,7 @@
 
 <script>
 
-    var data = dadavis.utils.getRandomTimeData(50, 5);
+    var data = cirrus.utils.getRandomTimeData(50, 5);
 
     var config1 = {
         container: '.container1',
@@ -129,7 +129,7 @@
         }
     };
 
-    var ds1 = dadavis.init(config1).render(data);
+    var chart1 = cirrus.init(config1).render(data);
 
     var config2 = {
         container: '.container2',
@@ -152,7 +152,7 @@
         colorList: ['yellow', 'orange', 'orangered', 'red', 'brown']
     };
 
-    var ds2 = dadavis.init(config2).render(data);
+    var chart2 = cirrus.init(config2).render(data);
 
 </script>
 </body>

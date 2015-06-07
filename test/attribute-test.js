@@ -25,10 +25,10 @@ describe('Attributes', function() {
             scaleType: 'time'
         };
 
-        var ds = dadavis.init(config).render(data);
+        var ds = cirrus.init(config).render(data);
 
         var internalConfig = ds._getConfig();
-        var attributes = dadavis.attribute.bar.simple(config, internalConfig);
+        var attributes = cirrus.attribute.bar.simple(config, internalConfig);
 
         expect(Object.keys(attributes[0][0])).to.eql(['x', 'y', 'width', 'height', 'color']);
     });
@@ -45,10 +45,10 @@ describe('Attributes', function() {
             scaleType: 'time'
         };
 
-        var ds = dadavis.init(config).render(data);
+        var ds = cirrus.init(config).render(data);
 
         var internalConfig = ds._getConfig();
-        var attributes = dadavis.attribute.line.simple(config, internalConfig);
+        var attributes = cirrus.attribute.line.simple(config, internalConfig);
 
         expect(Object.keys(attributes[0])).to.eql(['points', 'color']);
     });

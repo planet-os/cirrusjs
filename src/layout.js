@@ -1,10 +1,10 @@
-dadavis.layout = {
+cirrus.layout = {
     data: {},
     axes: {},
     fringes: {}
 };
 
-dadavis.layout.shape = function(config, _config){
+cirrus.layout.shape = function(config, _config){
 
     _config.visibleData = _config.data.filter(function(d){
         return _config.dataLayersToHide.indexOf(d.name) === -1;
@@ -13,7 +13,7 @@ dadavis.layout.shape = function(config, _config){
     var percentScaleY = _config.scaleY.copy();
     var stackedScaleY = _config.scaleY.copy();
 
-    var values = dadavis.utils.extractValues(_config.visibleData, config.keyY);
+    var values = cirrus.utils.extractValues(_config.visibleData, config.keyY);
     var valuesTransposed = d3.transpose(values);
 
     var previousValue = null;
@@ -87,7 +87,7 @@ dadavis.layout.shape = function(config, _config){
     });
 };
 
-dadavis.layout.axes.x = function(config, _config){
+cirrus.layout.axes.x = function(config, _config){
     var scaleX = _config.scaleX.copy();
 
     if(config.continuousXAxis){
@@ -118,12 +118,12 @@ dadavis.layout.axes.x = function(config, _config){
     }
 };
 
-dadavis.layout.axes.y = function(config, _config){
+cirrus.layout.axes.y = function(config, _config){
     var scaleY = _config.scaleY.copy();
     var percentScaleY = _config.scaleY.copy();
     var stackedScaleY = _config.scaleY.copy();
 
-    var values = dadavis.utils.extractValues(_config.visibleData, config.keyY);
+    var values = cirrus.utils.extractValues(_config.visibleData, config.keyY);
     var valuesTransposed = d3.transpose(values);
 
     var domainMax = d3.max(d3.merge(values));
@@ -149,14 +149,14 @@ dadavis.layout.axes.y = function(config, _config){
     });
 };
 
-dadavis.layout.legend = function(config, _config){
+cirrus.layout.legend = function(config, _config){
 
     return _config.data.map(function(d, i){
         return {name: d.name, color: d.color};
     });
 };
 
-dadavis.layout.fringes.y = function(config, _config){
+cirrus.layout.fringes.y = function(config, _config){
 
     //TODO
 

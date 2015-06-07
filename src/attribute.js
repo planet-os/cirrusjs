@@ -1,11 +1,11 @@
-dadavis.attribute = {
+cirrus.attribute = {
     bar: {},
     line: {},
     point: {},
     axis: {}
 };
 
-dadavis.attribute.bar.simple = function(config, _config){
+cirrus.attribute.bar.simple = function(config, _config){
     return _config.shapeLayout.map(function(d, i){
         return d.map(function(dB, iB){
             return {
@@ -19,7 +19,7 @@ dadavis.attribute.bar.simple = function(config, _config){
     });
 };
 
-dadavis.attribute.bar.percent = function(config, _config){
+cirrus.attribute.bar.percent = function(config, _config){
     return _config.shapeLayout.map(function(d, i){
         return d.map(function(dB, iB){
             return {
@@ -33,7 +33,7 @@ dadavis.attribute.bar.percent = function(config, _config){
     });
 };
 
-dadavis.attribute.bar.stacked = function(config, _config){
+cirrus.attribute.bar.stacked = function(config, _config){
     return _config.shapeLayout.map(function(d, i){
         return d.map(function(dB, iB){
             return {
@@ -47,7 +47,7 @@ dadavis.attribute.bar.stacked = function(config, _config){
     });
 };
 
-dadavis.attribute.point.stacked = function(config, _config){
+cirrus.attribute.point.stacked = function(config, _config){
     return {
         cx: function(d, i){
             if(_config.noPadding){
@@ -64,7 +64,7 @@ dadavis.attribute.point.stacked = function(config, _config){
     };
 };
 
-dadavis.attribute.line.simple = function(config, _config){
+cirrus.attribute.line.simple = function(config, _config){
     return _config.shapeLayout.map(function(d, i){
 
         return {
@@ -76,7 +76,7 @@ dadavis.attribute.line.simple = function(config, _config){
     });
 };
 
-dadavis.attribute.line.stacked = function(config, _config){
+cirrus.attribute.line.stacked = function(config, _config){
     return _config.shapeLayout.map(function(d, i){
         return {
             points: d.map(function(dB, iB){
@@ -87,7 +87,7 @@ dadavis.attribute.line.stacked = function(config, _config){
     });
 };
 
-dadavis.attribute.line.area = function(config, _config){
+cirrus.attribute.line.area = function(config, _config){
     return _config.shapeLayout.map(function(d, i){
         var line = d.map(function(dB, iB){
             return [dB.x, dB.stackedY];
@@ -114,7 +114,7 @@ dadavis.attribute.line.area = function(config, _config){
     });
 };
 
-dadavis.attribute.axis.labelX = function(config, _config){
+cirrus.attribute.axis.labelX = function(config, _config){
     var labelAttr = {};
     if(config.axisXAngle < 0){
         labelAttr = {
@@ -149,7 +149,7 @@ dadavis.attribute.axis.labelX = function(config, _config){
     return labelAttr;
 };
 
-dadavis.attribute.axis.tickX = function(config, _config){
+cirrus.attribute.axis.tickX = function(config, _config){
     var tickW = 1;
     return {
         left: function(d, i){
@@ -162,7 +162,7 @@ dadavis.attribute.axis.tickX = function(config, _config){
     };
 };
 
-dadavis.attribute.axis.gridX = function(config, _config){
+cirrus.attribute.axis.gridX = function(config, _config){
     var lineW = 1;
     return {
         top: config.margin.top + 'px',
@@ -176,7 +176,7 @@ dadavis.attribute.axis.gridX = function(config, _config){
     };
 };
 
-dadavis.attribute.axis.fringeX = function(config, _config){
+cirrus.attribute.axis.fringeX = function(config, _config){
     var fringeColorScale = d3.scale.linear().domain([0, 1]).range(['yellow', 'limegreen']);
     return {
         left: function(d, i){
@@ -194,7 +194,7 @@ dadavis.attribute.axis.fringeX = function(config, _config){
     };
 };
 
-dadavis.attribute.axis.labelY = function(config, _config){
+cirrus.attribute.axis.labelY = function(config, _config){
     return {
         position: 'absolute',
         left: function(d, i){
@@ -208,7 +208,7 @@ dadavis.attribute.axis.labelY = function(config, _config){
     };
 };
 
-dadavis.attribute.axis.tickY = function(config, _config){
+cirrus.attribute.axis.tickY = function(config, _config){
     var lineH = 1;
     return {
         width: config.tickSize + 'px',
@@ -221,7 +221,7 @@ dadavis.attribute.axis.tickY = function(config, _config){
     };
 };
 
-dadavis.attribute.axis.gridY = function(config, _config){
+cirrus.attribute.axis.gridY = function(config, _config){
     var lineH = 1;
     return {
         width: _config.chartWidth + 'px',
@@ -234,7 +234,7 @@ dadavis.attribute.axis.gridY = function(config, _config){
     };
 };
 
-dadavis.attribute.axis.fringeY = function(config, _config){
+cirrus.attribute.axis.fringeY = function(config, _config){
     var fringeColorScale = d3.scale.linear().domain([0, 1]).range(['yellow', 'limegreen']);
     var h = 3;
     return {

@@ -1,9 +1,8 @@
-# dadavis
+# Cirrus.js
 A multi-renderer charts library
 
 # Status
-Version 0.1.0 is in active development. There's a simple example on [Plunker](http://plnkr.co/edit/uTVvOy?p=preview)). 
-The project will be officially launched when API will stabilize and test/documentation will be done.
+Version 0.1.1 is in active development. There's a simple example on [Plunker](http://plnkr.co/edit/3QVrDlABkmtNzUCvyjwL?p=preview)).
 
 Current features:
 
@@ -13,7 +12,5 @@ Current features:
 
 
 # To Do
-* Documentation
-* Test suite
 * More chart types
 * More interactivity features

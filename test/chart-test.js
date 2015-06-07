@@ -2,7 +2,7 @@ var expect = chai.expect;
 
 describe('Chart', function() {
 
-    var defaultData = dadavis.utils.getRandomTimeData(50, 5);
+    var defaultData = cirrus.utils.getRandomTimeData(50, 5);
     var fixture, chartContainer1, chartContainer2;
 
     beforeEach(function(){
@@ -24,7 +24,7 @@ describe('Chart', function() {
     describe('Instantiation', function(){
 
         it('works with minimal configuration', function(){
-            dadavis.init({
+            cirrus.init({
                     container: chartContainer1
                 })
                 .render(defaultData);
@@ -33,7 +33,7 @@ describe('Chart', function() {
         });
 
         it('takes a selector or a DOM element as container', function(){
-            dadavis.init({
+            cirrus.init({
                     container: '.chart-container'
                 })
                 .render(defaultData);
@@ -42,12 +42,12 @@ describe('Chart', function() {
         });
 
         it('can instantiate multiple charts', function(){
-            dadavis.init({
+            cirrus.init({
                     container: chartContainer1
                 })
                 .render(defaultData);
 
-            dadavis.init({
+            cirrus.init({
                     container: chartContainer2
                 })
                 .render(defaultData);
@@ -61,13 +61,13 @@ describe('Chart', function() {
     describe('Rendering', function(){
 
         it('can use SVG or Canvas', function(){
-            dadavis.init({
+            cirrus.init({
                     container: chartContainer1,
                     renderer: 'svg'
                 })
                 .render(defaultData);
 
-            dadavis.init({
+            cirrus.init({
                     container: chartContainer2,
                     renderer: 'canvas'
                 })
@@ -80,7 +80,7 @@ describe('Chart', function() {
         });
 
         it('renders a set of components', function(){
-            dadavis.init({
+            cirrus.init({
                     container: chartContainer1
                 })
                 .render(defaultData);

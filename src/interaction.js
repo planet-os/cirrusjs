@@ -1,6 +1,6 @@
-dadavis.interaction = {};
+cirrus.interaction = {};
 
-dadavis.interaction.hovering = function(config, _config){
+cirrus.interaction.hovering = function(config, _config){
 
     var hoveringContainer = _config.container.select('.hovering')
 
@@ -40,8 +40,8 @@ dadavis.interaction.hovering = function(config, _config){
             _config.events.hoverOut();
         });
 
-    var hoverLine = dadavis.interaction.hoverLine(config, _config);
-    var tooltip = dadavis.interaction.tooltip(config, _config);
+    var hoverLine = cirrus.interaction.hoverLine(config, _config);
+    var tooltip = cirrus.interaction.tooltip(config, _config);
 
     _config.internalEvents.on('setHover', function(hoverData){
         setHovering(hoverData.idx);
@@ -64,7 +64,7 @@ dadavis.interaction.hovering = function(config, _config){
     };
 };
 
-dadavis.interaction.tooltip = function(config, _config){
+cirrus.interaction.tooltip = function(config, _config){
 
     return function(tooltipsData){
         var hoveringContainer = _config.container.select('.hovering');
@@ -104,7 +104,7 @@ dadavis.interaction.tooltip = function(config, _config){
     }
 };
 
-dadavis.interaction.hoverLine = function(config, _config){
+cirrus.interaction.hoverLine = function(config, _config){
 
     var hoverLine = _config.container.select('.hovering')
         .append('div')

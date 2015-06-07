@@ -1,6 +1,6 @@
-dadavis.data = {};
+cirrus.data = {};
 
-dadavis.data.validate = function(config, _config, _data){
+cirrus.data.validate = function(config, _config, _data){
 
     var dataIsValid = false;
     if(_data && typeof _data === 'object'){

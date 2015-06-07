@@ -1,6 +1,6 @@
-dadavis.renderer = {svg: null, canvas: null};
+cirrus.renderer = {svg: null, canvas: null};
 
-dadavis.renderer.svg = function(element){
+cirrus.renderer.svg = function(element){
     var svgRenderer = {};
     var svg = d3.select(element).append('svg')
         .attr({
@@ -34,7 +34,7 @@ dadavis.renderer.svg = function(element){
     return svgRenderer;
 };
 
-dadavis.renderer.canvas = function(element){
+cirrus.renderer.canvas = function(element){
     var canvasRenderer = {};
     var canvas = d3.select(element).append('canvas')
         .attr({

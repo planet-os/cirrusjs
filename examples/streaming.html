@@ -61,14 +61,14 @@
         }
     };
 
-    var ds = dadavis.init(config).render(data);
+    var chart = cirrus.init(config).render(data);
 
     setInterval(function(){
         lastDate = lastDate + DAY_IN_MILLIS;
         var val = data[0].values;
         val.shift();
         val.push({x: lastDate, y: ~~(Math.random() * 100)});
-        ds.render(data);
+        chart.render(data);
     }, 1000);
 
 </script>

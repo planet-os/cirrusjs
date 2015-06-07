@@ -1,6 +1,6 @@
-dadavis.template = {};
+cirrus.template = {};
 
-dadavis.template.main = '<div class="chart">' +
+cirrus.template.main = '<div class="chart">' +
 '<div class="title"></div>' +
 '<div class="axis-title-y"></div>' +
 '<div class="grid-x"></div>' +

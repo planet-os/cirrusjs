@@ -2,7 +2,7 @@ var expect = chai.expect;
 
 describe('Shape', function() {
 
-    var defaultData = dadavis.utils.getRandomTimeData(50, 5);
+    var defaultData = cirrus.utils.getRandomTimeData(50, 5);
     var fixture;
 
     beforeEach(function(){
@@ -16,7 +16,7 @@ describe('Shape', function() {
     describe('Rendering', function(){
 
         it('renders bars', function(){
-            dadavis.init({
+            cirrus.init({
                     container: fixture,
                     renderer: 'svg',
                     type: 'bar'
@@ -29,7 +29,7 @@ describe('Shape', function() {
         });
 
         it('renders lines', function(){
-            dadavis.init({
+            cirrus.init({
                     container: fixture,
                     renderer: 'svg',
                     type: 'line'

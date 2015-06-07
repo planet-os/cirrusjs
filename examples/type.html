@@ -49,8 +49,8 @@ var config = {
     subtype: 'area',
     labelFormatterX: labelFormatter
 };
-var data = dadavis.utils.getRandomTimeData(100, 5);
-var ds = dadavis.init(config).render(data);
+var data = cirrus.utils.getRandomTimeData(100, 5);
+var chart = cirrus.init(config).render(data);
 
 var config = {
     container: '#chart2',
@@ -58,8 +58,8 @@ var config = {
     subtype: 'stacked',
     labelFormatterX: labelFormatter
 };
-var data = dadavis.utils.getRandomTimeData(100, 5);
-var ds = dadavis.init(config).render(data);
+var data = cirrus.utils.getRandomTimeData(100, 5);
+var chart = cirrus.init(config).render(data);
 
 var config = {
     container: '#chart3',
@@ -67,8 +67,8 @@ var config = {
     subtype: 'simple',
     labelFormatterX: labelFormatter
 };
-var data = dadavis.utils.getRandomTimeData(100, 5);
-var ds = dadavis.init(config).render(data);
+var data = cirrus.utils.getRandomTimeData(100, 5);
+var chart = cirrus.init(config).render(data);
 
 var config = {
     container: '#chart4',
@@ -76,8 +76,8 @@ var config = {
     subtype: 'simple',
     labelFormatterX: labelFormatter
 };
-var data = dadavis.utils.getRandomTimeData(100, 5);
-var ds = dadavis.init(config).render([data[0]]);
+var data = cirrus.utils.getRandomTimeData(100, 5);
+var chart = cirrus.init(config).render([data[0]]);
 
 var config = {
     container: '#chart5',
@@ -85,8 +85,8 @@ var config = {
     subtype: 'stacked',
     labelFormatterX: labelFormatter
 };
-var data = dadavis.utils.getRandomTimeData(100, 5);
-var ds = dadavis.init(config).render(data);
+var data = cirrus.utils.getRandomTimeData(100, 5);
+var chart = cirrus.init(config).render(data);
 
 var config = {
     container: '#chart6',
@@ -94,8 +94,8 @@ var config = {
     subtype: 'percent',
     labelFormatterX: labelFormatter
 };
-var data = dadavis.utils.getRandomTimeData(100, 5);
-var ds = dadavis.init(config).render(data);
+var data = cirrus.utils.getRandomTimeData(100, 5);
+var chart = cirrus.init(config).render(data);
 
 </script>
 </body>

@@ -33,8 +33,8 @@
 
 <script>
 
-//var data = dadavis.utils.getRandomNumericData(20, 5);
-var data = dadavis.utils.getRandomTimeData(50, 5);
+//var data = cirrus.utils.getRandomNumericData(20, 5);
+var data = cirrus.utils.getRandomTimeData(50, 5);
 
 var config = {
     container: '.container',
@@ -52,7 +52,7 @@ var config = {
     }
 };
 
-var ds = dadavis.init(config).render(data);
+var chart = cirrus.init(config).render(data);
 
 </script>
 </body>

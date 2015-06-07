@@ -1,6 +1,6 @@
-dadavis.automatic = {};
+cirrus.automatic = {};
 
-dadavis.automatic.config = function(config, _config){
+cirrus.automatic.config = function(config, _config){
 
     if(config.type === 'auto'){
         var dataLength = _config.data[0].values.length;
@@ -35,7 +35,7 @@ dadavis.automatic.config = function(config, _config){
     _config.chartHeight = config.height - config.margin.top - config.margin.bottom;
 
     if(config.outerPadding === 'auto'){
-        var keys = dadavis.utils.extractValues(_config.data, config.keyX);
+        var keys = cirrus.utils.extractValues(_config.data, config.keyX);
         this.setConfig({
             outerPadding: _config.chartWidth / (keys[0].length) / 2
         });

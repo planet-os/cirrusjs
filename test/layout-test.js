@@ -25,7 +25,7 @@ describe('Layout', function() {
             scaleType: 'time'
         };
 
-        var ds = dadavis.init(config).render(data);
+        var ds = cirrus.init(config).render(data);
 
         var internalConfig = ds._getConfig();
 

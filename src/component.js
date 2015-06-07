@@ -1,6 +1,6 @@
-dadavis.component = {};
+cirrus.component = {};
 
-dadavis.component.chart = function(config, _config){
+cirrus.component.chart = function(config, _config){
     var chartContainer = _config.container.select('.chart').style({
         position: 'absolute',
         width: config.width + 'px',
@@ -23,13 +23,13 @@ dadavis.component.chart = function(config, _config){
 
 };
 
-dadavis.component.shapes = function(config, _config){
+cirrus.component.shapes = function(config, _config){
 
-    var shapeAttr = dadavis.attribute[config.type][config.subtype](config, _config);
+    var shapeAttr = cirrus.attribute[config.type][config.subtype](config, _config);
 
     var shapeContainer = _config.container.select('.shape');
     shapeContainer.html('');
-    var renderer = dadavis.renderer[config.renderer](shapeContainer.node());
+    var renderer = cirrus.renderer[config.renderer](shapeContainer.node());
 
     //console.time('rendering');
 
@@ -57,7 +57,7 @@ dadavis.component.shapes = function(config, _config){
     return this;
 };
 
-dadavis.component.title = function(config, _config){
+cirrus.component.title = function(config, _config){
 
     if(config.chartTitle){
         _config.container.select('.title')
@@ -91,7 +91,7 @@ dadavis.component.title = function(config, _config){
     }
 };
 
-dadavis.component.axisX = function(config, _config){
+cirrus.component.axisX = function(config, _config){
 
     if(!config.showAxes){
         return;
@@ -114,7 +114,7 @@ dadavis.component.axisX = function(config, _config){
         fringeX.enter().append('div').classed('fringe-x', true)
             .style({position: 'absolute'});
 
-        fringeX.style(dadavis.attribute.axis.fringeX(config, _config));
+        fringeX.style(cirrus.attribute.axis.fringeX(config, _config));
 
         fringeX.exit().remove();
     }
@@ -131,9 +131,9 @@ dadavis.component.axisX = function(config, _config){
         .html(function(d, i){
             return config.labelFormatterX(d.key, i);
         })
-        .style(dadavis.attribute.axis.labelX(config, _config));
+        .style(cirrus.attribute.axis.labelX(config, _config));
 
-    labelsX.style(dadavis.attribute.axis.labelX(config, _config));
+    labelsX.style(cirrus.attribute.axis.labelX(config, _config));
 
     labelsX.exit().remove();
 
@@ -165,7 +165,7 @@ dadavis.component.axisX = function(config, _config){
             .style({position: 'absolute'})
             .style({'background-color': '#eee'});
 
-        gridX.style(dadavis.attribute.axis.gridX(config, _config));
+        gridX.style(cirrus.attribute.axis.gridX(config, _config));
 
         if(config.axisXTickSkip === 'auto'){
             gridX.style({
@@ -186,7 +186,7 @@ dadavis.component.axisX = function(config, _config){
         .style({position: 'absolute'})
         .style({'background-color': 'black'});
 
-    ticksX.style(dadavis.attribute.axis.tickX(config, _config));
+    ticksX.style(cirrus.attribute.axis.tickX(config, _config));
 
     if(config.axisXTickSkip === 'auto'){
         ticksX.style({
@@ -200,7 +200,7 @@ dadavis.component.axisX = function(config, _config){
     ticksX.exit().remove();
 };
 
-dadavis.component.axisY = function(config, _config){
+cirrus.component.axisY = function(config, _config){
 
     if(!config.showAxes){
         return;
@@ -223,7 +223,7 @@ dadavis.component.axisY = function(config, _config){
         fringeY.enter().append('div').classed('fringe-y', true)
             .style({position: 'absolute'});
 
-        fringeY.style(dadavis.attribute.axis.fringeY(config, _config));
+        fringeY.style(cirrus.attribute.axis.fringeY(config, _config));
 
         fringeY.exit().remove();
     }
@@ -237,7 +237,7 @@ dadavis.component.axisY = function(config, _config){
             .style({position: 'absolute'})
             .style({'background-color': '#eee'});
 
-        gridX.style(dadavis.attribute.axis.gridY(config, _config));
+        gridX.style(cirrus.attribute.axis.gridY(config, _config));
 
         gridX.exit().remove();
     }
@@ -256,7 +256,7 @@ dadavis.component.axisY = function(config, _config){
                 return d.stackedLabel;
             }
         })
-        .style(dadavis.attribute.axis.labelY(config, _config));
+        .style(cirrus.attribute.axis.labelY(config, _config));
 
     labelsY.exit().remove();
 
@@ -266,12 +266,12 @@ dadavis.component.axisY = function(config, _config){
     ticksY.enter().append('div').classed('tick', true)
         .style({'background-color': 'black'});
 
-    ticksY.style(dadavis.attribute.axis.tickY(config, _config));
+    ticksY.style(cirrus.attribute.axis.tickY(config, _config));
 
     ticksY.exit().remove();
 };
 
-dadavis.component.legend = function(config, _config){
+cirrus.component.legend = function(config, _config){
 
     if(!config.showLegend){
         return this;
@@ -343,9 +343,9 @@ dadavis.component.legend = function(config, _config){
 };
 
 if(typeof define === "function" && define.amd){
-    define(dadavis);
+    define(cirrus);
 }
 else if(typeof module === "object" && module.exports){
     var d3 = require('d3');
-    module.exports = dadavis;
+    module.exports = cirrus;
 }

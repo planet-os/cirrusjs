@@ -1,8 +1,8 @@
-dadavis.scale = {};
+cirrus.scale = {};
 
-dadavis.scale.x = function(config, _config){
+cirrus.scale.x = function(config, _config){
 
-    var keys = dadavis.utils.extractValues(_config.visibleData, config.keyX);
+    var keys = cirrus.utils.extractValues(_config.visibleData, config.keyX);
     var allKeys = d3.merge(keys);
 
     var range = [config.outerPadding, _config.chartWidth - config.outerPadding];
@@ -27,9 +27,9 @@ dadavis.scale.x = function(config, _config){
     return scaleX;
 };
 
-dadavis.scale.y = function(config, _config){
+cirrus.scale.y = function(config, _config){
 
-    var values = d3.merge(dadavis.utils.extractValues(_config.visibleData, config.keyY));
+    var values = d3.merge(cirrus.utils.extractValues(_config.visibleData, config.keyY));
 
     return d3.scale.linear().range([0, _config.chartHeight]).domain([0, d3.max(values)]);
 };
