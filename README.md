@@ -2,7 +2,8 @@
 A multi-renderer charts library
 
 # Status
-Version 0.1.1 is in active development. There's a simple example on [Plunker](http://plnkr.co/edit/3QVrDlABkmtNzUCvyjwL?p=preview)).
+Version 0.1.1 is in active development. The home page is [here](http://planet-os.github.io/cirrusjs/)
+where you can find examples on [Plunker](http://plnkr.co/edit/3QVrDlABkmtNzUCvyjwL?p=preview)).
 
 Current features:
 
