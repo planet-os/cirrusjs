@@ -109,11 +109,11 @@ a, a:link, a:visited {
 
 
 
-.container {
+.site-container {
             width: 1160px;
             margin: 0 auto;
             padding: 20px;
-            
+            margin-bottom: 200px;
         }
 
         
