@@ -3,51 +3,25 @@
 <head lang="en">
     <meta charset="UTF-8">
     <title>Cirrus.js - A multi-renderer charts library</title>
-    <style>
-        .container {
-            width: 800px;
-            margin: 0 auto;
-            border: 1px solid silver;
-            padding: 20px;
-        }
-
-        a:visited, a {
-            color: black;
-        }
-
-        li {
-            font-size: 0.8em;
-        }
-
-        h2 {
-            font-size: 1.5em;
-            margin-bottom: 0;
-            font-weight: normal;
-        }
-
-        h3 {
-            font-size: 1em;
-            margin-bottom: 0;
-            font-weight: normal;
-        }
-
-        p {
-            -webkit-margin-before: 0.5em;
-            -webkit-margin-after: 0.5em;
-        }
-
-        .cloud-icon {
-            color: skyblue;
-        }
-    </style>
+    <link href="assets/styles.css" rel="stylesheet"/>
 </head>
 <body>
+<div class="header-bg">
 
-<div class="container">
 
-<h2>Cirrus.js <span class="cloud-icon">☁</span></h2>
+  <div class="header">
 
-<p>Cirrus.js is a charts library, open sourced by Planet OS, based on a datavis pipeline going from data space to graphics space.
+    <div class="logo">Planet OS</div>
+    <a href="http://www.planetos.com" target="_new" class="header-cta-button" style="color:white"><span>Visit Planet OS</span></a>
+
+  </div>
+
+  <div class="header-content">
+    <div class="cirrus-logo"></div>
+    <div class="header-text">
+
+
+  <p>Cirrus.js is a charts library, open sourced by Planet OS, based on a datavis pipeline going from data space to graphics space.
     You can learn more about the conceptual background <a href="">here</a>.
 </p>
 
@@ -56,8 +30,16 @@
     It starts with the basic charts: simple/stacked/percent bar charts and simple/multiple/stacked/area charts.
     But the goal is to validate if this datavis pipeline architecture makes it easy to expand indefinitely.
 </p>
+    </div>
+  </div>
+</div>
 
-    <iframe src="http://run.plnkr.co/plunks/3QVrDlABkmtNzUCvyjwL/" width="900" height="650" frameborder="0"></iframe>
+
+<div class="container">
+
+
+
+    <iframe src="http://run.plnkr.co/plunks/3QVrDlABkmtNzUCvyjwL/" width="1160" height="650" frameborder="0"></iframe>
 
 <h2>Documentation</h2>
     The data format is an array of objects:
@@ -121,14 +103,13 @@ var config = {
       chartTitle: 'Chart title',
       axisXTitle: 'Axis X title',
       axisYTitle: 'Axis Y title',
-      colorList: ['#2882be', '#05a5de', '#81dafb', '#e19c5f', '#fdcda3']
-    
+      colorList: ['skyblue', 'orange', 'lime', 'orangered', 'violet']
 };
 </pre>
 
 <p>If you are not sure what a config attribute is doing, just try it <a href="http://plnkr.co/edit/zybRSvKPkG7MlV1WGctf?p=preview">here</a>.</p>
 
-<p>You can find some demos in the examples folder as well as a minimal test suite. Enjoy! <span class="cloud-icon">☁</span></p>
+<p>You can find some demos in the examples folder as well as a minimal test suite. Enjoy!</p>
 
 Chris Viau<br>
 @d3visualization<br>

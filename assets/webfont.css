@@ -1,0 +1,36 @@
+/**
+ * @license
+ * MyFonts Webfont Build ID 2772097, 2014-03-18T06:10:37-0400
+ * 
+ * The fonts listed in this notice are subject to the End User License
+ * Agreement(s) entered into by the website owner. All other parties are 
+ * explicitly restricted from using the Licensed Webfonts(s).
+ * 
+ * You may obtain a valid license at the URLs below.
+ * 
+ * Webfont: Avenir 45 Book by Linotype
+ * URL: http://www.myfonts.com/fonts/linotype/avenir/45-book/
+ * Copyright: Copyright &#x00A9; 1989, 1995, 2002 Adobe Systems Incorporated.  All Rights Reserved. &#x00A9; 1981, 1995, 2002 Heidelberger Druckmaschinen AG. All rights reserved.
+ * Licensed pageviews: 250,000
+ * 
+ * Webfont: Avenir 85 Heavy by Linotype
+ * URL: http://www.myfonts.com/fonts/linotype/avenir/85-heavy/
+ * Copyright: Part of the digitally encoded machine readable outline data for producing the Typefaces provided is copyrighted &#x00A9; 1981 - 2007 Linotype GmbH, www.linotype.com. All rights reserved. This software is the property of Linotype GmbH, and may not be repro
+ * Licensed pageviews: 500,000
+ * 
+ * 
+ * License: http://www.myfonts.com/viewlicense?type=web&buildid=2772097
+ * 
+ * © 2014 MyFonts Inc
+*/
+
+
+/* @import must be at top of file, otherwise CSS will not work */
+@import url("//hello.myfonts.net/count/2a4c81");
+
+  
+@font-face {font-family: 'AvenirLTStd-Book';src: url('webfonts/2A4C81_0_0.eot');src: url('webfonts/2A4C81_0_0.eot?#iefix') format('embedded-opentype'),url('webfonts/2A4C81_0_0.woff') format('woff'),url('webfonts/2A4C81_0_0.ttf') format('truetype');}
+ 
+  
+@font-face {font-family: 'AvenirLT-Heavy';src: url('webfonts/2A4C81_1_0.eot');src: url('webfonts/2A4C81_1_0.eot?#iefix') format('embedded-opentype'),url('webfonts/2A4C81_1_0.woff') format('woff'),url('webfonts/2A4C81_1_0.ttf') format('truetype');}
+ 
