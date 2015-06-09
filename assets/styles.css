@@ -139,4 +139,14 @@ a, a:link, a:visited {
             -webkit-margin-after: 0.5em;
         }
 
-    
+.gist-meta {
+    display: none;
+}
+
+.gist-file {
+    border: none !important;
+}
+
+.gist-data {
+    border: none !important;
+}
