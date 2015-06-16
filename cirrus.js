@@ -351,7 +351,7 @@ cirrus.automatic.config = function(config, _config) {
         _config.gutterPercent = 0;
     }
     _config.data.forEach(function(d, i) {
-        if (d.values[0].color) {
+        if (d3.keys(d.values[0]).indexOf("color") > -1) {
             d.color = null;
         } else if (!d.color) {
             d.color = config.colorList[i % config.colorList.length];
