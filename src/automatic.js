@@ -43,7 +43,7 @@ cirrus.automatic.config = function(config, _config){
         _config.outerPadding = 0;
     }
 
-    if(config.subtype === 'grid'){
+    if(config.subtype === 'grid' && !(config.gutterPercent >= 0)){
         _config.gutterPercent = 0;
     }
 

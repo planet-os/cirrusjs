@@ -44,10 +44,7 @@
         renderer: 'canvas',
         labelFormatterX: function(d){
             return d3.time.format('%e %b')(new Date(d));
-        },
-        colorList: d3.range(0, 1, 1/data.length).map(function(t) {
-            return d3.hsl(t * 260, 1, .5);
-        })
+        }
     };
 
     var chart1 = cirrus.init(config1).render(data);
