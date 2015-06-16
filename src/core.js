@@ -49,8 +49,9 @@ cirrus.init = function(initialConfig){
         fringeLayout: {},
         previousData: null,
         container: null,
-        noPadding: false,
         dataLayersToHide: [],
+        outerPadding: null,
+        gutterPercent: 10,
         events: d3.dispatch('hover', 'hoverOut', 'legendClick'),
         internalEvents: d3.dispatch('setHover', 'hideHover', 'resize', 'legendClick')
     };
@@ -122,6 +123,7 @@ cirrus.init = function(initialConfig){
 
         _config.scaleX = cirrus.scale.x(config, _config);
         _config.scaleY = cirrus.scale.y(config, _config);
+        _config.scaleColor = cirrus.scale.color(config, _config);
 
         _config.shapeLayout = cirrus.layout.shape(config, _config);
         _config.axesLayout.x = cirrus.layout.axes.x(config, _config);

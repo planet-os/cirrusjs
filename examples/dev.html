@@ -19,140 +19,38 @@
 
     <link href="style.css" rel="stylesheet"/>
     <style>
-        .container1, .container2 {
+        .container{
             width: 600px;
-            height: 300px;
+            height: 600px;
             margin-bottom: 30px;
-        }
-
-        /* alternative style */
-        .container2 {
-
-        }
-
-        .container2 .axis-x .tick {
-            width: 3px !important;
-            background-color: #ccc !important;
-        }
-
-        .container2 .axis-y .tick {
-            height: 3px !important;
-            background-color: #ccc !important;
-        }
-
-        .container2 .label {
-            color: #666;
-            font-family: arial;
-            font-size: 8px;
-            padding-top: 10px;
-        }
-        .container2 .panel {
-            background: black;
-        }
-
-        .container2 .grid-line-x {
-            background-color: #333 !important;
-            z-index: 1;
-        }
-
-        .container2 .chart {
-            background-color: #eee;
-            border: 1px dotted black;
-        }
-
-        .container2 .title {
-            color: #666;
-            font-family: arial;
-            font-size: 24px;
-        }
-
-        .container2 .legend-color {
-            border-radius: 0 !important;
-            margin-right: 5px;
-            border: black 1px solid;
-        }
-
-        .container2 .legend-item:hover .legend-color {
-            border: black 3px solid;
-        }
-
-        .container2 .legend-name {
-            color: #666;
-            font-family: arial;
-            font-size: 12px;
-        }
-
-        .container2 .legend {
-            margin-left: -10px;
-        }
-
-        .container2 .hover-line {
-            background-color: white !important;
-            opacity: 0.5;
-            width: 3px !important;
-        }
-
-        .container2 .tooltip {
-            border-radius: 0;
-            border: 1px solid grey;
-            opacity: 0.8;
-            margin-left: 2px;
-            color: black;
-            font-family: arial;
-            font-size: 12px;
-            text-shadow: 1px 1px 1px white;
         }
     </style>
 </head>
 <body>
 
-<div class="container1"></div>
-<div class="container2"></div>
+<div class="container"></div>
 
 <script>
 
-    var data = cirrus.utils.getRandomTimeData(50, 5);
+    var data = cirrus.utils.getRandomHeatmapData(10, 10);
 
     var config1 = {
-        container: '.container1',
+        container: '.container',
         margin: {top: 10, right: 60, bottom: 50, left: 70},
-        type: 'line',
-        subtype: 'area',
-        chartTitle: 'Default theme',
-        axisXTickSkip: 5,
-        showLegend: true,
+        type: 'bar',
+        subtype: 'grid',
+        axisXTickSkip: 8,
+        showLegend: false,
+        renderer: 'canvas',
         labelFormatterX: function(d){
-            return d3.time.format('%e %b')(new Date(d)) + '<br>' + d3.time.format('%Y')(new Date(d));
+            return d3.time.format('%e %b')(new Date(d));
         },
-        tooltipFormatter: function(d){
-            return d.parentData.name + ' : ' + d.value;
-        }
+        colorList: d3.range(0, 1, 1/data.length).map(function(t) {
+            return d3.hsl(t * 260, 1, .5);
+        })
     };
 
     var chart1 = cirrus.init(config1).render(data);
-
-    var config2 = {
-        container: '.container2',
-        margin: {top: 30, right: 70, bottom: 50, left: 35},
-        type: 'line',
-        subtype: 'area',
-        chartTitle: 'Custom theme',
-        axisXTickSkip: 7,
-        showXGrid: true,
-        showYGrid: true,
-        showLegend: true,
-        labelFormatterX: function(d){
-            return d3.time.format('%e %b')(new Date(d)) + '<br>' + d3.time.format('%Y')(new Date(d));
-        },
-        tooltipFormatter: function(d){
-            return d.parentData.name + ' : ' + d.value;
-        },
-        minorTickSize: 2,
-        tickSize: 10,
-        colorList: ['yellow', 'orange', 'orangered', 'red', 'brown']
-    };
-
-    var chart2 = cirrus.init(config2).render(data);
 
 </script>
 </body>

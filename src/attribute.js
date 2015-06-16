@@ -33,6 +33,20 @@ cirrus.attribute.bar.percent = function(config, _config){
     });
 };
 
+cirrus.attribute.bar.grid = function(config, _config){
+    return _config.shapeLayout.map(function(d, i){
+        return d.map(function(dB, iB){
+            return {
+                x: dB.x - dB.w / 2 + dB.gutterW / 2,
+                y: dB.stackedPercentY,
+                width: dB.w - dB.gutterW,
+                height: dB.stackedPercentH,
+                color: dB.color
+            };
+        });
+    });
+};
+
 cirrus.attribute.bar.stacked = function(config, _config){
     return _config.shapeLayout.map(function(d, i){
         return d.map(function(dB, iB){
@@ -45,23 +59,6 @@ cirrus.attribute.bar.stacked = function(config, _config){
             };
         });
     });
-};
-
-cirrus.attribute.point.stacked = function(config, _config){
-    return {
-        cx: function(d, i){
-            if(_config.noPadding){
-                return d.x;
-            }
-            else{
-                return d.centerX
-            }
-        },
-        // cx: function(d, i){ return d.x + d.w / 2; },
-        cy: function(d, i){
-            return d.stackedY;
-        }
-    };
 };
 
 cirrus.attribute.line.simple = function(config, _config){

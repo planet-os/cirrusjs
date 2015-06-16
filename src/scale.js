@@ -5,7 +5,7 @@ cirrus.scale.x = function(config, _config){
     var keys = cirrus.utils.extractValues(_config.visibleData, config.keyX);
     var allKeys = d3.merge(keys);
 
-    var range = [config.outerPadding, _config.chartWidth - config.outerPadding];
+    var range = [_config.outerPadding, _config.chartWidth - _config.outerPadding];
     var scaleX = null;
     if(config.scaleType === 'time'){
         scaleX = d3.time.scale().range(range);
@@ -32,4 +32,11 @@ cirrus.scale.y = function(config, _config){
     var values = d3.merge(cirrus.utils.extractValues(_config.visibleData, config.keyY));
 
     return d3.scale.linear().range([0, _config.chartHeight]).domain([0, d3.max(values)]);
+};
+
+cirrus.scale.color = function(config, _config){
+
+    var values = d3.merge(cirrus.utils.extractValues(_config.visibleData, 'color'));
+
+    return d3.scale.linear().range(['yellow', 'red']).domain([0, d3.max(values)]);
 };

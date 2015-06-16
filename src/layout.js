@@ -18,6 +18,7 @@ cirrus.layout.shape = function(config, _config){
 
     var previousValue = null;
     var minW = _config.chartWidth;
+
     _config.visibleData[0].values.forEach(function(d, i){
 
         var value = d[config.keyX];
@@ -56,7 +57,7 @@ cirrus.layout.shape = function(config, _config){
             }
 
             var value = dB[config.keyY];
-            var gutterW = minW / 100 * config.gutterPercent;
+            var gutterW = minW / 100 * _config.gutterPercent;
 
             var datum = {
                 key: dB[config.keyX],
@@ -76,7 +77,7 @@ cirrus.layout.shape = function(config, _config){
                 layerCount: _config.visibleData.length,
                 layerIndex: i,
                 centerX: _config.scaleX(key) + minW / 2,
-                color: d.color
+                color: d.color || _config.scaleColor(dB.color)
             };
 
             datum.previous = previous || datum;

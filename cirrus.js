@@ -58,8 +58,9 @@ cirrus.init = function(initialConfig) {
         fringeLayout: {},
         previousData: null,
         container: null,
-        noPadding: false,
         dataLayersToHide: [],
+        outerPadding: null,
+        gutterPercent: 10,
         events: d3.dispatch("hover", "hoverOut", "legendClick"),
         internalEvents: d3.dispatch("setHover", "hideHover", "resize", "legendClick")
     };
@@ -115,6 +116,7 @@ cirrus.init = function(initialConfig) {
         cirrus.automatic.config.call(this, config, _config);
         _config.scaleX = cirrus.scale.x(config, _config);
         _config.scaleY = cirrus.scale.y(config, _config);
+        _config.scaleColor = cirrus.scale.color(config, _config);
         _config.shapeLayout = cirrus.layout.shape(config, _config);
         _config.axesLayout.x = cirrus.layout.axes.x(config, _config);
         _config.axesLayout.y = cirrus.layout.axes.y(config, _config);
@@ -184,6 +186,25 @@ cirrus.utils.getRandomTimeData = function(shapeCount, layerCount) {
             return {
                 x: d[0],
                 y: d[1]
+            };
+        });
+        return {
+            name: "name" + i,
+            values: values
+        };
+    });
+};
+
+cirrus.utils.getRandomHeatmapData = function(shapeCount, layerCount) {
+    var dateNow = new Date().getTime();
+    var x = cirrus.utils.computeRandomTimeArray(shapeCount, dateNow);
+    return d3.range(layerCount).map(function(d, i) {
+        var y = cirrus.utils.computeRandomNumericArray(shapeCount, 10, 100);
+        var values = d3.zip(x, y).map(function(d, i) {
+            return {
+                x: d[0],
+                y: 1,
+                color: d[1]
             };
         });
         return {
@@ -319,17 +340,20 @@ cirrus.automatic.config = function(config, _config) {
     }
     _config.chartWidth = config.width - config.margin.left - config.margin.right;
     _config.chartHeight = config.height - config.margin.top - config.margin.bottom;
-    if (config.outerPadding === "auto") {
+    if (config.outerPadding === "auto" || config.type === "bar") {
         var keys = cirrus.utils.extractValues(_config.data, config.keyX);
-        this.setConfig({
-            outerPadding: _config.chartWidth / keys[0].length / 2
-        });
+        _config.outerPadding = _config.chartWidth / keys[0].length / 2;
     }
     if (config.type === "line") {
-        _config.noPadding = true;
+        _config.outerPadding = 0;
+    }
+    if (config.subtype === "grid") {
+        _config.gutterPercent = 0;
     }
     _config.data.forEach(function(d, i) {
-        if (!d.color) {
+        if (d.values[0].color) {
+            d.color = null;
+        } else if (!d.color) {
             d.color = config.colorList[i % config.colorList.length];
         }
     });
@@ -384,7 +408,7 @@ cirrus.layout.shape = function(config, _config) {
                 key = iB;
             }
             var value = dB[config.keyY];
-            var gutterW = minW / 100 * config.gutterPercent;
+            var gutterW = minW / 100 * _config.gutterPercent;
             var datum = {
                 key: dB[config.keyX],
                 value: value,
@@ -403,7 +427,7 @@ cirrus.layout.shape = function(config, _config) {
                 layerCount: _config.visibleData.length,
                 layerIndex: i,
                 centerX: _config.scaleX(key) + minW / 2,
-                color: d.color
+                color: d.color || _config.scaleColor(dB.color)
             };
             datum.previous = previous || datum;
             previous = datum;
@@ -509,6 +533,20 @@ cirrus.attribute.bar.percent = function(config, _config) {
     });
 };
 
+cirrus.attribute.bar.grid = function(config, _config) {
+    return _config.shapeLayout.map(function(d, i) {
+        return d.map(function(dB, iB) {
+            return {
+                x: dB.x - dB.w / 2 + dB.gutterW / 2,
+                y: dB.stackedPercentY,
+                width: dB.w - dB.gutterW,
+                height: dB.stackedPercentH,
+                color: dB.color
+            };
+        });
+    });
+};
+
 cirrus.attribute.bar.stacked = function(config, _config) {
     return _config.shapeLayout.map(function(d, i) {
         return d.map(function(dB, iB) {
@@ -521,21 +559,6 @@ cirrus.attribute.bar.stacked = function(config, _config) {
             };
         });
     });
-};
-
-cirrus.attribute.point.stacked = function(config, _config) {
-    return {
-        cx: function(d, i) {
-            if (_config.noPadding) {
-                return d.x;
-            } else {
-                return d.centerX;
-            }
-        },
-        cy: function(d, i) {
-            return d.stackedY;
-        }
-    };
 };
 
 cirrus.attribute.line.simple = function(config, _config) {
@@ -836,7 +859,7 @@ cirrus.scale = {};
 cirrus.scale.x = function(config, _config) {
     var keys = cirrus.utils.extractValues(_config.visibleData, config.keyX);
     var allKeys = d3.merge(keys);
-    var range = [ config.outerPadding, _config.chartWidth - config.outerPadding ];
+    var range = [ _config.outerPadding, _config.chartWidth - _config.outerPadding ];
     var scaleX = null;
     if (config.scaleType === "time") {
         scaleX = d3.time.scale().range(range);
@@ -857,6 +880,11 @@ cirrus.scale.x = function(config, _config) {
 cirrus.scale.y = function(config, _config) {
     var values = d3.merge(cirrus.utils.extractValues(_config.visibleData, config.keyY));
     return d3.scale.linear().range([ 0, _config.chartHeight ]).domain([ 0, d3.max(values) ]);
+};
+
+cirrus.scale.color = function(config, _config) {
+    var values = d3.merge(cirrus.utils.extractValues(_config.visibleData, "color"));
+    return d3.scale.linear().range([ "yellow", "red" ]).domain([ 0, d3.max(values) ]);
 };
 
 cirrus.renderer = {

@@ -57,6 +57,23 @@ cirrus.utils.getRandomTimeData = function(shapeCount, layerCount){
     });
 };
 
+cirrus.utils.getRandomHeatmapData = function(shapeCount, layerCount){
+    var dateNow = new Date().getTime();
+
+    var x = cirrus.utils.computeRandomTimeArray(shapeCount, dateNow);
+
+    return d3.range(layerCount).map(function(d, i){
+        var y = cirrus.utils.computeRandomNumericArray(shapeCount, 10, 100);
+        var values = d3.zip(x, y).map(function(d, i){
+            return {x: d[0], y: 1, color: d[1]};
+        });
+        return {
+            name: 'name' + i,
+            values: values
+        };
+    });
+};
+
 cirrus.utils.throttle = function(callback, limit){
     var wait = false;
     var timer = null;
