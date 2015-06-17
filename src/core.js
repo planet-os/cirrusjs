@@ -66,6 +66,7 @@ cirrus.init = function(initialConfig){
         _config.container = d3.select(config.container);
         _config.container.html(cirrus.template.main);
 
+        /*
         d3.select(window).on('resize.namespace' + ~~(Math.random()*1000), cirrus.utils.throttle(function(){
             _config.internalEvents.resize();
         }, 200));
@@ -74,6 +75,8 @@ cirrus.init = function(initialConfig){
         _config.internalEvents.on('resize', function(){
             that.resize();
         });
+        */
+
         _config.internalEvents.on('legendClick', function(toHide){
             _config.dataLayersToHide = toHide;
             that.render();
