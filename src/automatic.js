@@ -20,19 +20,14 @@ cirrus.automatic.config = function(config, _config){
     }
 
     if(config.width === 'auto' || !config.width){
-        this.setConfig({
-            width: _config.container.node().offsetWidth
-        });
+        _config.width = _config.container.node().offsetWidth;
     }
+    _config.chartWidth = _config.width - config.margin.left - config.margin.right;
 
     if(config.height === 'auto' || !config.height){
-        this.setConfig({
-            height: _config.container.node().offsetHeight
-        });
+        _config.height = _config.container.node().offsetHeight;
     }
-
-    _config.chartWidth = config.width - config.margin.left - config.margin.right;
-    _config.chartHeight = config.height - config.margin.top - config.margin.bottom;
+    _config.chartHeight = _config.height - config.margin.top - config.margin.bottom;
 
     if(config.outerPadding === 'auto' || config.type === 'bar'){
         var keys = cirrus.utils.extractValues(_config.data, config.keyX);

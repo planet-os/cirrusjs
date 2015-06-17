@@ -3,8 +3,8 @@ cirrus.component = {};
 cirrus.component.chart = function(config, _config){
     var chartContainer = _config.container.select('.chart').style({
         position: 'absolute',
-        width: config.width + 'px',
-        height: config.height + 'px'
+        width: _config.width + 'px',
+        height: _config.height + 'px'
     });
 
     var panelContainer = chartContainer.select('.panel').style({
@@ -73,7 +73,7 @@ cirrus.component.title = function(config, _config){
             .html(config.axisXTitle)
             .style({
                 top: function(){
-                    return config.height - this.offsetHeight + 'px';
+                    return _config.height - this.offsetHeight + 'px';
                 },
                 position: 'absolute',
                 width: '100%',
@@ -85,7 +85,7 @@ cirrus.component.title = function(config, _config){
         _config.container.select('.axis-title-y')
             .html(config.axisYTitle)
             .style({
-                transform: 'rotate(-90deg) translate(-' + config.height / 2 + 'px)',
+                transform: 'rotate(-90deg) translate(-' + _config.height / 2 + 'px)',
                 'transform-origin': '0 0'
             });
     }
@@ -337,7 +337,7 @@ cirrus.component.legend = function(config, _config){
 
     legend.style({
         left: function(){
-            return config.width - this.offsetWidth + 'px';
+            return _config.width - this.offsetWidth + 'px';
         }
     });
 };

@@ -46,6 +46,8 @@ cirrus.init = function(initialConfig) {
         colorList: cirrus.utils.defaultColors
     };
     var _config = {
+        width: null,
+        height: null,
         chartWidth: 500,
         chartHeight: 500,
         data: null,
@@ -329,17 +331,13 @@ cirrus.automatic.config = function(config, _config) {
         }
     }
     if (config.width === "auto" || !config.width) {
-        this.setConfig({
-            width: _config.container.node().offsetWidth
-        });
+        _config.width = _config.container.node().offsetWidth;
     }
+    _config.chartWidth = _config.width - config.margin.left - config.margin.right;
     if (config.height === "auto" || !config.height) {
-        this.setConfig({
-            height: _config.container.node().offsetHeight
-        });
+        _config.height = _config.container.node().offsetHeight;
     }
-    _config.chartWidth = config.width - config.margin.left - config.margin.right;
-    _config.chartHeight = config.height - config.margin.top - config.margin.bottom;
+    _config.chartHeight = _config.height - config.margin.top - config.margin.bottom;
     if (config.outerPadding === "auto" || config.type === "bar") {
         var keys = cirrus.utils.extractValues(_config.data, config.keyX);
         _config.outerPadding = _config.chartWidth / keys[0].length / 2;
@@ -970,8 +968,8 @@ cirrus.component = {};
 cirrus.component.chart = function(config, _config) {
     var chartContainer = _config.container.select(".chart").style({
         position: "absolute",
-        width: config.width + "px",
-        height: config.height + "px"
+        width: _config.width + "px",
+        height: _config.height + "px"
     });
     var panelContainer = chartContainer.select(".panel").style({
         position: "absolute",
@@ -1030,7 +1028,7 @@ cirrus.component.title = function(config, _config) {
     if (config.axisXTitle) {
         _config.container.select(".axis-title-x").html(config.axisXTitle).style({
             top: function() {
-                return config.height - this.offsetHeight + "px";
+                return _config.height - this.offsetHeight + "px";
             },
             position: "absolute",
             width: "100%",
@@ -1039,7 +1037,7 @@ cirrus.component.title = function(config, _config) {
     }
     if (config.axisYTitle) {
         _config.container.select(".axis-title-y").html(config.axisYTitle).style({
-            transform: "rotate(-90deg) translate(-" + config.height / 2 + "px)",
+            transform: "rotate(-90deg) translate(-" + _config.height / 2 + "px)",
             "transform-origin": "0 0"
         });
     }
@@ -1223,7 +1221,7 @@ cirrus.component.legend = function(config, _config) {
     legendItems.exit().remove();
     legend.style({
         left: function() {
-            return config.width - this.offsetWidth + "px";
+            return _config.width - this.offsetWidth + "px";
         }
     });
 };

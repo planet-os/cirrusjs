@@ -37,6 +37,8 @@ cirrus.init = function(initialConfig){
     };
 
     var _config = {
+        width: null,
+        height: null,
         chartWidth: 500,
         chartHeight: 500,
         data: null,
