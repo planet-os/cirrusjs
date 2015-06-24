@@ -8,7 +8,6 @@ cirrus.data.validate = function(config, _config, _data){
         _data.forEach(function(d){
             isNotNull = isNotNull || !!d.values.length;
         });
-
         if(isNotNull){
             var data = JSON.parse(JSON.stringify(_data));
             _config.previousData = data;
@@ -16,15 +15,16 @@ cirrus.data.validate = function(config, _config, _data){
             dataIsValid = true;
         }
     }
-
-    if(_config.previousData){
+    else if(_config.previousData){
         _config.data = _config.previousData;
         dataIsValid = true;
     }
 
-    _config.visibleData = _config.data.filter(function(d){
-        return _config.dataLayersToHide.indexOf(d.name) === -1;
-    });
+    if(_config.data){
+        _config.visibleData = _config.data.filter(function(d){
+            return _config.dataLayersToHide.indexOf(d.name) === -1;
+        });
+    }
 
     return dataIsValid;
 };

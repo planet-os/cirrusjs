@@ -22,8 +22,8 @@ cirrus.init = function(initialConfig) {
             return d.value;
         },
         axisXAngle: null,
-        tickSize: 15,
-        minorTickSize: 10,
+        tickSize: 8,
+        minorTickSize: 4,
         fringeSize: 8,
         tickYCount: 5,
         axisXTickSkip: "auto",
@@ -66,9 +66,9 @@ cirrus.init = function(initialConfig) {
         events: d3.dispatch("hover", "hoverOut", "legendClick"),
         internalEvents: d3.dispatch("setHover", "hideHover", "resize", "legendClick")
     };
+    cirrus.utils.override(initialConfig, config);
     var exports = {};
     exports.initialize = cirrus.utils.once(function(config, _config) {
-        this.setConfig(initialConfig);
         _config.container = d3.select(config.container);
         _config.container.html(cirrus.template.main);
         _config.internalEvents.on("legendClick", function(toHide) {
@@ -294,14 +294,15 @@ cirrus.data.validate = function(config, _config, _data) {
             _config.data = data;
             dataIsValid = true;
         }
-    }
-    if (_config.previousData) {
+    } else if (_config.previousData) {
         _config.data = _config.previousData;
         dataIsValid = true;
     }
-    _config.visibleData = _config.data.filter(function(d) {
-        return _config.dataLayersToHide.indexOf(d.name) === -1;
-    });
+    if (_config.data) {
+        _config.visibleData = _config.data.filter(function(d) {
+            return _config.dataLayersToHide.indexOf(d.name) === -1;
+        });
+    }
     return dataIsValid;
 };
 
@@ -738,16 +739,16 @@ cirrus.attribute.axis.fringeY = function(config, _config) {
 cirrus.interaction = {};
 
 cirrus.interaction.hovering = function(config, _config) {
-    var hoveringContainer = _config.container.select(".hovering");
-    if (!!hoveringContainer.on("mousemove")) {
-        return this;
-    }
-    hoveringContainer.style({
+    var hoveringContainer = _config.container.select(".hovering").style({
         width: _config.chartWidth + "px",
         height: _config.chartHeight + "px",
         position: "absolute",
         opacity: 0
-    }).on("mousemove", function() {
+    });
+    if (!!hoveringContainer.on("mousemove")) {
+        return this;
+    }
+    hoveringContainer.on("mousemove", function() {
         var mouse = d3.mouse(this);
         var x = _config.shapeLayout[0].map(function(d, i) {
             return d.x;

@@ -3,17 +3,18 @@ cirrus.interaction = {};
 cirrus.interaction.hovering = function(config, _config){
 
     var hoveringContainer = _config.container.select('.hovering')
+        .style({
+            width: _config.chartWidth + 'px',
+            height: _config.chartHeight + 'px',
+            position: 'absolute',
+            opacity: 0
+        });
 
     if(!!hoveringContainer.on('mousemove')){
         return this;
     }
 
-    hoveringContainer.style({
-            width: _config.chartWidth + 'px',
-            height: _config.chartHeight + 'px',
-            position: 'absolute',
-            opacity: 0
-        })
+    hoveringContainer
         .on('mousemove', function(){
             var mouse = d3.mouse(this);
             var x = _config.shapeLayout[0].map(function(d, i){
