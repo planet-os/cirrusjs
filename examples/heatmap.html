@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta http-equiv="content-type" content="text/html; charset=UTF-8">
+    <title></title>
+    <script type='text/javascript' src="../lib/d3.js"></script>
+
+    <script type='text/javascript' src="../src/core.js"></script>
+    <script type='text/javascript' src="../src/utils.js"></script>
+    <script type='text/javascript' src="../src/data.js"></script>
+    <script type='text/javascript' src="../src/automatic.js"></script>
+    <script type='text/javascript' src="../src/layout.js"></script>
+    <script type='text/javascript' src="../src/attribute.js"></script>
+    <script type='text/javascript' src="../src/template.js"></script>
+    <script type='text/javascript' src="../src/interaction.js"></script>
+    <script type='text/javascript' src="../src/renderer.js"></script>
+    <script type='text/javascript' src="../src/scale.js"></script>
+    <script type='text/javascript' src="../src/component.js"></script>
+
+    <link href="style.css" rel="stylesheet"/>
+    <style>
+        .container{
+            width: 600px;
+            height: 600px;
+            margin-bottom: 30px;
+        }
+    </style>
+</head>
+<body>
+
+<div class="container"></div>
+
+<script>
+
+    var data = cirrus.utils.getRandomHeatmapData(100, 100);
+
+    var config1 = {
+        container: '.container',
+        margin: {top: 10, right: 60, bottom: 50, left: 70},
+        type: 'bar',
+        subtype: 'grid',
+        axisXTickSkip: 8,
+        showLegend: false,
+        renderer: 'canvas',
+        multipleTooltip: false,
+        labelFormatterX: function(d){
+            return d3.time.format('%e %b')(new Date(d));
+        }
+    };
+
+    var chart1 = cirrus.init(config1).render(data);
+
+</script>
+</body>
+</html>

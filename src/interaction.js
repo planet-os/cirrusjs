@@ -21,17 +21,30 @@ cirrus.interaction.hovering = function(config, _config){
                 return d.x;
             });
 
-            var mouseOffset = _config.shapeLayout[0][0].w / 2;
-            var idxUnderMouse = d3.bisect(x, mouse[0] - mouseOffset);
+            //TODO should work with other than stackedPercent
+            var y = d3.transpose(_config.shapeLayout)[0].map(function(d, i){
+                return d.stackedPercentY;
+            });
+
+            var bisector = d3.bisector(d3.descending);
+            var mouseOffsetY = 0;
+            var idxUnderMouseY = bisector.right(y, mouse[1] - mouseOffsetY);
+            idxUnderMouseY = Math.min(idxUnderMouseY, y.length - 1);
+
+            var mouseOffsetX = _config.shapeLayout[0][0].w / 2;
+            var idxUnderMouse = d3.bisect(x, mouse[0] - mouseOffsetX);
             idxUnderMouse = Math.min(idxUnderMouse, x.length - 1);
 
-            setHovering(idxUnderMouse);
-
-            _config.events.hover({
+            var hoverData = {
                 mouse: mouse,
                 x: x,
-                idx: idxUnderMouse
-            });
+                idx: idxUnderMouse,
+                idxY: idxUnderMouseY
+            };
+
+            setHovering(hoverData);
+
+            _config.events.hover(hoverData);
         })
         .on('mouseenter', function(){
             hoveringContainer.style({opacity: 1});
@@ -45,19 +58,23 @@ cirrus.interaction.hovering = function(config, _config){
     var tooltip = cirrus.interaction.tooltip(config, _config);
 
     _config.internalEvents.on('setHover', function(hoverData){
-        setHovering(hoverData.idx);
+        setHovering(hoverData);
     });
 
     _config.internalEvents.on('hideHover', function(){
         hoveringContainer.style({opacity: 0});
     });
 
-    var setHovering = function(idxUnderMouse){
-        var dataUnderMouse = _config.shapeLayout[0][idxUnderMouse];
+    var setHovering = function(hoverData){
+        var dataUnderMouse = _config.shapeLayout[hoverData.idxY][hoverData.idx];
 
         var tooltipsData = _config.shapeLayout.map(function(d, i){
-            return d[idxUnderMouse];
+            return d[hoverData.idx];
         });
+
+        if(!_config.multipleTooltip){
+            tooltipsData = [tooltipsData[hoverData.idxY]];
+        }
 
         hoveringContainer.style({opacity: 1});
         hoverLine(dataUnderMouse);

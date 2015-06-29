@@ -40,6 +40,7 @@ cirrus.automatic.config = function(config, _config){
 
     if(config.subtype === 'grid'){
         _config.gutterPercent = 0;
+        _config.multipleTooltip = false;
     }
 
     _config.data.forEach(function(d, i){

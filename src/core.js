@@ -54,6 +54,7 @@ cirrus.init = function(initialConfig){
         dataLayersToHide: [],
         outerPadding: null,
         gutterPercent: 10,
+        multipleTooltip: true,
         events: d3.dispatch('hover', 'hoverOut', 'legendClick'),
         internalEvents: d3.dispatch('setHover', 'hideHover', 'resize', 'legendClick')
     };
