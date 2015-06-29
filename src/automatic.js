@@ -5,18 +5,18 @@ cirrus.automatic.config = function(config, _config){
     if(config.type === 'auto'){
         var dataLength = _config.data[0].values.length;
         if(dataLength < config.autoTypeThreshold){
-            this.setConfig({
-                type: 'bar',
-                continuousXAxis: false,
-                outerPadding: 'auto'
-            });
+            _config.type = 'bar';
+            _config.continuousXAxis = false;
+            _config.outerPadding = 'auto';
         }
         else{
-            this.setConfig({
-                type: 'line',
-                continuousXAxis: true
-            });
+            _config.type = 'line';
+            _config.continuousXAxis = true;
         }
+    }
+    else{
+        _config.type = config.type;
+        _config.subtype = config.subtype;
     }
 
     if(config.width === 'auto' || !config.width){
@@ -34,11 +34,11 @@ cirrus.automatic.config = function(config, _config){
         _config.outerPadding = _config.chartWidth / (keys[0].length) / 2;
     }
 
-    if(config.type === 'line'){
+    if(_config.type === 'line'){
         _config.outerPadding = 0;
     }
 
-    if(config.subtype === 'grid'){
+    if(_config.subtype === 'grid'){
         _config.gutterPercent = 0;
         _config.multipleTooltip = false;
     }

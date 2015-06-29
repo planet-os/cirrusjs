@@ -55,6 +55,9 @@ cirrus.init = function(initialConfig){
         outerPadding: null,
         gutterPercent: 10,
         multipleTooltip: true,
+        continuousXAxis: false,
+        type: 'bar',
+        subtype: 'stacked',
         events: d3.dispatch('hover', 'hoverOut', 'legendClick'),
         internalEvents: d3.dispatch('setHover', 'hideHover', 'resize', 'legendClick')
     };
@@ -64,6 +67,7 @@ cirrus.init = function(initialConfig){
     var exports = {};
 
     exports.initialize = cirrus.utils.once(function(config, _config){
+        var that = this;
         _config.container = d3.select(config.container);
         _config.container.html(cirrus.template.main);
 

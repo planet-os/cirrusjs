@@ -91,7 +91,7 @@ cirrus.layout.shape = function(config, _config){
 cirrus.layout.axes.x = function(config, _config){
     var scaleX = _config.scaleX.copy();
 
-    if(config.continuousXAxis){
+    if(_config.continuousXAxis){
 
         return scaleX.ticks().map(function(d, i){
             return {
