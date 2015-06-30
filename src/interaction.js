@@ -21,13 +21,14 @@ cirrus.interaction.hovering = function(config, _config){
                 return d.x;
             });
 
-            //TODO should work with other than stackedPercent
+            //TODO should work with other than grid
             var y = d3.transpose(_config.shapeLayout)[0].map(function(d, i){
-                return d.stackedPercentY;
+                return d.gridY;
             });
+            var gridH = _config.shapeLayout[0][0].gridH;
 
-            var bisector = d3.bisector(d3.descending);
-            var mouseOffsetY = 0;
+            var bisector = d3.bisector(d3.ascending);
+            var mouseOffsetY = gridH;
             var idxUnderMouseY = bisector.right(y, mouse[1] - mouseOffsetY);
             idxUnderMouseY = Math.min(idxUnderMouseY, y.length - 1);
 
@@ -111,6 +112,9 @@ cirrus.interaction.tooltip = function(config, _config){
                     }
                     else if(config.subtype === 'percent'){
                         y = d.stackedPercentY;
+                    }
+                    else if(config.subtype === 'grid'){
+                        y = d.gridY;
                     }
                     return y + 'px';
                 },

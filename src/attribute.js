@@ -9,11 +9,11 @@ cirrus.attribute.bar.simple = function(config, _config){
     return _config.shapeLayout.map(function(d, i){
         return d.map(function(dB, iB){
             return {
-                x: dB.x - dB.w / 2 + dB.gutterW / 2,
+                x: dB.centerX,
                 y: dB.y,
-                width: dB.w - dB.gutterW,
+                width: dB.w,
                 height: dB.h,
-                color: d[0].color
+                color: dB.color
             };
         });
     });
@@ -23,11 +23,11 @@ cirrus.attribute.bar.percent = function(config, _config){
     return _config.shapeLayout.map(function(d, i){
         return d.map(function(dB, iB){
             return {
-                x: dB.x - dB.w / 2 + dB.gutterW / 2,
+                x: dB.centerX,
                 y: dB.stackedPercentY,
-                width: dB.w - dB.gutterW,
+                width: dB.w,
                 height: dB.stackedPercentH,
-                color: d[0].color
+                color: dB.color
             };
         });
     });
@@ -37,10 +37,10 @@ cirrus.attribute.bar.grid = function(config, _config){
     return _config.shapeLayout.map(function(d, i){
         return d.map(function(dB, iB){
             return {
-                x: dB.x - dB.w / 2 + dB.gutterW / 2,
-                y: dB.stackedPercentY,
-                width: dB.w - dB.gutterW,
-                height: dB.stackedPercentH,
+                x: dB.centerX,
+                y: dB.gridY,
+                width: dB.w,
+                height: dB.gridH,
                 color: dB.color
             };
         });
@@ -51,11 +51,11 @@ cirrus.attribute.bar.stacked = function(config, _config){
     return _config.shapeLayout.map(function(d, i){
         return d.map(function(dB, iB){
             return {
-                x: dB.x - dB.w / 2 + dB.gutterW / 2,
+                x: dB.centerX,
                 y: dB.stackedY,
-                width: dB.w - dB.gutterW,
+                width: dB.w,
                 height: dB.stackedH,
-                color: d[0].color
+                color: dB.color
             };
         });
     });
@@ -63,7 +63,6 @@ cirrus.attribute.bar.stacked = function(config, _config){
 
 cirrus.attribute.line.simple = function(config, _config){
     return _config.shapeLayout.map(function(d, i){
-
         return {
             points: d.map(function(dB, iB){
                 return [dB.x, dB.y];
@@ -77,8 +76,8 @@ cirrus.attribute.line.stacked = function(config, _config){
     return _config.shapeLayout.map(function(d, i){
         return {
             points: d.map(function(dB, iB){
-                    return [dB.x, dB.stackedY];
-                }),
+                return [dB.x, dB.stackedY];
+            }),
             color: d[0].color
         };
     });
@@ -177,10 +176,10 @@ cirrus.attribute.axis.fringeX = function(config, _config){
     var fringeColorScale = d3.scale.linear().domain([0, 1]).range(['yellow', 'limegreen']);
     return {
         left: function(d, i){
-            return d.x - d.w / 2 + d.gutterW / 2 + 'px';
+            return d.x - d.w / 2 + 'px';
         },
         width: function(d){
-            return Math.max(d.w - d.gutterW, 1) + 'px';
+            return Math.max(d.w, 1) + 'px';
         },
         height: function(d, i){
             return config.fringeSize + 'px';

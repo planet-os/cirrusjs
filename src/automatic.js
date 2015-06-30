@@ -30,7 +30,7 @@ cirrus.automatic.config = function(config, _config){
     _config.chartHeight = _config.height - config.margin.top - config.margin.bottom;
 
     if(config.outerPadding === 'auto' || config.type === 'bar'){
-        var keys = cirrus.utils.extractValues(_config.data, config.keyX);
+        var keys = cirrus.utils.extractValues(_config.data, 'x');
         _config.outerPadding = _config.chartWidth / (keys[0].length) / 2;
     }
 

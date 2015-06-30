@@ -64,8 +64,8 @@ cirrus.utils.getRandomHeatmapData = function(shapeCount, layerCount){
 
     return d3.range(layerCount).map(function(d, i){
         var y = cirrus.utils.computeRandomNumericArray(shapeCount, 10, 100);
-        var values = d3.zip(x, y).map(function(d, i){
-            return {x: d[0], y: 1, color: d[1]};
+        var values = d3.zip(x, y).map(function(dB, iB){
+            return {x: dB[0], y: i, color: dB[1]};
         });
         return {
             name: 'name' + i,

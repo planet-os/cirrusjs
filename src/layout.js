@@ -6,22 +6,17 @@ cirrus.layout = {
 
 cirrus.layout.shape = function(config, _config){
 
-    _config.visibleData = _config.data.filter(function(d){
-        return _config.dataLayersToHide.indexOf(d.name) === -1;
-    });
-
     var percentScaleY = _config.scaleY.copy();
     var stackedScaleY = _config.scaleY.copy();
 
-    var values = cirrus.utils.extractValues(_config.visibleData, config.keyY);
+    var values = cirrus.utils.extractValues(_config.visibleData, 'y');
     var valuesTransposed = d3.transpose(values);
 
     var previousValue = null;
     var minW = _config.chartWidth;
-
     _config.visibleData[0].values.forEach(function(d, i){
 
-        var value = d[config.keyX];
+        var value = d.x;
         if(config.scaleType === 'time'){
             value = new Date(value);
         }
@@ -38,6 +33,8 @@ cirrus.layout.shape = function(config, _config){
     });
     minW = Math.max(minW, 1);
 
+    var gridH = _config.chartHeight / _config.visibleData.length;
+
     return _config.visibleData.map(function(d, i){
 
         var previous = null;
@@ -48,7 +45,7 @@ cirrus.layout.shape = function(config, _config){
                 return d3.sum(d);
             }))]);
 
-            var key = dB[config.keyX];
+            var key = dB.x;
             if(config.scaleType === 'time'){
                 key = new Date(key);
             }
@@ -56,28 +53,27 @@ cirrus.layout.shape = function(config, _config){
                 key = iB;
             }
 
-            var value = dB[config.keyY];
             var gutterW = minW / 100 * _config.gutterPercent;
 
             var datum = {
-                key: dB[config.keyX],
-                value: value,
-                normalizedValue: value / _config.scaleY.domain()[1],
-                index: iB,
-                parentData: d,
+                data: dB,
+                normalizedValue: dB.y / _config.scaleY.domain()[1],
+                color: d.color || _config.scaleColor(dB.color),
+
                 x: _config.scaleX(key),
-                y: _config.chartHeight - _config.scaleY(value),
+                y: _config.chartHeight - _config.scaleY(dB.y),
+                w: minW - gutterW,
+                h: _config.scaleY(dB.y),
+                centerX: _config.scaleX(key) - minW / 2,
+
                 stackedPercentY: _config.chartHeight - percentScaleY(d3.sum(valuesTransposed[iB].slice(0, i + 1))),
+                stackedPercentH: percentScaleY(dB.y),
+
+                gridY: gridH * dB.y,
+                gridH: gridH,
+
                 stackedY: _config.chartHeight - stackedScaleY(d3.sum(valuesTransposed[iB].slice(0, i + 1))),
-                w: minW,
-                h: _config.scaleY(value),
-                gutterW: gutterW,
-                stackedPercentH: percentScaleY(value),
-                stackedH: stackedScaleY(value),
-                layerCount: _config.visibleData.length,
-                layerIndex: i,
-                centerX: _config.scaleX(key) + minW / 2,
-                color: d.color || _config.scaleColor(dB.color)
+                stackedH: stackedScaleY(dB.y)
             };
 
             datum.previous = previous || datum;
@@ -103,7 +99,7 @@ cirrus.layout.axes.x = function(config, _config){
     else{
         return _config.visibleData[0].values.map(function(d, i){
 
-            var key = d[config.keyX];
+            var key = d.x;
             if(config.scaleType === 'time'){
                 key = new Date(key);
             }
@@ -112,7 +108,7 @@ cirrus.layout.axes.x = function(config, _config){
             }
 
             return {
-                key: d[config.keyX],
+                key: d.x,
                 x: scaleX(key)
             };
         });
@@ -124,7 +120,7 @@ cirrus.layout.axes.y = function(config, _config){
     var percentScaleY = _config.scaleY.copy();
     var stackedScaleY = _config.scaleY.copy();
 
-    var values = cirrus.utils.extractValues(_config.visibleData, config.keyY);
+    var values = cirrus.utils.extractValues(_config.visibleData, 'y');
     var valuesTransposed = d3.transpose(values);
 
     var domainMax = d3.max(d3.merge(values));
