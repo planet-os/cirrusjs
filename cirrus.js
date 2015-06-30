@@ -19,7 +19,7 @@ cirrus.init = function(initialConfig) {
             return d;
         },
         tooltipFormatter: function(d) {
-            return d.value;
+            return d.data.y;
         },
         axisXAngle: null,
         tickSize: 8,
@@ -31,8 +31,6 @@ cirrus.init = function(initialConfig) {
         gutterPercent: 10,
         renderer: "svg",
         scaleType: "time",
-        keyX: "x",
-        keyY: "y",
         outerPadding: 0,
         showFringe: false,
         showAxes: true,
@@ -64,12 +62,16 @@ cirrus.init = function(initialConfig) {
         outerPadding: null,
         gutterPercent: 10,
         multipleTooltip: true,
+        continuousXAxis: false,
+        type: "bar",
+        subtype: "stacked",
         events: d3.dispatch("hover", "hoverOut", "legendClick"),
         internalEvents: d3.dispatch("setHover", "hideHover", "resize", "legendClick")
     };
     cirrus.utils.override(initialConfig, config);
     var exports = {};
     exports.initialize = cirrus.utils.once(function(config, _config) {
+        var that = this;
         _config.container = d3.select(config.container);
         _config.container.html(cirrus.template.main);
         _config.internalEvents.on("legendClick", function(toHide) {
@@ -196,11 +198,11 @@ cirrus.utils.getRandomHeatmapData = function(shapeCount, layerCount) {
     var x = cirrus.utils.computeRandomTimeArray(shapeCount, dateNow);
     return d3.range(layerCount).map(function(d, i) {
         var y = cirrus.utils.computeRandomNumericArray(shapeCount, 10, 100);
-        var values = d3.zip(x, y).map(function(d, i) {
+        var values = d3.zip(x, y).map(function(dB, iB) {
             return {
-                x: d[0],
-                y: 1,
-                color: d[1]
+                x: dB[0],
+                y: i,
+                color: dB[1]
             };
         });
         return {
@@ -313,17 +315,16 @@ cirrus.automatic.config = function(config, _config) {
     if (config.type === "auto") {
         var dataLength = _config.data[0].values.length;
         if (dataLength < config.autoTypeThreshold) {
-            this.setConfig({
-                type: "bar",
-                continuousXAxis: false,
-                outerPadding: "auto"
-            });
+            _config.type = "bar";
+            _config.continuousXAxis = false;
+            _config.outerPadding = "auto";
         } else {
-            this.setConfig({
-                type: "line",
-                continuousXAxis: true
-            });
+            _config.type = "line";
+            _config.continuousXAxis = true;
         }
+    } else {
+        _config.type = config.type;
+        _config.subtype = config.subtype;
     }
     if (config.width === "auto" || !config.width) {
         _config.width = _config.container.node().offsetWidth;
@@ -334,13 +335,13 @@ cirrus.automatic.config = function(config, _config) {
     }
     _config.chartHeight = _config.height - config.margin.top - config.margin.bottom;
     if (config.outerPadding === "auto" || config.type === "bar") {
-        var keys = cirrus.utils.extractValues(_config.data, config.keyX);
+        var keys = cirrus.utils.extractValues(_config.data, "x");
         _config.outerPadding = _config.chartWidth / keys[0].length / 2;
     }
-    if (config.type === "line") {
+    if (_config.type === "line") {
         _config.outerPadding = 0;
     }
-    if (config.subtype === "grid") {
+    if (_config.subtype === "grid") {
         _config.gutterPercent = 0;
         _config.multipleTooltip = false;
     }
@@ -365,17 +366,14 @@ cirrus.layout = {
 };
 
 cirrus.layout.shape = function(config, _config) {
-    _config.visibleData = _config.data.filter(function(d) {
-        return _config.dataLayersToHide.indexOf(d.name) === -1;
-    });
     var percentScaleY = _config.scaleY.copy();
     var stackedScaleY = _config.scaleY.copy();
-    var values = cirrus.utils.extractValues(_config.visibleData, config.keyY);
+    var values = cirrus.utils.extractValues(_config.visibleData, "y");
     var valuesTransposed = d3.transpose(values);
     var previousValue = null;
     var minW = _config.chartWidth;
     _config.visibleData[0].values.forEach(function(d, i) {
-        var value = d[config.keyX];
+        var value = d.x;
         if (config.scaleType === "time") {
             value = new Date(value);
         } else if (config.scaleType === "ordinal") {
@@ -388,6 +386,7 @@ cirrus.layout.shape = function(config, _config) {
         previousValue = value;
     });
     minW = Math.max(minW, 1);
+    var gridH = _config.chartHeight / _config.visibleData.length;
     return _config.visibleData.map(function(d, i) {
         var previous = null;
         return d.values.map(function(dB, iB) {
@@ -395,33 +394,28 @@ cirrus.layout.shape = function(config, _config) {
             stackedScaleY.domain([ 0, d3.max(valuesTransposed.map(function(d, i) {
                 return d3.sum(d);
             })) ]);
-            var key = dB[config.keyX];
+            var key = dB.x;
             if (config.scaleType === "time") {
                 key = new Date(key);
             } else if (config.scaleType === "ordinal") {
                 key = iB;
             }
-            var value = dB[config.keyY];
             var gutterW = minW / 100 * _config.gutterPercent;
             var datum = {
-                key: dB[config.keyX],
-                value: value,
-                normalizedValue: value / _config.scaleY.domain()[1],
-                index: iB,
-                parentData: d,
+                data: dB,
+                normalizedValue: dB.y / _config.scaleY.domain()[1],
+                color: d.color || _config.scaleColor(dB.color),
                 x: _config.scaleX(key),
-                y: _config.chartHeight - _config.scaleY(value),
+                y: _config.chartHeight - _config.scaleY(dB.y),
+                w: minW - gutterW,
+                h: _config.scaleY(dB.y),
+                centerX: _config.scaleX(key) - minW / 2,
                 stackedPercentY: _config.chartHeight - percentScaleY(d3.sum(valuesTransposed[iB].slice(0, i + 1))),
+                stackedPercentH: percentScaleY(dB.y),
+                gridY: gridH * dB.y,
+                gridH: gridH,
                 stackedY: _config.chartHeight - stackedScaleY(d3.sum(valuesTransposed[iB].slice(0, i + 1))),
-                w: minW,
-                h: _config.scaleY(value),
-                gutterW: gutterW,
-                stackedPercentH: percentScaleY(value),
-                stackedH: stackedScaleY(value),
-                layerCount: _config.visibleData.length,
-                layerIndex: i,
-                centerX: _config.scaleX(key) + minW / 2,
-                color: d.color || _config.scaleColor(dB.color)
+                stackedH: stackedScaleY(dB.y)
             };
             datum.previous = previous || datum;
             previous = datum;
@@ -432,7 +426,7 @@ cirrus.layout.shape = function(config, _config) {
 
 cirrus.layout.axes.x = function(config, _config) {
     var scaleX = _config.scaleX.copy();
-    if (config.continuousXAxis) {
+    if (_config.continuousXAxis) {
         return scaleX.ticks().map(function(d, i) {
             return {
                 key: d,
@@ -441,14 +435,14 @@ cirrus.layout.axes.x = function(config, _config) {
         });
     } else {
         return _config.visibleData[0].values.map(function(d, i) {
-            var key = d[config.keyX];
+            var key = d.x;
             if (config.scaleType === "time") {
                 key = new Date(key);
             } else if (config.scaleType === "ordinal") {
                 key = i;
             }
             return {
-                key: d[config.keyX],
+                key: d.x,
                 x: scaleX(key)
             };
         });
@@ -459,7 +453,7 @@ cirrus.layout.axes.y = function(config, _config) {
     var scaleY = _config.scaleY.copy();
     var percentScaleY = _config.scaleY.copy();
     var stackedScaleY = _config.scaleY.copy();
-    var values = cirrus.utils.extractValues(_config.visibleData, config.keyY);
+    var values = cirrus.utils.extractValues(_config.visibleData, "y");
     var valuesTransposed = d3.transpose(values);
     var domainMax = d3.max(d3.merge(values));
     scaleY.domain([ domainMax, 0 ]);
@@ -503,11 +497,11 @@ cirrus.attribute.bar.simple = function(config, _config) {
     return _config.shapeLayout.map(function(d, i) {
         return d.map(function(dB, iB) {
             return {
-                x: dB.x - dB.w / 2 + dB.gutterW / 2,
+                x: dB.centerX,
                 y: dB.y,
-                width: dB.w - dB.gutterW,
+                width: dB.w,
                 height: dB.h,
-                color: d[0].color
+                color: dB.color
             };
         });
     });
@@ -517,11 +511,11 @@ cirrus.attribute.bar.percent = function(config, _config) {
     return _config.shapeLayout.map(function(d, i) {
         return d.map(function(dB, iB) {
             return {
-                x: dB.x - dB.w / 2 + dB.gutterW / 2,
+                x: dB.centerX,
                 y: dB.stackedPercentY,
-                width: dB.w - dB.gutterW,
+                width: dB.w,
                 height: dB.stackedPercentH,
-                color: d[0].color
+                color: dB.color
             };
         });
     });
@@ -531,10 +525,10 @@ cirrus.attribute.bar.grid = function(config, _config) {
     return _config.shapeLayout.map(function(d, i) {
         return d.map(function(dB, iB) {
             return {
-                x: dB.x - dB.w / 2 + dB.gutterW / 2,
-                y: dB.stackedPercentY,
-                width: dB.w - dB.gutterW,
-                height: dB.stackedPercentH,
+                x: dB.centerX,
+                y: dB.gridY,
+                width: dB.w,
+                height: dB.gridH,
                 color: dB.color
             };
         });
@@ -545,11 +539,11 @@ cirrus.attribute.bar.stacked = function(config, _config) {
     return _config.shapeLayout.map(function(d, i) {
         return d.map(function(dB, iB) {
             return {
-                x: dB.x - dB.w / 2 + dB.gutterW / 2,
+                x: dB.centerX,
                 y: dB.stackedY,
-                width: dB.w - dB.gutterW,
+                width: dB.w,
                 height: dB.stackedH,
-                color: d[0].color
+                color: dB.color
             };
         });
     });
@@ -663,10 +657,10 @@ cirrus.attribute.axis.fringeX = function(config, _config) {
     var fringeColorScale = d3.scale.linear().domain([ 0, 1 ]).range([ "yellow", "limegreen" ]);
     return {
         left: function(d, i) {
-            return d.x - d.w / 2 + d.gutterW / 2 + "px";
+            return d.x - d.w / 2 + "px";
         },
         width: function(d) {
-            return Math.max(d.w - d.gutterW, 1) + "px";
+            return Math.max(d.w, 1) + "px";
         },
         height: function(d, i) {
             return config.fringeSize + "px";
@@ -756,10 +750,11 @@ cirrus.interaction.hovering = function(config, _config) {
             return d.x;
         });
         var y = d3.transpose(_config.shapeLayout)[0].map(function(d, i) {
-            return d.stackedPercentY;
+            return d.gridY;
         });
-        var bisector = d3.bisector(d3.descending);
-        var mouseOffsetY = 0;
+        var gridH = _config.shapeLayout[0][0].gridH;
+        var bisector = d3.bisector(d3.ascending);
+        var mouseOffsetY = gridH;
         var idxUnderMouseY = bisector.right(y, mouse[1] - mouseOffsetY);
         idxUnderMouseY = Math.min(idxUnderMouseY, y.length - 1);
         var mouseOffsetX = _config.shapeLayout[0][0].w / 2;
@@ -832,6 +827,8 @@ cirrus.interaction.tooltip = function(config, _config) {
                     y = d.y;
                 } else if (config.subtype === "percent") {
                     y = d.stackedPercentY;
+                } else if (config.subtype === "grid") {
+                    y = d.gridY;
                 }
                 return y + "px";
             },
@@ -863,7 +860,7 @@ cirrus.interaction.hoverLine = function(config, _config) {
 cirrus.scale = {};
 
 cirrus.scale.x = function(config, _config) {
-    var keys = cirrus.utils.extractValues(_config.visibleData, config.keyX);
+    var keys = cirrus.utils.extractValues(_config.visibleData, "x");
     var allKeys = d3.merge(keys);
     var range = [ _config.outerPadding, _config.chartWidth - _config.outerPadding ];
     var scaleX = null;
@@ -884,7 +881,7 @@ cirrus.scale.x = function(config, _config) {
 };
 
 cirrus.scale.y = function(config, _config) {
-    var values = d3.merge(cirrus.utils.extractValues(_config.visibleData, config.keyY));
+    var values = d3.merge(cirrus.utils.extractValues(_config.visibleData, "y"));
     return d3.scale.linear().range([ 0, _config.chartHeight ]).domain([ 0, d3.max(values) ]);
 };
 
@@ -994,11 +991,11 @@ cirrus.component.chart = function(config, _config) {
 };
 
 cirrus.component.shapes = function(config, _config) {
-    var shapeAttr = cirrus.attribute[config.type][config.subtype](config, _config);
+    var shapeAttr = cirrus.attribute[_config.type][_config.subtype](config, _config);
     var shapeContainer = _config.container.select(".shape");
     shapeContainer.html("");
     var renderer = cirrus.renderer[config.renderer](shapeContainer.node());
-    if (config.type === "line") {
+    if (_config.type === "line") {
         shapeAttr.forEach(function(d, i) {
             var color = null;
             if (config.subtype === "area") {
