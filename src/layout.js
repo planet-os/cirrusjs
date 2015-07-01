@@ -69,7 +69,7 @@ cirrus.layout.shape = function(config, _config){
                 stackedPercentY: _config.chartHeight - percentScaleY(d3.sum(valuesTransposed[iB].slice(0, i + 1))),
                 stackedPercentH: percentScaleY(dB.y),
 
-                gridY: gridH * dB.y,
+                gridY: _config.chartHeight - gridH * dB.y - gridH,
                 gridH: gridH,
 
                 stackedY: _config.chartHeight - stackedScaleY(d3.sum(valuesTransposed[iB].slice(0, i + 1))),

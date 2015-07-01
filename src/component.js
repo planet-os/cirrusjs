@@ -249,7 +249,7 @@ cirrus.component.axisY = function(config, _config){
 
     labelsY
         .html(function(d, i){
-            if(config.subtype === 'simple'){
+            if(config.subtype === 'simple' || config.subtype === 'grid'){
                 return d.label;
             }
             else{

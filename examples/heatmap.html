@@ -34,6 +34,12 @@
 
     var data = cirrus.utils.getRandomHeatmapData(10, 10);
 
+    data[0].values = data[0].values.map(function(d, i){
+        d.color = i*10;
+        return d;
+    });
+    console.log(data);
+
     var config1 = {
         container: '.container',
         margin: {top: 10, right: 60, bottom: 50, left: 70},

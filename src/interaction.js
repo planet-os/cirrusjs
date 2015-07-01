@@ -22,15 +22,9 @@ cirrus.interaction.hovering = function(config, _config){
             });
 
             //TODO should work with other than grid
-            var y = d3.transpose(_config.shapeLayout)[0].map(function(d, i){
-                return d.gridY;
-            });
             var gridH = _config.shapeLayout[0][0].gridH;
-
-            var bisector = d3.bisector(d3.ascending);
-            var mouseOffsetY = gridH;
-            var idxUnderMouseY = bisector.right(y, mouse[1] - mouseOffsetY);
-            idxUnderMouseY = Math.min(idxUnderMouseY, y.length - 1);
+            var idxUnderMouseY = Math.floor((_config.chartHeight - mouse[1]) / gridH);
+            idxUnderMouseY = Math.min(idxUnderMouseY, _config.chartHeight / gridH - 1);
 
             var mouseOffsetX = _config.shapeLayout[0][0].w / 2;
             var idxUnderMouse = d3.bisect(x, mouse[0] - mouseOffsetX);

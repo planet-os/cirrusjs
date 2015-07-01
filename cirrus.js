@@ -412,7 +412,7 @@ cirrus.layout.shape = function(config, _config) {
                 centerX: _config.scaleX(key) - minW / 2,
                 stackedPercentY: _config.chartHeight - percentScaleY(d3.sum(valuesTransposed[iB].slice(0, i + 1))),
                 stackedPercentH: percentScaleY(dB.y),
-                gridY: gridH * dB.y,
+                gridY: _config.chartHeight - gridH * dB.y - gridH,
                 gridH: gridH,
                 stackedY: _config.chartHeight - stackedScaleY(d3.sum(valuesTransposed[iB].slice(0, i + 1))),
                 stackedH: stackedScaleY(dB.y)
@@ -749,14 +749,9 @@ cirrus.interaction.hovering = function(config, _config) {
         var x = _config.shapeLayout[0].map(function(d, i) {
             return d.x;
         });
-        var y = d3.transpose(_config.shapeLayout)[0].map(function(d, i) {
-            return d.gridY;
-        });
         var gridH = _config.shapeLayout[0][0].gridH;
-        var bisector = d3.bisector(d3.ascending);
-        var mouseOffsetY = gridH;
-        var idxUnderMouseY = bisector.right(y, mouse[1] - mouseOffsetY);
-        idxUnderMouseY = Math.min(idxUnderMouseY, y.length - 1);
+        var idxUnderMouseY = Math.floor((_config.chartHeight - mouse[1]) / gridH);
+        idxUnderMouseY = Math.min(idxUnderMouseY, _config.chartHeight / gridH - 1);
         var mouseOffsetX = _config.shapeLayout[0][0].w / 2;
         var idxUnderMouse = d3.bisect(x, mouse[0] - mouseOffsetX);
         idxUnderMouse = Math.min(idxUnderMouse, x.length - 1);
@@ -1165,7 +1160,7 @@ cirrus.component.axisY = function(config, _config) {
     var labelsY = axisYContainer.selectAll("div.label").data(_config.axesLayout.y);
     labelsY.enter().append("div").classed("label", true);
     labelsY.html(function(d, i) {
-        if (config.subtype === "simple") {
+        if (config.subtype === "simple" || config.subtype === "grid") {
             return d.label;
         } else {
             return d.stackedLabel;
