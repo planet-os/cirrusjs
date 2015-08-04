@@ -36,13 +36,19 @@ cirrus.component.shapes = function(config, _config){
     if(_config.type === 'line'){
         shapeAttr.forEach(function(d, i){
             var color = null;
+            var stroke = d.color;
             if(config.subtype === 'area'){
                 color = d.color;
+                stroke = 'none'
             }
             else{
                 color = 'none';
             }
-            renderer.polygon({points: d.points, fill: color, stroke: d.color});
+            if(config.subtype === 'contour'){
+                color = d.color;
+                stroke = 'transparent'
+            }
+            renderer.polygon({points: d.points, fill: color, stroke: stroke});
         });
     }
     else{

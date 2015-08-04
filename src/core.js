@@ -127,6 +127,8 @@ cirrus.init = function(initialConfig){
         _config.axesLayout.y = cirrus.layout.axes.y(config, _config);
         _config.legendLayout = cirrus.layout.legend(config, _config);
 
+        _config.contourLayout = cirrus.layout.contour(config, _config);
+
         //_config.fringeLayout.y = cirrus.layout.fringes.y(config, _config);
         //console.log(_config.fringeLayout.y);
 

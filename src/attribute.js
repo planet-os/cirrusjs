@@ -110,6 +110,17 @@ cirrus.attribute.line.area = function(config, _config){
     });
 };
 
+cirrus.attribute.line.contour = function(config, _config){
+    return _config.contourLayout.map(function(d, i){
+        return {
+            points: d.map(function(dB, iB){
+                return [dB.x, dB.y];
+            }),
+            color: d[0].color
+        };
+    });
+};
+
 cirrus.attribute.axis.labelX = function(config, _config){
     var labelAttr = {};
     if(config.axisXAngle < 0){
