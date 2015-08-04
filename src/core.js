@@ -10,7 +10,7 @@ cirrus.init = function(initialConfig){
         type: 'bar',
         subtype: 'stacked',
         labelFormatterX: function(d){ return d; },
-        tooltipFormatter: function(d){ return d.data.y; },
+        tooltipFormatter: function(d){ return d; },
         axisXAngle: null,
         tickSize: 8,
         minorTickSize: 4,
@@ -122,7 +122,7 @@ cirrus.init = function(initialConfig){
         _config.scaleY = cirrus.scale.y(config, _config);
         _config.scaleColor = cirrus.scale.color(config, _config);
 
-        _config.shapeLayout = cirrus.layout.shape(config, _config);
+        _config.shapeLayout = cirrus.layout[_config.type][_config.subtype](config, _config);
         _config.axesLayout.x = cirrus.layout.axes.x(config, _config);
         _config.axesLayout.y = cirrus.layout.axes.y(config, _config);
         _config.legendLayout = cirrus.layout.legend(config, _config);

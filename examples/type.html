@@ -36,6 +36,7 @@
 <div class="container" id="chart4"></div>
 <div class="container" id="chart5"></div>
 <div class="container" id="chart6"></div>
+<div class="container" id="chart7"></div>
 
 <script>
     
@@ -95,6 +96,15 @@ var config = {
     labelFormatterX: labelFormatter
 };
 var data = cirrus.utils.getRandomTimeData(100, 5);
+var chart = cirrus.init(config).render(data);
+
+var config = {
+    container: '#chart7',
+    type: 'bar',
+    subtype: 'grid',
+    labelFormatterX: labelFormatter
+};
+var data = cirrus.utils.getRandomHeatmapData(10, 10);
 var chart = cirrus.init(config).render(data);
 
 </script>

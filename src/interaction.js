@@ -17,16 +17,16 @@ cirrus.interaction.hovering = function(config, _config){
     hoveringContainer
         .on('mousemove', function(){
             var mouse = d3.mouse(this);
-            var x = _config.shapeLayout[0].map(function(d, i){
+            var x = _config.shapeLayout[0].points.map(function(d, i){
                 return d.x;
             });
 
             //TODO should work with other than grid
-            var gridH = _config.shapeLayout[0][0].gridH;
-            var idxUnderMouseY = Math.floor((_config.chartHeight - mouse[1]) / gridH);
-            idxUnderMouseY = Math.min(idxUnderMouseY, _config.chartHeight / gridH - 1);
+            //var gridH = _config.shapeLayout[0][0].gridH;
+            //var idxUnderMouseY = Math.floor((_config.chartHeight - mouse[1]) / gridH);
+            //idxUnderMouseY = Math.min(idxUnderMouseY, _config.chartHeight / gridH - 1);
 
-            var mouseOffsetX = _config.shapeLayout[0][0].w / 2;
+            var mouseOffsetX = _config.shapeLayout[0].width / 2;
             var idxUnderMouse = d3.bisect(x, mouse[0] - mouseOffsetX);
             idxUnderMouse = Math.min(idxUnderMouse, x.length - 1);
 
@@ -34,7 +34,8 @@ cirrus.interaction.hovering = function(config, _config){
                 mouse: mouse,
                 x: x,
                 idx: idxUnderMouse,
-                idxY: idxUnderMouseY
+                //idxY: idxUnderMouseY
+                idxY: 0
             };
 
             setHovering(hoverData);
@@ -72,7 +73,7 @@ cirrus.interaction.hovering = function(config, _config){
         }
 
         hoveringContainer.style({opacity: 1});
-        hoverLine(dataUnderMouse);
+        //hoverLine(dataUnderMouse);
         tooltip(tooltipsData);
     };
 };
@@ -100,17 +101,7 @@ cirrus.interaction.tooltip = function(config, _config){
                     return d.x + 'px';
                 },
                 top: function(d, i){
-                    var y = d.stackedY;
-                    if(config.subtype === 'simple'){
-                        y = d.y;
-                    }
-                    else if(config.subtype === 'percent'){
-                        y = d.stackedPercentY;
-                    }
-                    else if(config.subtype === 'grid'){
-                        y = d.gridY;
-                    }
-                    return y + 'px';
+                    return d.y + 'px';
                 },
                 'background-color': function(d, i){
                     return d.color;

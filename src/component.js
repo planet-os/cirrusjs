@@ -25,7 +25,7 @@ cirrus.component.chart = function(config, _config){
 
 cirrus.component.shapes = function(config, _config){
 
-    var shapeAttr = cirrus.attribute[_config.type][_config.subtype](config, _config);
+    var shapeAttr = _config.shapeLayout;
 
     var shapeContainer = _config.container.select('.shape');
     shapeContainer.html('');

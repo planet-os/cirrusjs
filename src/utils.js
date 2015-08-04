@@ -140,6 +140,17 @@ cirrus.utils.extractValues = function(data, key){
     });
 };
 
+cirrus.utils.getKey = function(scaleType, d, i){
+    var key = d.x;
+    if(scaleType === 'time'){
+        key = new Date(key);
+    }
+    else if(scaleType === 'ordinal'){
+        key = i;
+    }
+    return key;
+};
+
 cirrus.utils.once = function once(fn, context) {
     var result;
 
