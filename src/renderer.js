@@ -11,22 +11,26 @@ cirrus.renderer.svg = function(element){
             position: 'absolute'
         });
 
-    svgRenderer.polygon = function(attributes){
+    svgRenderer.polygon = function(options){
+        var points = options.attributes.map(function(d){
+            return [d.x, d.y];
+        });
+
         svg.append('path')
             .attr({
-                d: 'M' + attributes.points.join('L'),
-                fill: attributes.fill || 'silver',
-                stroke: attributes.stroke || 'silver'
+                d: 'M' + points.join('L'),
+                fill: options.fill || 'silver',
+                stroke: options.stroke || 'silver'
             });
         return this;
     };
 
-    svgRenderer.rect = function(attributes){
+    svgRenderer.rect = function(options){
         path = svg.append('rect')
-            .attr(attributes.rect)
+            .attr(options.attributes)
             .attr({
-                fill: attributes.fill || 'silver',
-                stroke: attributes.stroke || 'silver'
+                fill: options.fill || 'silver',
+                stroke: options.stroke || 'silver'
             });
         return this;
     };
@@ -47,15 +51,19 @@ cirrus.renderer.canvas = function(element){
     var path = null;
     var ctx = canvas.node().getContext("2d");
 
-    canvasRenderer.polygon = function(attributes){
-        var fill = attributes.fill;
-        if(attributes.fill === 'none' || !attributes.fill){
+    canvasRenderer.polygon = function(options){
+        var points = options.attributes.map(function(d){
+            return [d.x, d.y];
+        });
+
+        var fill = options.fill;
+        if(options.fill === 'none' || !options.fill){
             fill = 'transparent'
         }
         ctx.fillStyle = fill;
-        ctx.strokeStyle = attributes.stroke;
+        ctx.strokeStyle = options.stroke;
         ctx.beginPath();
-        attributes.points.forEach(function(d, i){
+        points.forEach(function(d, i){
             if(i === 0){
                 ctx.moveTo(d[0], d[1]);
             }
@@ -68,18 +76,18 @@ cirrus.renderer.canvas = function(element){
         return this;
     };
 
-    canvasRenderer.rect = function(attributes){
-        ctx.fillStyle = attributes.fill;
-        ctx.strokeStyle = attributes.stroke;
-        ctx.fillRect(attributes.rect.x, attributes.rect.y, attributes.rect.width, attributes.rect.height);
+    canvasRenderer.rect = function(options){
+        ctx.fillStyle = options.fill;
+        ctx.strokeStyle = options.stroke;
+        ctx.fillRect(options.attributes.x, options.attributes.y, options.attributes.width, options.attributes.height);
         return this;
     };
 
-    canvasRenderer.circle = function(attributes){
-        ctx.fillStyle = attributes.fill;
-        ctx.strokeStyle = attributes.stroke;
+    canvasRenderer.circle = function(options){
+        ctx.fillStyle = options.fill;
+        ctx.strokeStyle = options.stroke;
         context.beginPath();
-        context.arc(attributes.circle.x, attributes.circle.y, attributes.circle.r, 0, 2 * Math.PI, false);
+        context.arc(options.x, options.y, options.r, 0, 2 * Math.PI, false);
         context.fill();
         context.stroke();
 

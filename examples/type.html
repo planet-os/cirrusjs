@@ -43,12 +43,14 @@
 var labelFormatter = function(d, i){
     return d3.time.format('%e %b')(new Date(d));
 };
+var renderer = 'svg';
 
 var config = {
     container: '#chart1',
     type: 'line',
     subtype: 'area',
-    labelFormatterX: labelFormatter
+    labelFormatterX: labelFormatter,
+    renderer: renderer
 };
 var data = cirrus.utils.getRandomTimeData(100, 5);
 var chart = cirrus.init(config).render(data);
@@ -57,7 +59,8 @@ var config = {
     container: '#chart2',
     type: 'line',
     subtype: 'stacked',
-    labelFormatterX: labelFormatter
+    labelFormatterX: labelFormatter,
+    renderer: renderer
 };
 var data = cirrus.utils.getRandomTimeData(100, 5);
 var chart = cirrus.init(config).render(data);
@@ -66,7 +69,8 @@ var config = {
     container: '#chart3',
     type: 'line',
     subtype: 'simple',
-    labelFormatterX: labelFormatter
+    labelFormatterX: labelFormatter,
+    renderer: renderer
 };
 var data = cirrus.utils.getRandomTimeData(100, 5);
 var chart = cirrus.init(config).render(data);
@@ -75,7 +79,8 @@ var config = {
     container: '#chart4',
     type: 'bar',
     subtype: 'simple',
-    labelFormatterX: labelFormatter
+    labelFormatterX: labelFormatter,
+    renderer: renderer
 };
 var data = cirrus.utils.getRandomTimeData(100, 5);
 var chart = cirrus.init(config).render([data[0]]);
@@ -84,7 +89,8 @@ var config = {
     container: '#chart5',
     type: 'bar',
     subtype: 'stacked',
-    labelFormatterX: labelFormatter
+    labelFormatterX: labelFormatter,
+    renderer: renderer
 };
 var data = cirrus.utils.getRandomTimeData(100, 5);
 var chart = cirrus.init(config).render(data);
@@ -93,7 +99,8 @@ var config = {
     container: '#chart6',
     type: 'bar',
     subtype: 'percent',
-    labelFormatterX: labelFormatter
+    labelFormatterX: labelFormatter,
+    renderer: renderer
 };
 var data = cirrus.utils.getRandomTimeData(100, 5);
 var chart = cirrus.init(config).render(data);
@@ -102,7 +109,8 @@ var config = {
     container: '#chart7',
     type: 'bar',
     subtype: 'grid',
-    labelFormatterX: labelFormatter
+    labelFormatterX: labelFormatter,
+    renderer: renderer
 };
 var data = cirrus.utils.getRandomHeatmapData(10, 10);
 var chart = cirrus.init(config).render(data);

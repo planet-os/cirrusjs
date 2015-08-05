@@ -17,25 +17,21 @@ cirrus.interaction.hovering = function(config, _config){
     hoveringContainer
         .on('mousemove', function(){
             var mouse = d3.mouse(this);
-            var x = _config.shapeLayout[0].points.map(function(d, i){
+            var x = _config.shapeLayout[0].map(function(d, i){
                 return d.x;
             });
+            var y = _config.shapeLayout[0].map(function(d, i){
+                return d.y;
+            });
 
-            //TODO should work with other than grid
-            //var gridH = _config.shapeLayout[0][0].gridH;
-            //var idxUnderMouseY = Math.floor((_config.chartHeight - mouse[1]) / gridH);
-            //idxUnderMouseY = Math.min(idxUnderMouseY, _config.chartHeight / gridH - 1);
-
-            var mouseOffsetX = _config.shapeLayout[0].width / 2;
+            var mouseOffsetX = _config.shapeLayout[0][0].width / 2;
             var idxUnderMouse = d3.bisect(x, mouse[0] - mouseOffsetX);
             idxUnderMouse = Math.min(idxUnderMouse, x.length - 1);
 
             var hoverData = {
                 mouse: mouse,
                 x: x,
-                idx: idxUnderMouse,
-                //idxY: idxUnderMouseY
-                idxY: 0
+                idx: idxUnderMouse
             };
 
             setHovering(hoverData);
@@ -62,18 +58,28 @@ cirrus.interaction.hovering = function(config, _config){
     });
 
     var setHovering = function(hoverData){
-        var dataUnderMouse = _config.shapeLayout[hoverData.idxY][hoverData.idx];
-
         var tooltipsData = _config.shapeLayout.map(function(d, i){
             return d[hoverData.idx];
         });
 
+        var y = tooltipsData.map(function(d){
+            return d.y;
+        });
+        y.sort(function(a, b){
+            return a - b;
+        });
+
+        var idxY = d3.bisectRight(y, hoverData.mouse[1]);
+        idxY = Math.min(y.length - idxY, y.length - 1);
+
         if(!_config.multipleTooltip){
-            tooltipsData = [tooltipsData[hoverData.idxY]];
+            tooltipsData = [tooltipsData[idxY]];
         }
 
+        var dataUnderMouse = _config.shapeLayout[idxY][hoverData.idx];
+
         hoveringContainer.style({opacity: 1});
-        //hoverLine(dataUnderMouse);
+        hoverLine(dataUnderMouse);
         tooltip(tooltipsData);
     };
 };

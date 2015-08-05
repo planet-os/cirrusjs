@@ -10,7 +10,7 @@ cirrus.init = function(initialConfig){
         type: 'bar',
         subtype: 'stacked',
         labelFormatterX: function(d){ return d; },
-        tooltipFormatter: function(d){ return d; },
+        tooltipFormatter: function(d){ return d.data.y; },
         axisXAngle: null,
         tickSize: 8,
         minorTickSize: 4,

@@ -35,20 +35,35 @@ cirrus.component.shapes = function(config, _config){
 
     if(_config.type === 'line'){
         shapeAttr.forEach(function(d, i){
-            var color = null;
+            var attributes = d;
+            var previousAttributes = null;
+            var strokeColor = d[0].color;
+            var fillColor = d[0].color;
+
             if(config.subtype === 'area'){
-                color = d.color;
+                fillColor = 'transparent';
+                if(i === 0){
+                    previousAttributes = JSON.parse(JSON.stringify(d))
+                        .map(function(d){
+                            d.y = _config.chartHeight;
+                            return d;
+                        });
+                }
+                else{
+                    previousAttributes = JSON.parse(JSON.stringify(shapeAttr[i-1]));
+                }
+                attributes = d.concat(previousAttributes.reverse());
             }
             else{
-                color = 'none';
+                strokeColor = 'transparent';
             }
-            renderer.polygon({points: d.points, fill: color, stroke: d.color});
+            renderer.polygon({attributes: attributes, fill: strokeColor, stroke: fillColor});
         });
     }
     else{
         shapeAttr.forEach(function(d, i){
             d.forEach(function(dB, iB){
-                renderer.rect({rect: dB, fill: dB.color, stroke: dB.color});
+                renderer.rect({attributes: dB, fill: dB.color, stroke: dB.color});
             });
         });
     }
