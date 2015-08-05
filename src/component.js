@@ -33,31 +33,43 @@ cirrus.component.shapes = function(config, _config){
 
     //console.time('rendering');
 
-    if(_config.type === 'line'){
+    if(_config.type === 'line' && config.subtype === 'area'){
         shapeAttr.forEach(function(d, i){
-            var attributes = d;
             var previousAttributes = null;
             var strokeColor = d[0].color;
-            var fillColor = d[0].color;
-
-            if(config.subtype === 'area'){
-                fillColor = 'transparent';
-                if(i === 0){
-                    previousAttributes = JSON.parse(JSON.stringify(d))
-                        .map(function(d){
-                            d.y = _config.chartHeight;
-                            return d;
-                        });
-                }
-                else{
-                    previousAttributes = JSON.parse(JSON.stringify(shapeAttr[i-1]));
-                }
-                attributes = d.concat(previousAttributes.reverse());
+            var fillColor = 'transparent';
+            if(i === 0){
+                previousAttributes = JSON.parse(JSON.stringify(d))
+                    .map(function(d){
+                        d.y = _config.chartHeight;
+                        return d;
+                    });
             }
             else{
-                strokeColor = 'transparent';
+                previousAttributes = JSON.parse(JSON.stringify(shapeAttr[i-1]));
             }
+            var attributes = d.concat(previousAttributes.reverse());
             renderer.polygon({attributes: attributes, fill: strokeColor, stroke: fillColor});
+        });
+    }
+    else if(_config.type === 'line'){
+        shapeAttr.forEach(function(d, i){
+            var attributes = d;
+            var strokeColor = d[0].color;
+            var fillColor = d[0].color;
+            renderer.polygon({attributes: attributes, fill: strokeColor, stroke: fillColor});
+        });
+    }
+    else if(_config.type === 'grid' && _config.subtype === 'heatmap'){
+        shapeAttr.forEach(function(d, i){
+            d.forEach(function(dB, iB){
+                renderer.rect({attributes: dB, fill: dB.color, stroke: dB.color});
+            });
+        });
+    }
+    else if(_config.type === 'grid' && _config.subtype === 'contour'){
+        shapeAttr.forEach(function(d, i){
+            renderer.polygon({attributes: d, fill: d[0].color, stroke: d[0].color});
         });
     }
     else{

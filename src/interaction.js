@@ -11,7 +11,12 @@ cirrus.interaction.hovering = function(config, _config){
         });
 
     if(!!hoveringContainer.on('mousemove')){
-        return this;
+        return false;
+    }
+
+    //TODO how to display tooltips on a contour map?
+    if(_config.subtype === 'contour'){
+        return false;
     }
 
     hoveringContainer

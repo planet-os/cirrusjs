@@ -29,7 +29,7 @@ cirrus.automatic.config = function(config, _config){
     }
     _config.chartHeight = _config.height - config.margin.top - config.margin.bottom;
 
-    if(config.outerPadding === 'auto' || config.type === 'bar'){
+    if(config.outerPadding === 'auto' || config.type === 'bar' || _config.type === 'grid'){
         var keys = cirrus.utils.extractValues(_config.data, 'x');
         _config.outerPadding = _config.chartWidth / (keys[0].length) / 2;
     }
@@ -38,7 +38,7 @@ cirrus.automatic.config = function(config, _config){
         _config.outerPadding = 0;
     }
 
-    if(_config.subtype === 'grid'){
+    if(_config.type === 'grid'){
         _config.gutterPercent = 0;
         _config.multipleTooltip = false;
     }

@@ -4,7 +4,8 @@ cirrus.layout = {
     legend: {},
     fringes: {},
     line: {},
-    bar: {}
+    bar: {},
+    grid: {}
 };
 
 cirrus.layout.bar.simple = function(config, _config){
@@ -130,7 +131,13 @@ cirrus.layout.bar.percent = function(config, _config){
     });
 };
 
-cirrus.layout.bar.grid = function(config, _config){
+cirrus.layout.line.stacked = cirrus.layout.bar.stacked;
+
+cirrus.layout.line.area = cirrus.layout.bar.stacked;
+
+cirrus.layout.line.simple = cirrus.layout.bar.simple;
+
+cirrus.layout.grid.heatmap = function(config, _config){
     var previousValue = null;
     var minW = _config.chartWidth;
     _config.visibleData[0].values.forEach(function(d, i){
@@ -149,7 +156,6 @@ cirrus.layout.bar.grid = function(config, _config){
 
     return _config.visibleData.map(function(d, i){
 
-        var previous = null;
         return d.values.map(function(dB, iB){
 
             var key = cirrus.utils.getKey(config.scaleType, dB, iB);
@@ -165,19 +171,68 @@ cirrus.layout.bar.grid = function(config, _config){
                 height: gridH
             };
 
-            datum.previous = previous || datum;
-            previous = datum;
             return datum;
         });
 
     });
 };
 
-cirrus.layout.line.stacked = cirrus.layout.bar.stacked;
+cirrus.layout.grid.contour = function(config, _config){
+        if(!Conrec){
+            console.log('Conrec.js is needed for the contour layout to work.');
+            return false;
+        }
 
-cirrus.layout.line.area = cirrus.layout.bar.stacked;
+        var data2 = d3.transpose(_config.data.map(function(d){
+            return d.values.map(function(dB){
+                return dB.color;
+            });
+        }));
 
-cirrus.layout.line.simple = cirrus.layout.bar.simple;
+        var cliff = -1000;
+        data2.push(d3.range(data2[0].length).map(function() { return cliff; }));
+        data2.unshift(d3.range(data2[0].length).map(function() { return cliff; }));
+        data2.forEach(function(d) {
+            d.push(cliff);
+            d.unshift(cliff);
+        });
+
+        var layerNum = 15;
+        var dataMax = d3.max(d3.merge(data2));
+        var xs = d3.range(0, data2.length);
+        var ys = d3.range(0, data2[0].length);
+        var zs = d3.range(0, dataMax, dataMax / layerNum);
+
+        // This seems wrong...
+        var magicNumberA = _config.chartWidth / (data2.length-2);
+        var magicNumberB = _config.chartHeight / (data2[0].length-4);
+        var x = d3.scale.linear().range([-magicNumberA, _config.chartWidth + magicNumberA*2]).domain([0, data2.length]);
+        var y = d3.scale.linear().range([_config.chartHeight + magicNumberB, -magicNumberB*2]).domain([0, data2[0].length]);
+
+        var colorScale = d3.scale.linear().domain([0, dataMax]).range(["yellow", "red"]);
+        var c = new Conrec;
+        c.contour(data2, 0, xs.length - 1, 0, ys.length - 1, xs, ys, zs.length, zs);
+
+        var contourList = c.contourList();
+
+        var contourListScaled = contourList
+            .map(function(d){
+                return d.map(function(dB){
+                    return {x: x(dB.x), y: y(dB.y), color: colorScale(d.level)};
+                });
+            })
+            .sort(function(a, b){
+                var extentXA = d3.extent(a.map(function(d){ return d.x; }));
+                var extentYA = d3.extent(a.map(function(d){ return d.y; }));
+                var areaA = (extentXA[1] - extentXA[0]) * (extentYA[1] - extentYA[0]);
+                var extentXB = d3.extent(b.map(function(d){ return d.x; }));
+                var extentYB = d3.extent(b.map(function(d){ return d.y; }));
+                var areaB = (extentXB[1] - extentXB[0]) * (extentYB[1] - extentYB[0]);
+                return areaB - areaA;
+            });
+
+        return contourListScaled;
+    };
 
 cirrus.layout.axes.x = function(config, _config){
     var scaleX = _config.scaleX.copy();
