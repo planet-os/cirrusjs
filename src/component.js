@@ -55,7 +55,7 @@ cirrus.component.shapes = function(config, _config){
     else if(_config.type === 'line'){
         shapeAttr.forEach(function(d, i){
             var attributes = d;
-            var strokeColor = d[0].color;
+            var strokeColor = 'transparent';
             var fillColor = d[0].color;
             renderer.polygon({attributes: attributes, fill: strokeColor, stroke: fillColor});
         });

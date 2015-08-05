@@ -197,7 +197,7 @@ cirrus.layout.grid.contour = function(config, _config){
             d.unshift(cliff);
         });
 
-        var layerNum = 15;
+        var layerNum = 10;
         var dataMax = d3.max(d3.merge(data2));
         var xs = d3.range(0, data2.length);
         var ys = d3.range(0, data2[0].length);

@@ -34,12 +34,24 @@
 
 <script>
 
-    var data = cirrus.utils.getRandomHeatmapData(10, 10);
-
-    data[0].values = data[0].values.map(function(d, i){
-        d.color = i*10;
-        return d;
-    });
+    var data = [];
+    var values = [];
+    noise.seed(Math.random());
+    for (var x = 0; x < 20; x++) {
+        values = [];
+        for (var y = 0; y < 20; y++) {
+            var value = noise.simplex2(x / 8, y / 8);
+            values.push({
+                x: y,
+                y: x,
+                color: (value+1)/2 * 255
+            });
+        }
+        data.push({
+            name: 'row' + x,
+            values: values
+        });
+    }
 
     var config1 = {
         container: '.container',
@@ -48,10 +60,10 @@
         subtype: 'contour',
         axisXTickSkip: 8,
         showLegend: false,
-        renderer: 'svg',
+        renderer: 'canvas',
         multipleTooltip: false,
         labelFormatterX: function(d){
-            return d3.time.format('%e %b')(new Date(d));
+            return d;
         },
         tooltipFormatter: function(d){
             return d.data.color;
@@ -70,7 +82,7 @@
         renderer: 'svg',
         multipleTooltip: false,
         labelFormatterX: function(d){
-            return d3.time.format('%e %b')(new Date(d));
+            return d;
         },
         tooltipFormatter: function(d){
             return d.data.color;
