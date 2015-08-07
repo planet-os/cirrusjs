@@ -1,11 +1,11 @@
 cirrus.scale = {};
 
-cirrus.scale.x = function(config, _config){
+cirrus.scale.x = function(config){
 
-    var keys = cirrus.utils.extractValues(_config.visibleData, 'x');
+    var keys = cirrus.utils.extractValues(config.visibleData, 'x');
     var allKeys = d3.merge(keys);
 
-    var range = [_config.outerPadding, _config.chartWidth - _config.outerPadding];
+    var range = [config.outerPadding, config.chartWidth - config.outerPadding];
     var scaleX = null;
     if(config.scaleType === 'time'){
         scaleX = d3.time.scale().range(range);
@@ -27,16 +27,16 @@ cirrus.scale.x = function(config, _config){
     return scaleX;
 };
 
-cirrus.scale.y = function(config, _config){
+cirrus.scale.y = function(config){
 
-    var values = d3.merge(cirrus.utils.extractValues(_config.visibleData, 'y'));
+    var values = d3.merge(cirrus.utils.extractValues(config.visibleData, 'y'));
 
-    return d3.scale.linear().range([0, _config.chartHeight]).domain([0, d3.max(values)]);
+    return d3.scale.linear().range([0, config.chartHeight]).domain([0, d3.max(values)]);
 };
 
-cirrus.scale.color = function(config, _config){
+cirrus.scale.color = function(config){
 
-    var values = d3.merge(cirrus.utils.extractValues(_config.visibleData, 'color'));
+    var values = d3.merge(cirrus.utils.extractValues(config.visibleData, 'color'));
 
     return d3.scale.linear().range(['yellow', 'red']).domain([0, d3.max(values)]);
 };

@@ -1,6 +1,6 @@
 cirrus.data = {};
 
-cirrus.data.validate = function(config, _config, _data){
+cirrus.data.validate = function(config, _data){
 
     var dataIsValid = false;
     if(_data && typeof _data === 'object'){
@@ -10,19 +10,19 @@ cirrus.data.validate = function(config, _config, _data){
         });
         if(isNotNull){
             var data = JSON.parse(JSON.stringify(_data));
-            _config.previousData = data;
-            _config.data = data;
+            config.previousData = data;
+            config.data = data;
             dataIsValid = true;
         }
     }
-    else if(_config.previousData){
-        _config.data = _config.previousData;
+    else if(config.previousData){
+        config.data = config.previousData;
         dataIsValid = true;
     }
 
-    if(_config.data){
-        _config.visibleData = _config.data.filter(function(d){
-            return _config.dataLayersToHide.indexOf(d.name) === -1;
+    if(config.data){
+        config.visibleData = config.data.filter(function(d){
+            return config.dataLayersToHide.indexOf(d.name) === -1;
         });
     }
 

@@ -4,8 +4,8 @@ cirrus.init = function(initialConfig){
 
     var config = {
         container: '.container',
-        width: 'auto',
-        height: 'auto',
+        width: null,
+        height: null,
         margin: {top: 20, right: 20, bottom: 50, left: 50},
         type: 'bar',
         subtype: 'stacked',
@@ -14,9 +14,9 @@ cirrus.init = function(initialConfig){
         axisXAngle: null,
         tickSize: 8,
         minorTickSize: 4,
-        fringeSize: 8,
         tickYCount: 5,
-        axisXTickSkip: 'auto',
+        axisXTickSkip: 0,
+        fringeSize: 8,
         continuousXAxis: false,
         gutterPercent: 10,
         renderer: 'svg',
@@ -31,46 +31,40 @@ cirrus.init = function(initialConfig){
         chartTitle: null,
         axisXTitle: null,
         axisYTitle: null,
-        colorList: cirrus.utils.defaultColors
-    };
+        colorList: cirrus.utils.defaultColors,
+        multipleTooltip: true,
 
-    var _config = {
-        width: null,
-        height: null,
         chartWidth: 500,
         chartHeight: 500,
         data: null,
+        previousData: null,
         visibleData: null,
+        dataLayersToHide: [],
         shapeLayout: null,
-        scaleX: null,
-        scaleY: null,
         axesLayout: {},
         legendLayout: {},
         fringeLayout: {},
-        previousData: null,
-        container: null,
-        dataLayersToHide: [],
-        outerPadding: null,
-        gutterPercent: 10,
-        multipleTooltip: true,
+        scaleX: null,
+        scaleY: null,
         continuousXAxis: false,
-        type: 'bar',
-        subtype: 'stacked',
         events: d3.dispatch('hover', 'hoverOut', 'legendClick'),
         internalEvents: d3.dispatch('setHover', 'hideHover', 'resize', 'legendClick')
     };
+
+    var initialConfig = initialConfig;
 
     cirrus.utils.override(initialConfig, config);
 
     var exports = {};
 
-    exports.initialize = cirrus.utils.once(function(config, _config){
+    exports.initialize = cirrus.utils.once(function(config){
         var that = this;
-        _config.container = d3.select(config.container);
-        _config.container.html(cirrus.template.main);
 
-        _config.internalEvents.on('legendClick', function(toHide){
-            _config.dataLayersToHide = toHide;
+        config.container = d3.select(config.container);
+        config.container.html(cirrus.template.main);
+
+        config.internalEvents.on('legendClick', function(toHide){
+            config.dataLayersToHide = toHide;
             that.render();
         });
     });
@@ -85,7 +79,7 @@ cirrus.init = function(initialConfig){
     };
 
     exports._getConfig = function(){
-        return _config;
+        return config;
     };
 
     exports.resize = function(){
@@ -94,54 +88,55 @@ cirrus.init = function(initialConfig){
     };
 
     exports.downloadAsPNG = function(callback){
-        cirrus.utils.convertToImage(config, _config, callback);
+        cirrus.utils.convertToImage(config, callback);
         return this;
     };
 
     exports.setHovering = function(hoverData){
-        _config.internalEvents.setHover(hoverData);
+        config.internalEvents.setHover(hoverData);
         return this;
     };
 
     exports.hideHovering = function(){
-        _config.internalEvents.hideHover();
+        config.internalEvents.hideHover();
         return this;
     };
 
     exports.render = function(data){
 
-        if(!cirrus.data.validate(config, _config, data)){
+        if(!cirrus.data.validate(config, data)){
             console.error('Invalid data', data);
             return this;
         }
 
-        this.initialize.call(this, config, _config);
-        cirrus.automatic.config.call(this, config, _config);
+        this.initialize.call(this, config);
+        cirrus.automatic.configuration.call(this, initialConfig, config);
 
-        _config.scaleX = cirrus.scale.x(config, _config);
-        _config.scaleY = cirrus.scale.y(config, _config);
-        _config.scaleColor = cirrus.scale.color(config, _config);
+        config.scaleX = cirrus.scale.x(config);
+        config.scaleY = cirrus.scale.y(config);
+        config.scaleColor = cirrus.scale.color(config);
 
-        _config.shapeLayout = cirrus.layout[_config.type][_config.subtype](config, _config);
-        _config.axesLayout.x = cirrus.layout.axes.x(config, _config);
-        _config.axesLayout.y = cirrus.layout.axes.y(config, _config);
-        _config.legendLayout = cirrus.layout.legend(config, _config);
+        config.shapeLayout = cirrus.layout[config.type][config.subtype](config);
+        config.axesLayout.x = cirrus.layout.axes.x(config);
+        config.axesLayout.y = cirrus.layout.axes.y(config);
+        config.legendLayout = cirrus.layout.legend(config);
 
-        //_config.fringeLayout.y = cirrus.layout.fringes.y(config, _config);
-        //console.log(_config.fringeLayout.y);
+        //config.fringeLayout.y = cirrus.layout.fringes.y(config, config);
+        //console.log(config.fringeLayout.y);
 
-        cirrus.component.chart(config, _config);
-        cirrus.component.shapes(config, _config);
-        cirrus.component.axisX(config, _config);
-        cirrus.component.axisY(config, _config);
-        cirrus.component.title(config, _config);
-        cirrus.component.legend(config, _config);
-        cirrus.interaction.hovering(config, _config);
+        cirrus.component.chart(config);
+        cirrus.component.shapes(config);
+        cirrus.component.axisX(initialConfig, config);
+        cirrus.component.axisY(initialConfig, config);
+        cirrus.component.title(config);
+        cirrus.component.legend(config);
+
+        cirrus.interaction.hovering(config);
 
         return this;
     };
 
-    d3.rebind(exports, _config.events, "on");
+    d3.rebind(exports, config.events, "on");
 
     return exports;
 };

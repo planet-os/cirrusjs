@@ -2,7 +2,7 @@ cirrus.attribute = {
     axis: {}
 };
 
-cirrus.attribute.axis.labelX = function(config, _config){
+cirrus.attribute.axis.labelX = function(config){
     var labelAttr = {};
     if(config.axisXAngle < 0){
         labelAttr = {
@@ -37,7 +37,7 @@ cirrus.attribute.axis.labelX = function(config, _config){
     return labelAttr;
 };
 
-cirrus.attribute.axis.tickX = function(config, _config){
+cirrus.attribute.axis.tickX = function(config){
     var tickW = 1;
     return {
         left: function(d, i){
@@ -50,7 +50,7 @@ cirrus.attribute.axis.tickX = function(config, _config){
     };
 };
 
-cirrus.attribute.axis.gridX = function(config, _config){
+cirrus.attribute.axis.gridX = function(config){
     var lineW = 1;
     return {
         top: config.margin.top + 'px',
@@ -59,12 +59,12 @@ cirrus.attribute.axis.gridX = function(config, _config){
         },
         width: lineW + 'px',
         height: function(d, i){
-            return ((i % config.axisXTickSkip) ? 0 : _config.chartHeight) + 'px';
+            return ((i % config.axisXTickSkip) ? 0 : config.chartHeight) + 'px';
         }
     };
 };
 
-cirrus.attribute.axis.fringeX = function(config, _config){
+cirrus.attribute.axis.fringeX = function(config){
     var fringeColorScale = d3.scale.linear().domain([0, 1]).range(['yellow', 'limegreen']);
     return {
         left: function(d, i){
@@ -82,7 +82,7 @@ cirrus.attribute.axis.fringeX = function(config, _config){
     };
 };
 
-cirrus.attribute.axis.labelY = function(config, _config){
+cirrus.attribute.axis.labelY = function(config){
     return {
         position: 'absolute',
         left: function(d, i){
@@ -96,7 +96,7 @@ cirrus.attribute.axis.labelY = function(config, _config){
     };
 };
 
-cirrus.attribute.axis.tickY = function(config, _config){
+cirrus.attribute.axis.tickY = function(config){
     var lineH = 1;
     return {
         width: config.tickSize + 'px',
@@ -109,10 +109,10 @@ cirrus.attribute.axis.tickY = function(config, _config){
     };
 };
 
-cirrus.attribute.axis.gridY = function(config, _config){
+cirrus.attribute.axis.gridY = function(config){
     var lineH = 1;
     return {
-        width: _config.chartWidth + 'px',
+        width: config.chartWidth + 'px',
         height: lineH + 'px',
         position: 'absolute',
         left: config.margin.left + 'px',
@@ -122,7 +122,7 @@ cirrus.attribute.axis.gridY = function(config, _config){
     };
 };
 
-cirrus.attribute.axis.fringeY = function(config, _config){
+cirrus.attribute.axis.fringeY = function(config){
     var fringeColorScale = d3.scale.linear().domain([0, 1]).range(['yellow', 'limegreen']);
     var h = 3;
     return {

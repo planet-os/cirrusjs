@@ -1,49 +1,45 @@
 cirrus.automatic = {};
 
-cirrus.automatic.config = function(config, _config){
+cirrus.automatic.configuration = function(initialConfig, config){
 
-    if(config.type === 'auto'){
-        var dataLength = _config.data[0].values.length;
-        if(dataLength < config.autoTypeThreshold){
-            _config.type = 'bar';
-            _config.continuousXAxis = false;
-            _config.outerPadding = 'auto';
+    if(initialConfig.type === 'auto'){
+        var dataLength = config.data[0].values.length;
+        if(initialConfig.autoTypeThreshold && dataLength < initialConfig.autoTypeThreshold){
+            config.type = 'bar';
+            config.continuousXAxis = false;
+            config.outerPadding = 'auto';
         }
         else{
-            _config.type = 'line';
-            _config.continuousXAxis = true;
+            config.type = 'line';
+            config.continuousXAxis = true;
         }
     }
-    else{
-        _config.type = config.type;
-        _config.subtype = config.subtype;
+
+    if(initialConfig.width === 'auto' || !config.width){
+        config.width = config.container.node().offsetWidth;
+    }
+    config.chartWidth = config.width - config.margin.left - config.margin.right;
+
+    if(initialConfig.height === 'auto' || !config.height){
+        config.height = config.container.node().offsetHeight;
+    }
+    config.chartHeight = config.height - config.margin.top - config.margin.bottom;
+
+    if(initialConfig.outerPadding === 'auto' || config.type === 'bar' || config.type === 'grid'){
+        var keys = cirrus.utils.extractValues(config.data, 'x');
+        config.outerPadding = config.chartWidth / (keys[0].length) / 2;
     }
 
-    if(config.width === 'auto' || !config.width){
-        _config.width = _config.container.node().offsetWidth;
-    }
-    _config.chartWidth = _config.width - config.margin.left - config.margin.right;
-
-    if(config.height === 'auto' || !config.height){
-        _config.height = _config.container.node().offsetHeight;
-    }
-    _config.chartHeight = _config.height - config.margin.top - config.margin.bottom;
-
-    if(config.outerPadding === 'auto' || config.type === 'bar' || _config.type === 'grid'){
-        var keys = cirrus.utils.extractValues(_config.data, 'x');
-        _config.outerPadding = _config.chartWidth / (keys[0].length) / 2;
+    if(config.type === 'line'){
+        config.outerPadding = 0;
     }
 
-    if(_config.type === 'line'){
-        _config.outerPadding = 0;
+    if(config.type === 'grid'){
+        config.gutterPercent = 0;
+        config.multipleTooltip = false;
     }
 
-    if(_config.type === 'grid'){
-        _config.gutterPercent = 0;
-        _config.multipleTooltip = false;
-    }
-
-    _config.data.forEach(function(d, i){
+    config.data.forEach(function(d, i){
         if (d3.keys(d.values[0]).indexOf('color') > -1) {
             d.color = null;
         }
