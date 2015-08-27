@@ -1,4 +1,4 @@
-var cirrus = {version: '0.1.1'};
+var cirrus = {version: '0.1.2'};
 
 cirrus.init = function(initialConfig){
 
