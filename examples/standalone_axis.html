@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta http-equiv="content-type" content="text/html; charset=UTF-8">
+    <title></title>
+    <script type='text/javascript' src="../lib/d3.js"></script>
+
+    <script type='text/javascript' src="../src/core.js"></script>
+    <script type='text/javascript' src="../src/utils.js"></script>
+    <script type='text/javascript' src="../src/data.js"></script>
+    <script type='text/javascript' src="../src/automatic.js"></script>
+    <script type='text/javascript' src="../src/layout.js"></script>
+    <script type='text/javascript' src="../src/attribute.js"></script>
+    <script type='text/javascript' src="../src/template.js"></script>
+    <script type='text/javascript' src="../src/interaction.js"></script>
+    <script type='text/javascript' src="../src/renderer.js"></script>
+    <script type='text/javascript' src="../src/scale.js"></script>
+    <script type='text/javascript' src="../src/component.js"></script>
+
+    <link href="style.css" rel="stylesheet"/>
+    <style>
+        .container{
+            width: 600px;
+            height: 600px;
+        }
+    </style>
+</head>
+<body>
+
+<div class="container"></div>
+
+<script>
+
+    var config = {
+        container: '.container',
+        width: 'auto',
+        height: 'auto',
+        margin: {top: 20, right: 20, bottom: 50, left: 50},
+        type: 'bar',
+        subtype: 'stacked',
+        labelFormatterX: function(d){ return d; },
+        tooltipFormatter: function(d){ return d.data.y; },
+        axisXAngle: null,
+        tickSize: 8,
+        minorTickSize: 4,
+        fringeSize: 8,
+        tickYCount: 5,
+        axisXTickSkip: 'auto',
+        continuousXAxis: false,
+        gutterPercent: 10,
+        renderer: 'svg',
+        scaleType: 'time',
+        outerPadding: 0,
+        showFringe: false,
+        showAxes: true,
+        showXGrid: false,
+        showYGrid: false,
+        showLegend: false,
+        autoTypeThreshold: 30,
+        chartTitle: null,
+        axisXTitle: null,
+        axisYTitle: null,
+        colorList: cirrus.utils.defaultColors
+    };
+
+    var _config = {
+        width: null,
+        height: null,
+        chartWidth: 500,
+        chartHeight: 500,
+        data: null,
+        visibleData: null,
+        shapeLayout: null,
+        scaleX: null,
+        scaleY: null,
+        axesLayout: {},
+        legendLayout: {},
+        fringeLayout: {},
+        previousData: null,
+        container: null,
+        dataLayersToHide: [],
+        outerPadding: null,
+        gutterPercent: 10,
+        multipleTooltip: true,
+        continuousXAxis: false,
+        type: 'bar',
+        subtype: 'stacked',
+        events: d3.dispatch('hover', 'hoverOut', 'legendClick'),
+        internalEvents: d3.dispatch('setHover', 'hideHover', 'resize', 'legendClick')
+    };
+
+    _config.container = d3.select('.container');
+    _config.container.html(cirrus.template.main);
+    var data = cirrus.utils.getRandomTimeData(100, 5);
+
+    cirrus.data.validate(config, _config, data);
+    cirrus.automatic.config.call(this, config, _config);
+
+    _config.scaleX = cirrus.scale.x(config, _config);
+    _config.scaleY = cirrus.scale.y(config, _config);
+
+    _config.axesLayout.x = cirrus.layout.axes.x(config, _config);
+    _config.axesLayout.y = cirrus.layout.axes.y(config, _config);
+
+    cirrus.component.axisX(config, _config);
+    cirrus.component.axisY(config, _config);
+
+</script>
+
+</body>
+</html>

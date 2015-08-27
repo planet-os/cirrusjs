@@ -24,7 +24,7 @@ cirrus.init = function(initialConfig){
         outerPadding: 0,
         showFringe: false,
         showAxes: true,
-        showXGrid: false,
+        showXGrid: true,
         showYGrid: false,
         showLegend: false,
         autoTypeThreshold: 30,
@@ -46,7 +46,6 @@ cirrus.init = function(initialConfig){
         fringeLayout: {},
         scaleX: null,
         scaleY: null,
-        continuousXAxis: false,
         events: d3.dispatch('hover', 'hoverOut', 'legendClick'),
         internalEvents: d3.dispatch('setHover', 'hideHover', 'resize', 'legendClick')
     };
@@ -121,13 +120,10 @@ cirrus.init = function(initialConfig){
         config.axesLayout.y = cirrus.layout.axes.y(config);
         config.legendLayout = cirrus.layout.legend(config);
 
-        //config.fringeLayout.y = cirrus.layout.fringes.y(config, config);
-        //console.log(config.fringeLayout.y);
-
         cirrus.component.chart(config);
         cirrus.component.shapes(config);
-        cirrus.component.axisX(initialConfig, config);
-        cirrus.component.axisY(initialConfig, config);
+        cirrus.component.axisX(config);
+        cirrus.component.axisY(config);
         cirrus.component.title(config);
         cirrus.component.legend(config);
 

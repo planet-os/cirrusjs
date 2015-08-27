@@ -12,13 +12,9 @@ cirrus.renderer.svg = function(element){
         });
 
     svgRenderer.polygon = function(options){
-        var points = options.attributes.map(function(d){
-            return [d.x, d.y];
-        });
-
         svg.append('path')
             .attr({
-                d: 'M' + points.join('L'),
+                d: 'M' + options.points.join('L'),
                 fill: options.fill || 'silver',
                 stroke: options.stroke || 'silver'
             });
@@ -52,9 +48,6 @@ cirrus.renderer.canvas = function(element){
     var ctx = canvas.node().getContext("2d");
 
     canvasRenderer.polygon = function(options){
-        var points = options.attributes.map(function(d){
-            return [d.x, d.y];
-        });
 
         var fill = options.fill;
         if(options.fill === 'none' || !options.fill){
@@ -63,7 +56,7 @@ cirrus.renderer.canvas = function(element){
         ctx.fillStyle = fill;
         ctx.strokeStyle = options.stroke;
         ctx.beginPath();
-        points.forEach(function(d, i){
+        options.points.forEach(function(d, i){
             if(i === 0){
                 ctx.moveTo(d[0], d[1]);
             }

@@ -48,16 +48,21 @@ cirrus.component.shapes = function(config){
             else{
                 previousAttributes = JSON.parse(JSON.stringify(shapeAttr[i-1]));
             }
-            var attributes = d.concat(previousAttributes.reverse());
-            renderer.polygon({attributes: attributes, fill: strokeColor, stroke: fillColor});
+            var points = d.concat(previousAttributes.reverse())
+                .map(function(d){
+                    return [d.x, d.y];
+                });
+            renderer.polygon({points: points, fill: strokeColor, stroke: fillColor});
         });
     }
     else if(config.type === 'line'){
         shapeAttr.forEach(function(d, i){
-            var attributes = d;
+            var points = d.map(function(d){
+                    return [d.x, d.y];
+                });
             var strokeColor = 'transparent';
             var fillColor = d[0].color;
-            renderer.polygon({attributes: attributes, fill: strokeColor, stroke: fillColor});
+            renderer.polygon({points: points, fill: strokeColor, stroke: fillColor});
         });
     }
     else if(config.type === 'grid' && config.subtype === 'heatmap'){
@@ -69,7 +74,10 @@ cirrus.component.shapes = function(config){
     }
     else if(config.type === 'grid' && config.subtype === 'contour'){
         shapeAttr.forEach(function(d, i){
-            renderer.polygon({attributes: d, fill: d[0].color, stroke: d[0].color});
+            var points = d.map(function(d){
+                    return [d.x, d.y];
+                });
+            renderer.polygon({points: points, fill: d[0].color, stroke: d[0].color});
         });
     }
     else{
@@ -118,116 +126,73 @@ cirrus.component.title = function(config){
     }
 };
 
-cirrus.component.axisX = function(initialConfig, config){
+cirrus.component.axisX = function(config){
 
     if(!config.showAxes){
         return;
     }
 
-    var axisXContainer = config.container.select('.axis-x')
-        .style({
+    // TODO: use renderer (needs new text, line could proxy to polygon)
+
+    // in layout
+    config.axisXPositionLayout = function(){
+        return {
             width: config.chartWidth + 'px',
             height: config.margin.bottom + 'px',
-            position: 'absolute',
-            top: config.chartHeight + config.margin.top + 'px',
-            left: config.margin.left + 'px',
-            'border-top': '1px solid black'
-        });
-
-    if(config.showFringe){
-        var fringeX = axisXContainer.selectAll('div.fringe-x')
-            .data(config.shapeLayout[0]);
-
-        fringeX.enter().append('div').classed('fringe-x', true)
-            .style({position: 'absolute'});
-
-        fringeX.style(cirrus.attribute.axis.fringeX(config));
-
-        fringeX.exit().remove();
-    }
-
-    var labelsX = axisXContainer.selectAll('div.label')
-        .data(config.axesLayout.x);
-
-    labelsX.enter().append('div').classed('label', true)
-        .style({
             position: 'absolute'
+        };
+    };
+
+    var axisLines = cirrus.layout.axes.line(config);
+    var axisXContainer = config.container.select('.axis-x');
+    axisXContainer.append('div').classed('axis-x-line', true)
+        .style({position: 'absolute', 'background-color': 'black'})
+        .style({
+            top: axisLines.lineXTop,
+            left: axisLines.lineXLeft,
+            width: axisLines.lineXWidth,
+            height: axisLines.lineXHeight
         });
 
-    labelsX
-        .html(function(d, i){
-            return config.labelFormatterX(d.key, i);
-        })
-        .style(cirrus.attribute.axis.labelX(config));
-
-    labelsX.style(cirrus.attribute.axis.labelX(config));
-
-    labelsX.exit().remove();
-
-    var skipped = [];
-    if(initialConfig.axisXTickSkip === 'auto'){
-        var previous = null;
-        labelsX[0].forEach(function(d, i){
-            var hide = false;
-            if(previous){
-                hide = parseFloat(d.style.left) - parseFloat(previous.style.left) < d.offsetWidth;
-            }
-            if(!hide){
-                previous = d;
-            }
-            else{
-                skipped.push(i);
-            }
-            d3.select(d).style({opacity: +!hide});
-            return d.offsetWidth;
-        });
-    }
+    config.axesLayout.x.forEach(function(d){
+        axisXContainer.append('div').classed('label', true)
+            .style({position: 'absolute'})
+            .style({
+                top: d.top,
+                left: d.left,
+                'transform-origin': d['transform-origin'],
+                transform: d.transform
+            })
+            .html(d.label);
+    });
 
     if(config.showXGrid){
-        var gridX = config.container.select('.grid-x')
-            .selectAll('div.grid-line-x')
-            .data(config.axesLayout.x);
 
-        gridX.enter().append('div').classed('grid-line-x', true)
-            .style({position: 'absolute'})
-            .style({'background-color': '#eee'});
-
-        gridX.style(cirrus.attribute.axis.gridX(config));
-
-        if(initialConfig.axisXTickSkip === 'auto'){
-            gridX.style({
-                height: function(d, i){
-                    var toSkip = skipped.indexOf(i) !== -1;
-                    return (toSkip ? 0 : d.height) + 'px';
-                }
-            });
-        }
-
-        gridX.exit().remove();
-    }
-
-    var ticksX = axisXContainer.selectAll('div.tick')
-        .data(config.axesLayout.x);
-
-    ticksX.enter().append('div').classed('tick', true)
-        .style({position: 'absolute'})
-        .style({'background-color': 'black'});
-
-    ticksX.style(cirrus.attribute.axis.tickX(config));
-
-    if(initialConfig.axisXTickSkip === 'auto'){
-        ticksX.style({
-            height: function(d, i){
-                var toSkip = skipped.indexOf(i) !== -1;
-                return (toSkip ? config.minorTickSize : config.tickSize) + 'px';
-            }
+        config.axesLayout.x.forEach(function(d){
+            axisXContainer.append('div').classed('grid-line-x', true)
+                .style({position: 'absolute', 'background-color': 'black'})
+                .style({
+                    top: d.gridTop,
+                    left: d.gridLeft,
+                    width: d.gridWidth,
+                    height: d.gridHeight
+                });
         });
     }
 
-    ticksX.exit().remove();
+    config.axesLayout.x.forEach(function(d){
+        axisXContainer.append('div').classed('tick', true)
+            .style({position: 'absolute', 'background-color': 'black'})
+            .style({
+                top: d.tickTop,
+                left: d.tickLeft,
+                width: d.tickWidth,
+                height: d.tickHeight
+            });
+    });
 };
 
-cirrus.component.axisY = function(initialConfig, config){
+cirrus.component.axisY = function(config){
 
     if(!config.showAxes){
         return;
@@ -242,18 +207,6 @@ cirrus.component.axisY = function(initialConfig, config){
             left: 0 + 'px',
             'border-right': '1px solid black'
         });
-
-    if(config.showFringe){
-        var fringeY = axisYContainer.selectAll('div.fringe-y')
-            .data(config.shapeLayout[0]); // TODO only works for single layer
-
-        fringeY.enter().append('div').classed('fringe-y', true)
-            .style({position: 'absolute'});
-
-        fringeY.style(cirrus.attribute.axis.fringeY(config));
-
-        fringeY.exit().remove();
-    }
 
     if(config.showYGrid){
         var gridX = config.container.select('.grid-y')

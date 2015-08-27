@@ -50,7 +50,8 @@ var config = {
     type: 'line',
     subtype: 'area',
     labelFormatterX: labelFormatter,
-    renderer: renderer
+    renderer: renderer,
+    axisXTickSkip: 15
 };
 var data = cirrus.utils.getRandomTimeData(100, 5);
 var chart = cirrus.init(config).render(data);
@@ -60,7 +61,8 @@ var config = {
     type: 'line',
     subtype: 'stacked',
     labelFormatterX: labelFormatter,
-    renderer: renderer
+    renderer: renderer,
+    axisXTickSkip: 15
 };
 var data = cirrus.utils.getRandomTimeData(100, 5);
 var chart = cirrus.init(config).render(data);
@@ -70,7 +72,8 @@ var config = {
     type: 'line',
     subtype: 'simple',
     labelFormatterX: labelFormatter,
-    renderer: renderer
+    renderer: renderer,
+    axisXTickSkip: 15
 };
 var data = cirrus.utils.getRandomTimeData(100, 5);
 var chart = cirrus.init(config).render(data);
@@ -80,7 +83,8 @@ var config = {
     type: 'bar',
     subtype: 'simple',
     labelFormatterX: labelFormatter,
-    renderer: renderer
+    renderer: renderer,
+    axisXTickSkip: 15
 };
 var data = cirrus.utils.getRandomTimeData(100, 5);
 var chart = cirrus.init(config).render([data[0]]);
@@ -90,7 +94,8 @@ var config = {
     type: 'bar',
     subtype: 'stacked',
     labelFormatterX: labelFormatter,
-    renderer: renderer
+    renderer: renderer,
+    axisXTickSkip: 15
 };
 var data = cirrus.utils.getRandomTimeData(100, 5);
 var chart = cirrus.init(config).render(data);
@@ -100,7 +105,8 @@ var config = {
     type: 'bar',
     subtype: 'percent',
     labelFormatterX: labelFormatter,
-    renderer: renderer
+    renderer: renderer,
+    axisXTickSkip: 15
 };
 var data = cirrus.utils.getRandomTimeData(100, 5);
 var chart = cirrus.init(config).render(data);
@@ -110,7 +116,8 @@ var config = {
     type: 'grid',
     subtype: 'heatmap',
     labelFormatterX: labelFormatter,
-    renderer: renderer
+    renderer: renderer,
+    axisXTickSkip: 15
 };
 var data = cirrus.utils.getRandomHeatmapData(10, 10);
 var chart = cirrus.init(config).render(data);
