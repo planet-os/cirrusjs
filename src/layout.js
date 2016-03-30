@@ -263,6 +263,7 @@ cirrus.layout.axes.x = function(config){
         };
     });
 
+    var previousNotSkippedLabelWidth = 0;
     return ticks.map(function(d, i){
 
         var labelAttr = {};
@@ -270,27 +271,38 @@ cirrus.layout.axes.x = function(config){
         labelAttr.x = d.x;
         labelAttr.label = (i % config.axisXTickSkip) ? '' : d.label;
 
-        var fontSize = 0;
+        var fontSize = 8;
         var labelWidth = labelAttr.label.length * fontSize;
         var chartBottom = config.chartHeight + config.margin.top;
 
+        labelAttr['transform-origin'] = '0%';
+
         if(config.axisXAngle < 0){
-            labelAttr.left = config.margin.left + labelAttr.x - labelWidth + 'px';
-            labelAttr['transform-origin'] = '100%';
+            //labelAttr.left = config.margin.left + labelAttr.x - labelWidth + 'px';
+            labelAttr.left = config.margin.left + labelAttr.x + 'px';
             labelAttr.transform = 'rotate(' + config.axisXAngle + 'deg)';
         }
         else if(config.axisXAngle > 0){
             labelAttr.left = config.margin.left + labelAttr.x + 'px';
-            labelAttr['transform-origin'] = '0%';
             labelAttr.transform ='rotate(' + config.axisXAngle + 'deg)';
         }
         else{
-            labelAttr.left = config.margin.left + labelAttr.x - labelWidth / 2 + 'px';
-            labelAttr['transform-origin'] = '0%';
+            //labelAttr.left = config.margin.left + labelAttr.x - labelWidth / 2 + 'px';
+            labelAttr.left = config.margin.left + labelAttr.x + 'px';
             labelAttr.transform = 'rotate(0deg)';
         }
 
-        labelAttr.display = (i % config.axisXTickSkip) ? 'none' : 'block';
+        var isSkipped = false;
+        if(config.axisXTickSkip === 'auto'){
+            if(d.x >= previousNotSkippedLabelWidth){
+                previousNotSkippedLabelWidth = d.x + labelWidth;
+            }
+            else{
+                isSkipped = true;
+            }
+        }
+
+        labelAttr.skipped = (isSkipped || !!(i % config.axisXTickSkip));
         labelAttr.top = chartBottom + config.tickSize + 'px';
 
         var tickW = 1;
@@ -333,7 +345,7 @@ cirrus.layout.axes.y = function(config){
     return d3.range(config.tickYCount).map(function(d, i){
         var value = i * domainMax / (config.tickYCount - 1);
         return {
-            label: value,
+            label: config.labelFormatterY(value),
             stackedLabel: i * stackedDomainMax / (config.tickYCount - 1),
             labelY: scaleY(value)
         };

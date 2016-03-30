@@ -18,6 +18,9 @@ cirrus.init = function(initialConfig) {
         labelFormatterX: function(d) {
             return d;
         },
+        labelFormatterY: function(d) {
+            return d;
+        },
         tooltipFormatter: function(d) {
             return d.data.y;
         },
@@ -33,7 +36,8 @@ cirrus.init = function(initialConfig) {
         scaleType: "time",
         outerPadding: 0,
         showFringe: false,
-        showAxes: true,
+        showXAxis: true,
+        showYAxis: true,
         showXGrid: true,
         showYGrid: false,
         showLegend: false,
@@ -586,28 +590,35 @@ cirrus.layout.axes.x = function(config) {
             label: config.labelFormatterX(d.x, i) + ""
         };
     });
+    var previousNotSkippedLabelWidth = 0;
     return ticks.map(function(d, i) {
         var labelAttr = {};
         labelAttr.key = d.key;
         labelAttr.x = d.x;
         labelAttr.label = i % config.axisXTickSkip ? "" : d.label;
-        var fontSize = 0;
+        var fontSize = 8;
         var labelWidth = labelAttr.label.length * fontSize;
         var chartBottom = config.chartHeight + config.margin.top;
+        labelAttr["transform-origin"] = "0%";
         if (config.axisXAngle < 0) {
-            labelAttr.left = config.margin.left + labelAttr.x - labelWidth + "px";
-            labelAttr["transform-origin"] = "100%";
+            labelAttr.left = config.margin.left + labelAttr.x + "px";
             labelAttr.transform = "rotate(" + config.axisXAngle + "deg)";
         } else if (config.axisXAngle > 0) {
             labelAttr.left = config.margin.left + labelAttr.x + "px";
-            labelAttr["transform-origin"] = "0%";
             labelAttr.transform = "rotate(" + config.axisXAngle + "deg)";
         } else {
-            labelAttr.left = config.margin.left + labelAttr.x - labelWidth / 2 + "px";
-            labelAttr["transform-origin"] = "0%";
+            labelAttr.left = config.margin.left + labelAttr.x + "px";
             labelAttr.transform = "rotate(0deg)";
         }
-        labelAttr.display = i % config.axisXTickSkip ? "none" : "block";
+        var isSkipped = false;
+        if (config.axisXTickSkip === "auto") {
+            if (d.x >= previousNotSkippedLabelWidth) {
+                previousNotSkippedLabelWidth = d.x + labelWidth;
+            } else {
+                isSkipped = true;
+            }
+        }
+        labelAttr.skipped = isSkipped || !!(i % config.axisXTickSkip);
         labelAttr.top = chartBottom + config.tickSize + "px";
         var tickW = 1;
         labelAttr.tickTop = chartBottom + "px";
@@ -642,7 +653,7 @@ cirrus.layout.axes.y = function(config) {
     return d3.range(config.tickYCount).map(function(d, i) {
         var value = i * domainMax / (config.tickYCount - 1);
         return {
-            label: value,
+            label: config.labelFormatterY(value),
             stackedLabel: i * stackedDomainMax / (config.tickYCount - 1),
             labelY: scaleY(value)
         };
@@ -1156,7 +1167,7 @@ cirrus.component.title = function(config) {
 };
 
 cirrus.component.axisX = function(config) {
-    if (!config.showAxes) {
+    if (!config.showXAxis) {
         return;
     }
     config.axisXPositionLayout = function() {
@@ -1184,7 +1195,8 @@ cirrus.component.axisX = function(config) {
             top: d.top,
             left: d.left,
             "transform-origin": d["transform-origin"],
-            transform: d.transform
+            transform: d.transform,
+            display: d.skipped ? "none" : "block"
         }).html(d.label);
     });
     if (config.showXGrid) {
@@ -1196,7 +1208,8 @@ cirrus.component.axisX = function(config) {
                 top: d.gridTop,
                 left: d.gridLeft,
                 width: d.gridWidth,
-                height: d.gridHeight
+                height: d.gridHeight,
+                display: d.skipped ? "none" : "block"
             });
         });
     }
@@ -1208,13 +1221,14 @@ cirrus.component.axisX = function(config) {
             top: d.tickTop,
             left: d.tickLeft,
             width: d.tickWidth,
-            height: d.tickHeight
+            height: d.tickHeight,
+            display: d.skipped ? "none" : "block"
         });
     });
 };
 
 cirrus.component.axisY = function(config) {
-    if (!config.showAxes) {
+    if (!config.showYAxis) {
         return;
     }
     var axisYContainer = config.container.select(".axis-y").style({
@@ -1238,7 +1252,7 @@ cirrus.component.axisY = function(config) {
     var labelsY = axisYContainer.selectAll("div.label").data(config.axesLayout.y);
     labelsY.enter().append("div").classed("label", true);
     labelsY.html(function(d, i) {
-        if (config.subtype === "simple" || config.subtype === "grid") {
+        if (config.subtype === "simple" || config.subtype === "grid" || config.subtype === "area") {
             return d.label;
         } else {
             return d.stackedLabel;

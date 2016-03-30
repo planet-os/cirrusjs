@@ -128,7 +128,7 @@ cirrus.component.title = function(config){
 
 cirrus.component.axisX = function(config){
 
-    if(!config.showAxes){
+    if(!config.showXAxis){
         return;
     }
 
@@ -161,7 +161,8 @@ cirrus.component.axisX = function(config){
                 top: d.top,
                 left: d.left,
                 'transform-origin': d['transform-origin'],
-                transform: d.transform
+                transform: d.transform,
+                display: d.skipped ? 'none' : 'block'
             })
             .html(d.label);
     });
@@ -175,7 +176,8 @@ cirrus.component.axisX = function(config){
                     top: d.gridTop,
                     left: d.gridLeft,
                     width: d.gridWidth,
-                    height: d.gridHeight
+                    height: d.gridHeight,
+                    display: d.skipped ? 'none' : 'block'
                 });
         });
     }
@@ -187,14 +189,15 @@ cirrus.component.axisX = function(config){
                 top: d.tickTop,
                 left: d.tickLeft,
                 width: d.tickWidth,
-                height: d.tickHeight
+                height: d.tickHeight,
+                display: d.skipped ? 'none' : 'block'
             });
     });
 };
 
 cirrus.component.axisY = function(config){
 
-    if(!config.showAxes){
+    if(!config.showYAxis){
         return;
     }
 
@@ -229,7 +232,7 @@ cirrus.component.axisY = function(config){
 
     labelsY
         .html(function(d, i){
-            if(config.subtype === 'simple' || config.subtype === 'grid'){
+            if(config.subtype === 'simple' || config.subtype === 'grid' || config.subtype === "area"){
                 return d.label;
             }
             else{
